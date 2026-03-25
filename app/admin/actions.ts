@@ -1,8 +1,5 @@
 "use server";
 
-import { mkdir, writeFile } from "fs/promises";
-import { randomUUID } from "crypto";
-import path from "path";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
@@ -11,10 +8,11 @@ import {
   requireAdmin,
   verifyAdminCredentials
 } from "@/lib/admin-auth";
-import { makeId, readStore, writeStore } from "@/lib/content-store";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { makeId } from "@/lib/content-store";
 import { parseLanguageLines } from "@/lib/content-utils";
 import { joinLines, splitLines } from "@/lib/project-helpers";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { uploadProjectImage } from "@/lib/supabase/storage";
 import type { AdminFormState } from "@/app/admin/form-state";
 import {
   aboutFormSchema,
@@ -29,38 +27,19 @@ function extractField(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
 }
 
-function sanitizeFileName(value: string) {
-  return value
-    .normalize("NFKD")
-    .replace(/[^a-zA-Z0-9.-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .toLowerCase();
-}
-
-async function saveUploadedFile(file: File, folder: string, slugBase: string) {
-  const extension = path.extname(file.name) || ".bin";
-  const safeBase = sanitizeFileName(slugBase || file.name || "asset") || "asset";
-  const filename = `${safeBase}-${Date.now()}-${randomUUID().slice(0, 8)}${extension}`;
-  const uploadDirectory = path.join(process.cwd(), "public", folder);
-  await mkdir(uploadDirectory, { recursive: true });
-
-  const bytes = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDirectory, filename), bytes);
-
-  return `/${folder}/${filename}`;
-}
-
 function revalidatePortfolioPaths(slug?: string) {
   revalidatePath("/");
   revalidatePath("/portfolio");
   revalidatePath("/about");
   revalidatePath("/experience");
   revalidatePath("/education");
+  revalidatePath("/contact");
+  revalidatePath("/admin");
   revalidatePath("/admin/projects");
   revalidatePath("/admin/about");
   revalidatePath("/admin/experience");
   revalidatePath("/admin/education");
+
   if (slug) {
     revalidatePath(`/portfolio/${slug}`);
   }
@@ -115,19 +94,21 @@ export async function saveProjectAction(
 ): Promise<AdminFormState> {
   await requireAdmin();
 
-  const slugBase = extractField(formData, "slug") || extractField(formData, "shortTitle") || "project";
+  const slugBase =
+    extractField(formData, "slug") || extractField(formData, "shortTitle") || "project";
+
   const heroUpload = formData.get("heroImageFile");
   const galleryUploads = formData.getAll("galleryImageFiles");
 
   const uploadedHeroImage =
     heroUpload instanceof File && heroUpload.size > 0
-      ? await saveUploadedFile(heroUpload, "uploads/projects", slugBase)
+      ? await uploadProjectImage(heroUpload, slugBase)
       : "";
 
   const uploadedGalleryImages = await Promise.all(
     galleryUploads
       .filter((item): item is File => item instanceof File && item.size > 0)
-      .map((file, index) => saveUploadedFile(file, "uploads/projects", `${slugBase}-gallery-${index + 1}`))
+      .map((file, index) => uploadProjectImage(file, `${slugBase}-gallery-${index + 1}`))
   );
 
   const galleryLines = [...splitLines(extractField(formData, "gallery")), ...uploadedGalleryImages];
@@ -161,9 +142,19 @@ export async function saveProjectAction(
   }
 
   try {
-    const store = await readStore();
-    const existingSlug = store.projects.find(
-      (project) => project.slug === parsed.data.slug && project.id !== parsed.data.id
+    const supabase = createSupabaseAdminClient();
+
+    const { data: duplicateSlugRows, error: duplicateSlugError } = await supabase
+      .from("portfolio_projects")
+      .select("id, slug")
+      .eq("slug", parsed.data.slug);
+
+    if (duplicateSlugError) {
+      throw duplicateSlugError;
+    }
+
+    const existingSlug = (duplicateSlugRows ?? []).find(
+      (project) => project.id !== parsed.data.id
     );
 
     if (existingSlug) {
@@ -177,42 +168,42 @@ export async function saveProjectAction(
     }
 
     const now = new Date().toISOString();
+    const id = parsed.data.id ?? makeId("project");
+
     const payload = {
+      id,
       slug: parsed.data.slug,
       title: parsed.data.title,
-      shortTitle: parsed.data.shortTitle,
+      short_title: parsed.data.shortTitle,
       excerpt: parsed.data.excerpt,
       summary: parsed.data.summary,
       category: parsed.data.category,
       year: parsed.data.year,
       featured: parsed.data.featured,
-      heroImage: parsed.data.heroImage,
+      hero_image: parsed.data.heroImage,
       tools: splitLines(parsed.data.tools),
       gallery: splitLines(parsed.data.gallery),
       goals: splitLines(parsed.data.goals),
       process: splitLines(parsed.data.process),
       outcome: splitLines(parsed.data.outcome),
-      updatedAt: now
+      updated_at: now
     };
 
     if (parsed.data.id) {
-      store.projects = store.projects.map((project) =>
-        project.id === parsed.data.id
-          ? {
-              ...project,
-              ...payload
-            }
-          : project
-      );
-    } else {
-      store.projects.push({
-        id: makeId("project"),
-        createdAt: now,
-        ...payload
-      });
-    }
+      const { error } = await supabase
+        .from("portfolio_projects")
+        .update(payload)
+        .eq("id", parsed.data.id);
 
-    await writeStore(store);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from("portfolio_projects").insert({
+        ...payload,
+        created_at: now
+      });
+
+      if (error) throw error;
+    }
   } catch (error) {
     console.error("Save project error:", error);
     return {
@@ -236,9 +227,12 @@ export async function deleteProjectAction(formData: FormData) {
   }
 
   try {
-    const store = await readStore();
-    store.projects = store.projects.filter((project) => project.id !== id);
-    await writeStore(store);
+    const supabase = createSupabaseAdminClient();
+    const { error } = await supabase.from("portfolio_projects").delete().eq("id", id);
+
+    if (error) {
+      throw error;
+    }
   } catch (error) {
     console.error("Delete project error:", error);
     redirect("/admin/projects?status=error");
@@ -274,18 +268,25 @@ export async function saveAboutAction(
   }
 
   try {
-    const store = await readStore();
-    store.about = {
-      heroTitle: parsed.data.heroTitle,
-      heroDescription: parsed.data.heroDescription,
-      profileTitle: parsed.data.profileTitle,
-      profileParagraphs: splitLines(parsed.data.profileText),
-      workTitle: parsed.data.workTitle,
-      workParagraphs: splitLines(parsed.data.workText),
-      strengths: splitLines(parsed.data.strengths),
-      languages: parseLanguageLines(parsed.data.languages)
-    };
-    await writeStore(store);
+    const supabase = createSupabaseAdminClient();
+
+    const { error } = await supabase.from("about_content").upsert(
+      {
+        id: 1,
+        hero_title: parsed.data.heroTitle,
+        hero_description: parsed.data.heroDescription,
+        profile_title: parsed.data.profileTitle,
+        profile_paragraphs: splitLines(parsed.data.profileText),
+        work_title: parsed.data.workTitle,
+        work_paragraphs: splitLines(parsed.data.workText),
+        strengths: splitLines(parsed.data.strengths),
+        languages: parseLanguageLines(parsed.data.languages),
+        updated_at: new Date().toISOString()
+      },
+      { onConflict: "id" }
+    );
+
+    if (error) throw error;
   } catch (error) {
     console.error("Save about error:", error);
     return {
@@ -324,29 +325,25 @@ export async function saveExperienceAction(
   }
 
   try {
-    const store = await readStore();
-    const payload = {
-      company: parsed.data.company,
-      role: parsed.data.role,
-      location: parsed.data.location,
-      period: parsed.data.period,
-      summary: parsed.data.summary,
-      bullets: splitLines(parsed.data.bullets),
-      sortOrder: parsed.data.sortOrder
-    };
+    const supabase = createSupabaseAdminClient();
+    const id = parsed.data.id ?? makeId("experience");
 
-    if (parsed.data.id) {
-      store.experience = store.experience.map((item) =>
-        item.id === parsed.data.id ? { ...item, ...payload } : item
-      );
-    } else {
-      store.experience.push({
-        id: makeId("experience"),
-        ...payload
-      });
-    }
+    const { error } = await supabase.from("experience_entries").upsert(
+      {
+        id,
+        company: parsed.data.company,
+        role: parsed.data.role,
+        location: parsed.data.location,
+        period: parsed.data.period,
+        summary: parsed.data.summary,
+        bullets: splitLines(parsed.data.bullets),
+        sort_order: Number(parsed.data.sortOrder) || 0,
+        updated_at: new Date().toISOString()
+      },
+      { onConflict: "id" }
+    );
 
-    await writeStore(store);
+    if (error) throw error;
   } catch (error) {
     console.error("Save experience error:", error);
     return {
@@ -368,9 +365,10 @@ export async function deleteExperienceAction(formData: FormData) {
   }
 
   try {
-    const store = await readStore();
-    store.experience = store.experience.filter((item) => item.id !== id);
-    await writeStore(store);
+    const supabase = createSupabaseAdminClient();
+    const { error } = await supabase.from("experience_entries").delete().eq("id", id);
+
+    if (error) throw error;
   } catch (error) {
     console.error("Delete experience error:", error);
     redirect("/admin/experience?status=error");
@@ -404,27 +402,23 @@ export async function saveEducationAction(
   }
 
   try {
-    const store = await readStore();
-    const payload = {
-      institution: parsed.data.institution,
-      degree: parsed.data.degree,
-      period: parsed.data.period,
-      description: parsed.data.description,
-      sortOrder: parsed.data.sortOrder
-    };
+    const supabase = createSupabaseAdminClient();
+    const id = parsed.data.id ?? makeId("education");
 
-    if (parsed.data.id) {
-      store.education = store.education.map((item) =>
-        item.id === parsed.data.id ? { ...item, ...payload } : item
-      );
-    } else {
-      store.education.push({
-        id: makeId("education"),
-        ...payload
-      });
-    }
+    const { error } = await supabase.from("education_entries").upsert(
+      {
+        id,
+        institution: parsed.data.institution,
+        degree: parsed.data.degree,
+        period: parsed.data.period,
+        description: parsed.data.description,
+        sort_order: Number(parsed.data.sortOrder) || 0,
+        updated_at: new Date().toISOString()
+      },
+      { onConflict: "id" }
+    );
 
-    await writeStore(store);
+    if (error) throw error;
   } catch (error) {
     console.error("Save education error:", error);
     return {
@@ -446,9 +440,10 @@ export async function deleteEducationAction(formData: FormData) {
   }
 
   try {
-    const store = await readStore();
-    store.education = store.education.filter((item) => item.id !== id);
-    await writeStore(store);
+    const supabase = createSupabaseAdminClient();
+    const { error } = await supabase.from("education_entries").delete().eq("id", id);
+
+    if (error) throw error;
   } catch (error) {
     console.error("Delete education error:", error);
     redirect("/admin/education?status=error");
@@ -482,27 +477,23 @@ export async function saveCertificationAction(
   }
 
   try {
-    const store = await readStore();
-    const payload = {
-      title: parsed.data.title,
-      issuer: parsed.data.issuer,
-      year: parsed.data.year,
-      href: parsed.data.href || undefined,
-      sortOrder: parsed.data.sortOrder
-    };
+    const supabase = createSupabaseAdminClient();
+    const id = parsed.data.id ?? makeId("certification");
 
-    if (parsed.data.id) {
-      store.certifications = store.certifications.map((item) =>
-        item.id === parsed.data.id ? { ...item, ...payload } : item
-      );
-    } else {
-      store.certifications.push({
-        id: makeId("certification"),
-        ...payload
-      });
-    }
+    const { error } = await supabase.from("certification_entries").upsert(
+      {
+        id,
+        title: parsed.data.title,
+        issuer: parsed.data.issuer,
+        year: parsed.data.year,
+        href: parsed.data.href || null,
+        sort_order: Number(parsed.data.sortOrder) || 0,
+        updated_at: new Date().toISOString()
+      },
+      { onConflict: "id" }
+    );
 
-    await writeStore(store);
+    if (error) throw error;
   } catch (error) {
     console.error("Save certification error:", error);
     return {
@@ -524,9 +515,13 @@ export async function deleteCertificationAction(formData: FormData) {
   }
 
   try {
-    const store = await readStore();
-    store.certifications = store.certifications.filter((item) => item.id !== id);
-    await writeStore(store);
+    const supabase = createSupabaseAdminClient();
+    const { error } = await supabase
+      .from("certification_entries")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
   } catch (error) {
     console.error("Delete certification error:", error);
     redirect("/admin/education?status=error");
