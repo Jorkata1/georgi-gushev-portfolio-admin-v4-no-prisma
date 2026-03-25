@@ -4,7 +4,7 @@ import {
   education as seedEducation
 } from "@/data/education";
 import { experience as seedExperience } from "@/data/experience";
-import { readStore } from "@/lib/content-store";
+import { createSupabasePublicClient } from "@/lib/supabase/public";
 import type {
   AboutContent,
   CertificationItem,
@@ -12,87 +12,116 @@ import type {
   ExperienceItem
 } from "@/types";
 
+type ExperienceItemNormalized = ExperienceItem & {
+  id: string;
+  sortOrder: number;
+};
+
+type EducationItemNormalized = EducationItem & {
+  id: string;
+  sortOrder: number;
+};
+
+type CertificationItemNormalized = CertificationItem & {
+  id: string;
+  sortOrder: number;
+};
+
 const fallbackAbout: AboutContent = aboutContentSeed;
 
-const fallbackExperience: ExperienceItem[] = seedExperience.map((item, index) => ({
-  ...item,
-  id: item.id ?? `experience-seed-${index + 1}`,
-  sortOrder: item.sortOrder ?? index
-}));
-
-const fallbackEducation: EducationItem[] = seedEducation.map((item, index) => ({
-  ...item,
-  id: item.id ?? `education-seed-${index + 1}`,
-  sortOrder: item.sortOrder ?? index
-}));
-
-const fallbackCertifications: CertificationItem[] = seedCertifications.map(
+const fallbackExperience: ExperienceItemNormalized[] = seedExperience.map(
   (item, index) => ({
     ...item,
-    id: item.id ?? `certification-seed-${index + 1}`,
+    id: item.id ?? `experience-seed-${index + 1}`,
     sortOrder: item.sortOrder ?? index
   })
 );
 
-function sortByOrder<T extends { sortOrder?: number }>(items: T[]) {
-  return [...items].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+const fallbackEducation: EducationItemNormalized[] = seedEducation.map(
+  (item, index) => ({
+    ...item,
+    id: item.id ?? `education-seed-${index + 1}`,
+    sortOrder: item.sortOrder ?? index
+  })
+);
+
+const fallbackCertifications: CertificationItemNormalized[] =
+  seedCertifications.map((item, index) => ({
+    ...item,
+    id: item.id ?? `certification-seed-${index + 1}`,
+    sortOrder: item.sortOrder ?? index
+  }));
+
+async function withFallback<T>(resolver: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await resolver();
+  } catch (error) {
+    console.warn("Content fallback activated:", error);
+    return fallback;
+  }
 }
 
-function normalizeExperienceItems(items: ExperienceItem[]): ExperienceItem[] {
-  return sortByOrder(
-    items.map((item, index) => ({
-      ...item,
-      id: item.id ?? `experience-${index + 1}`,
-      sortOrder: item.sortOrder ?? index
-    }))
-  );
+function sortExperience(items: ExperienceItemNormalized[]): ExperienceItemNormalized[] {
+  return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
-function normalizeEducationItems(items: EducationItem[]): EducationItem[] {
-  return sortByOrder(
-    items.map((item, index) => ({
-      ...item,
-      id: item.id ?? `education-${index + 1}`,
-      sortOrder: item.sortOrder ?? index
-    }))
-  );
+function sortEducation(items: EducationItemNormalized[]): EducationItemNormalized[] {
+  return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
-function normalizeCertificationItems(
-  items: CertificationItem[]
-): CertificationItem[] {
-  return sortByOrder(
-    items.map((item, index) => ({
-      ...item,
-      id: item.id ?? `certification-${index + 1}`,
-      sortOrder: item.sortOrder ?? index
-    }))
-  );
+function sortCertifications(
+  items: CertificationItemNormalized[]
+): CertificationItemNormalized[] {
+  return [...items].sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
 export async function getAboutContent(): Promise<AboutContent> {
-  try {
-    const store = await readStore();
-    return store.about ?? fallbackAbout;
-  } catch (error) {
-    console.warn("About content fallback activated:", error);
-    return fallbackAbout;
-  }
+  return withFallback(async () => {
+    const supabase = createSupabasePublicClient();
+    const { data, error } = await supabase
+      .from("about_content")
+      .select("*")
+      .eq("id", 1)
+      .single();
+
+    if (error) throw error;
+
+    return {
+      heroTitle: data.hero_title,
+      heroDescription: data.hero_description,
+      profileTitle: data.profile_title,
+      profileParagraphs: data.profile_paragraphs ?? [],
+      workTitle: data.work_title,
+      workParagraphs: data.work_paragraphs ?? [],
+      strengths: data.strengths ?? [],
+      languages: data.languages ?? []
+    };
+  }, fallbackAbout);
 }
 
 export async function getExperienceItems(): Promise<ExperienceItem[]> {
-  try {
-    const store = await readStore();
-    const items =
-      store.experience && store.experience.length > 0
-        ? store.experience
-        : fallbackExperience;
+  return withFallback(async () => {
+    const supabase = createSupabasePublicClient();
+    const { data, error } = await supabase
+      .from("experience_entries")
+      .select("*")
+      .order("sort_order", { ascending: true });
 
-    return normalizeExperienceItems(items);
-  } catch (error) {
-    console.warn("Experience fallback activated:", error);
-    return normalizeExperienceItems(fallbackExperience);
-  }
+    if (error) throw error;
+
+    const items: ExperienceItemNormalized[] = (data ?? []).map((item, index) => ({
+      id: item.id ?? `experience-${index + 1}`,
+      sortOrder: item.sort_order ?? index,
+      company: item.company,
+      role: item.role,
+      location: item.location,
+      period: item.period,
+      summary: item.summary,
+      bullets: item.bullets ?? []
+    }));
+
+    return sortExperience(items);
+  }, fallbackExperience);
 }
 
 export async function getExperienceItemById(
@@ -103,18 +132,26 @@ export async function getExperienceItemById(
 }
 
 export async function getEducationItems(): Promise<EducationItem[]> {
-  try {
-    const store = await readStore();
-    const items =
-      store.education && store.education.length > 0
-        ? store.education
-        : fallbackEducation;
+  return withFallback(async () => {
+    const supabase = createSupabasePublicClient();
+    const { data, error } = await supabase
+      .from("education_entries")
+      .select("*")
+      .order("sort_order", { ascending: true });
 
-    return normalizeEducationItems(items);
-  } catch (error) {
-    console.warn("Education fallback activated:", error);
-    return normalizeEducationItems(fallbackEducation);
-  }
+    if (error) throw error;
+
+    const items: EducationItemNormalized[] = (data ?? []).map((item, index) => ({
+      id: item.id ?? `education-${index + 1}`,
+      sortOrder: item.sort_order ?? index,
+      institution: item.institution,
+      degree: item.degree,
+      period: item.period,
+      description: item.description
+    }));
+
+    return sortEducation(items);
+  }, fallbackEducation);
 }
 
 export async function getEducationItemById(
@@ -125,18 +162,26 @@ export async function getEducationItemById(
 }
 
 export async function getCertificationItems(): Promise<CertificationItem[]> {
-  try {
-    const store = await readStore();
-    const items =
-      store.certifications && store.certifications.length > 0
-        ? store.certifications
-        : fallbackCertifications;
+  return withFallback(async () => {
+    const supabase = createSupabasePublicClient();
+    const { data, error } = await supabase
+      .from("certification_entries")
+      .select("*")
+      .order("sort_order", { ascending: true });
 
-    return normalizeCertificationItems(items);
-  } catch (error) {
-    console.warn("Certifications fallback activated:", error);
-    return normalizeCertificationItems(fallbackCertifications);
-  }
+    if (error) throw error;
+
+    const items: CertificationItemNormalized[] = (data ?? []).map((item, index) => ({
+      id: item.id ?? `certification-${index + 1}`,
+      sortOrder: item.sort_order ?? index,
+      title: item.title,
+      issuer: item.issuer,
+      year: item.year,
+      href: item.href ?? undefined
+    }));
+
+    return sortCertifications(items);
+  }, fallbackCertifications);
 }
 
 export async function getCertificationItemById(

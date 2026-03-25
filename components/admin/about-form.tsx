@@ -11,6 +11,9 @@ import type { AboutContent } from "@/types";
 export function AboutForm({ content }: { content: AboutContent }) {
   const [state, formAction] = useFormState(saveAboutAction, initialAdminFormState);
 
+  const fieldErrors = state?.fieldErrors ?? {};
+  const message = state?.message;
+
   return (
     <form action={formAction} className="space-y-8">
       <div className="grid gap-6 md:grid-cols-2">
@@ -18,7 +21,7 @@ export function AboutForm({ content }: { content: AboutContent }) {
           label="Hero заглавие"
           name="heroTitle"
           defaultValue={content.heroTitle}
-          error={state.fieldErrors?.heroTitle?.[0]}
+          error={fieldErrors.heroTitle?.[0]}
           textarea
           rows={3}
         />
@@ -26,7 +29,7 @@ export function AboutForm({ content }: { content: AboutContent }) {
           label="Hero описание"
           name="heroDescription"
           defaultValue={content.heroDescription}
-          error={state.fieldErrors?.heroDescription?.[0]}
+          error={fieldErrors.heroDescription?.[0]}
           textarea
           rows={3}
         />
@@ -37,13 +40,13 @@ export function AboutForm({ content }: { content: AboutContent }) {
           label="Заглавие на профила"
           name="profileTitle"
           defaultValue={content.profileTitle}
-          error={state.fieldErrors?.profileTitle?.[0]}
+          error={fieldErrors.profileTitle?.[0]}
         />
         <AdminField
           label="Заглавие на секцията „Начин на работа“"
           name="workTitle"
           defaultValue={content.workTitle}
-          error={state.fieldErrors?.workTitle?.[0]}
+          error={fieldErrors.workTitle?.[0]}
         />
       </div>
 
@@ -52,7 +55,7 @@ export function AboutForm({ content }: { content: AboutContent }) {
           label="Професионален профил (по един абзац на ред)"
           name="profileText"
           defaultValue={serializeParagraphs(content.profileParagraphs)}
-          error={state.fieldErrors?.profileText?.[0]}
+          error={fieldErrors.profileText?.[0]}
           textarea
           rows={7}
         />
@@ -60,7 +63,7 @@ export function AboutForm({ content }: { content: AboutContent }) {
           label="Начин на работа (по един абзац на ред)"
           name="workText"
           defaultValue={serializeParagraphs(content.workParagraphs)}
-          error={state.fieldErrors?.workText?.[0]}
+          error={fieldErrors.workText?.[0]}
           textarea
           rows={7}
         />
@@ -71,7 +74,7 @@ export function AboutForm({ content }: { content: AboutContent }) {
           label="Силни страни (по една на ред)"
           name="strengths"
           defaultValue={content.strengths.join("\n")}
-          error={state.fieldErrors?.strengths?.[0]}
+          error={fieldErrors.strengths?.[0]}
           textarea
           rows={8}
         />
@@ -79,16 +82,16 @@ export function AboutForm({ content }: { content: AboutContent }) {
           label="Езици (формат: Име | Ниво)"
           name="languages"
           defaultValue={serializeLanguageLines(content.languages)}
-          error={state.fieldErrors?.languages?.[0]}
+          error={fieldErrors.languages?.[0]}
           textarea
           rows={8}
           hint="Пример: Български | Майчин език"
         />
       </div>
 
-      {state.message ? (
+      {message ? (
         <div className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-200">
-          {state.message}
+          {message}
         </div>
       ) : null}
 
