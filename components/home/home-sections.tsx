@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, MoveUpRight } from "lucide-react";
-import { futureServices, whatIDo } from "@/data/site";
+import { whatIDo } from "@/data/site";
 import { skillGroups } from "@/data/skills";
-import { getAboutContent, getCertificationItems, getEducationItems, getExperienceItems } from "@/lib/content";
+import {
+  getAboutContent,
+  getCertificationItems,
+  getEducationItems,
+  getExperienceItems
+} from "@/lib/content";
 import { getFeaturedProjects } from "@/lib/projects";
 import { ProjectCard } from "@/components/cards/project-card";
 import { SkillCard } from "@/components/cards/skill-card";
@@ -12,13 +17,14 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
 
 export async function HomeSections() {
-  const [featuredProjects, aboutContent, experience, education, certifications] = await Promise.all([
-    getFeaturedProjects(),
-    getAboutContent(),
-    getExperienceItems(),
-    getEducationItems(),
-    getCertificationItems()
-  ]);
+  const [featuredProjects, aboutContent, experience, education, certifications] =
+    await Promise.all([
+      getFeaturedProjects(),
+      getAboutContent(),
+      getExperienceItems(),
+      getEducationItems(),
+      getCertificationItems()
+    ]);
 
   return (
     <>
@@ -42,7 +48,9 @@ export async function HomeSections() {
                     <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
                       <Icon size={20} />
                     </div>
-                    <h3 className="mt-5 text-xl font-semibold text-white">{item.title}</h3>
+                    <h3 className="mt-5 text-xl font-semibold text-white">
+                      {item.title}
+                    </h3>
                     <p className="mt-3 text-sm text-slate-300">{item.text}</p>
                   </article>
                 </Reveal>
@@ -56,8 +64,8 @@ export async function HomeSections() {
         <Container>
           <SectionHeading
             eyebrow="Избрани проекти"
-            title="Проектен showcase с premium визия и структура, готова за бъдещи реални кейс стъдита."
-            description="Всеки проект вече се зарежда от база данни и може да се управлява през админ панела."
+            title="Подбрани проекти, които показват подход към визуална структура, дигитално мислене и внимание към детайла."
+            description="Селекция от проекти в области като графичен дизайн, branding, UI концепции и практическа работа."
           />
 
           <div className="mt-10 grid gap-6">
@@ -109,13 +117,22 @@ export async function HomeSections() {
 
               <div className="mt-8 space-y-5">
                 {experience.map((item, index) => (
-                  <Reveal key={item.id ?? `${item.company}-${item.role}-${index}`} delay={index * 0.08}>
+                  <Reveal
+                    key={item.id ?? `${item.company}-${item.role}-${index}`}
+                    delay={index * 0.08}
+                  >
                     <article className="surface p-6">
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
-                          <p className="text-sm uppercase tracking-[0.25em] text-amber">{item.company}</p>
-                          <h3 className="mt-3 text-xl font-semibold text-white">{item.role}</h3>
-                          <p className="mt-1 text-sm text-slate-400">{item.location}</p>
+                          <p className="text-sm uppercase tracking-[0.25em] text-amber">
+                            {item.company}
+                          </p>
+                          <h3 className="mt-3 text-xl font-semibold text-white">
+                            {item.role}
+                          </h3>
+                          <p className="mt-1 text-sm text-slate-400">
+                            {item.location}
+                          </p>
                         </div>
                         <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-300">
                           {item.period}
@@ -126,7 +143,10 @@ export async function HomeSections() {
                       <ul className="mt-5 space-y-3">
                         {item.bullets.slice(0, 3).map((bullet) => (
                           <li key={bullet} className="flex gap-3 text-sm text-slate-300">
-                            <CheckCircle2 className="mt-0.5 shrink-0 text-primaryGlow" size={16} />
+                            <CheckCircle2
+                              className="mt-0.5 shrink-0 text-primaryGlow"
+                              size={16}
+                            />
                             <span>{bullet}</span>
                           </li>
                         ))}
@@ -141,24 +161,37 @@ export async function HomeSections() {
               <SectionHeading
                 eyebrow="Образование и сертификати"
                 title="Силен фундамент между визуална култура, техническа дисциплина и QA развитие."
-                description="Съдържанието вече може да се редактира през админ панела и е готово за бъдещо разширяване с нови курсове и achievements."
+                description="Образование, курсове и сертификати, които изграждат професионален профил с баланс между дизайн, техническо мислене и практическа подготовка."
               />
 
               <div className="mt-8 space-y-5">
                 {education.map((item, index) => (
-                  <Reveal key={item.id ?? `${item.institution}-${item.degree}-${index}`} delay={index * 0.08}>
+                  <Reveal
+                    key={item.id ?? `${item.institution}-${item.degree}-${index}`}
+                    delay={index * 0.08}
+                  >
                     <article className="surface p-6">
-                      <p className="text-sm uppercase tracking-[0.25em] text-amber">{item.period}</p>
-                      <h3 className="mt-3 text-xl font-semibold text-white">{item.degree}</h3>
-                      <p className="mt-2 text-sm font-medium text-slate-200">{item.institution}</p>
-                      <p className="mt-3 text-sm text-slate-300">{item.description}</p>
+                      <p className="text-sm uppercase tracking-[0.25em] text-amber">
+                        {item.period}
+                      </p>
+                      <h3 className="mt-3 text-xl font-semibold text-white">
+                        {item.degree}
+                      </h3>
+                      <p className="mt-2 text-sm font-medium text-slate-200">
+                        {item.institution}
+                      </p>
+                      <p className="mt-3 text-sm text-slate-300">
+                        {item.description}
+                      </p>
                     </article>
                   </Reveal>
                 ))}
 
                 <Reveal delay={0.16}>
                   <article className="surface p-6">
-                    <p className="text-sm uppercase tracking-[0.25em] text-amber">Сертификати</p>
+                    <p className="text-sm uppercase tracking-[0.25em] text-amber">
+                      Сертификати
+                    </p>
                     <div className="mt-4 space-y-4">
                       {certifications.map((item, index) => {
                         const body = (
@@ -197,28 +230,6 @@ export async function HomeSections() {
                 </Reveal>
               </div>
             </div>
-          </div>
-        </Container>
-      </section>
-
-      <section className="section-padding">
-        <Container>
-          <SectionHeading
-            eyebrow="Future-ready"
-            title="Подготвена секция за следващата фаза на бранда."
-            description="Тук по-късно могат да се добавят услуги, дигитални продукти, UI assets или template предложения."
-          />
-
-          <div className="mt-10 grid gap-6 lg:grid-cols-3">
-            {futureServices.map((item, index) => (
-              <Reveal key={item.title} delay={index * 0.08}>
-                <article className="surface card-hover h-full p-6">
-                  <p className="text-xs uppercase tracking-[0.25em] text-amber">Future Expansion</p>
-                  <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-                  <p className="mt-3 text-sm text-slate-300">{item.description}</p>
-                </article>
-              </Reveal>
-            ))}
           </div>
         </Container>
       </section>

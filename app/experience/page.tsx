@@ -18,7 +18,7 @@ export default async function ExperiencePage() {
       <PageHero
         eyebrow="Професионален опит"
         title="Работа в среди, в които качеството, яснотата и отговорността имат пряка стойност."
-        description="Страницата показва професионалния опит на Георги през структурирана timeline/card система с акцент върху роли, отговорности и полезен контекст."
+        description="Професионален опит с фокус върху дигитални приложения, системна поддръжка, клиентска комуникация и аналитичен подход към работата."
       />
 
       <section className="section-padding">
@@ -28,16 +28,25 @@ export default async function ExperiencePage() {
 
             <div className="space-y-6">
               {experience.map((item, index) => (
-                <article key={item.id ?? `${item.company}-${item.role}-${index}`} className="grid gap-5 md:grid-cols-[40px_1fr]">
+                <article
+                  key={item.id ?? `${item.company}-${item.role}-${index}`}
+                  className="grid gap-5 md:grid-cols-[40px_1fr]"
+                >
                   <div className="hidden md:flex">
                     <span className="mt-6 inline-flex h-3 w-3 rounded-full bg-primary shadow-[0_0_20px_rgba(87,166,255,0.7)]" />
                   </div>
                   <div className="surface p-7 sm:p-8">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div>
-                        <p className="text-sm uppercase tracking-[0.25em] text-amber">{item.company}</p>
-                        <h2 className="mt-3 text-2xl font-semibold text-white">{item.role}</h2>
-                        <p className="mt-2 text-sm text-slate-400">{item.location}</p>
+                        <p className="text-sm uppercase tracking-[0.25em] text-amber">
+                          {item.company}
+                        </p>
+                        <h2 className="mt-3 text-2xl font-semibold text-white">
+                          {item.role}
+                        </h2>
+                        <p className="mt-2 text-sm text-slate-400">
+                          {item.location}
+                        </p>
                       </div>
                       <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.25em] text-slate-300">
                         {item.period}
@@ -56,10 +65,6 @@ export default async function ExperiencePage() {
                         </div>
                       ))}
                     </div>
-
-                    <p className="mt-5 text-xs uppercase tracking-[0.25em] text-slate-500">
-                      Role {String(index + 1).padStart(2, "0")}
-                    </p>
                   </div>
                 </article>
               ))}

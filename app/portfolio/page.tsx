@@ -1,6 +1,6 @@
-import { PortfolioGrid } from "@/components/portfolio-grid";
 import { Container } from "@/components/shared/container";
 import { PageHero } from "@/components/page-hero";
+import { PortfolioGrid } from "@/components/portfolio-grid";
 import { getAllProjects, getProjectCategories } from "@/lib/projects";
 import { createMetadata } from "@/lib/site-metadata";
 
@@ -20,7 +20,7 @@ export default async function PortfolioPage() {
       <PageHero
         eyebrow="Портфолио"
         title="Визуално подредени концепции и практични проекти с фокус върху яснота, структура и детайл."
-        description="Портфолиото комбинира UI идеи, branding и practice projects, а съдържанието му вече може да се управлява през админ панела."
+        description="Подбрани проекти в области като графичен дизайн, branding, UI концепции и практическа работа."
       />
 
       <section className="section-padding">

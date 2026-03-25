@@ -20,7 +20,7 @@ export default async function EducationPage() {
       <PageHero
         eyebrow="Образование и сертификати"
         title="Фундамент от графичен дизайн, техническа дисциплина и последователно QA развитие."
-        description="Страницата събира на едно място образованието, курсовете и сертификатите, които оформят професионалния профил."
+        description="Образование, курсове и сертификати, които оформят професионален профил между визуална култура, техническо мислене и практическа подготовка."
       />
 
       <section className="section-padding">
@@ -34,10 +34,18 @@ export default async function EducationPage() {
                     key={item.id ?? `${item.institution}-${item.degree}-${index}`}
                     className="rounded-[1.4rem] border border-white/10 bg-white/5 p-5"
                   >
-                    <p className="text-xs uppercase tracking-[0.25em] text-amber">{item.period}</p>
-                    <h2 className="mt-3 text-2xl font-semibold text-white">{item.degree}</h2>
-                    <p className="mt-2 text-sm font-medium text-slate-200">{item.institution}</p>
-                    <p className="mt-3 text-sm text-slate-300">{item.description}</p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-amber">
+                      {item.period}
+                    </p>
+                    <h2 className="mt-3 text-2xl font-semibold text-white">
+                      {item.degree}
+                    </h2>
+                    <p className="mt-2 text-sm font-medium text-slate-200">
+                      {item.institution}
+                    </p>
+                    <p className="mt-3 text-sm text-slate-300">
+                      {item.description}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -78,13 +86,6 @@ export default async function EducationPage() {
                     </div>
                   );
                 })}
-              </div>
-
-              <div className="mt-6 rounded-[1.4rem] border border-primary/20 bg-primary/10 p-5">
-                <p className="text-sm text-primaryGlow">
-                  Секцията е подготвена така, че лесно да се добавят нови сертификати,
-                  курсове, achievements и външни proof links.
-                </p>
               </div>
             </article>
           </div>

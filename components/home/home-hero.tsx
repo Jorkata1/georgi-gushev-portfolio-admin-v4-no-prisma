@@ -26,9 +26,9 @@ export function HomeHero() {
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg text-slate-300">
-              Премиум personal portfolio сайт, който представя Георги като млад
-              професионалист с визуална култура, аналитично мислене и стремеж към
-              качество във всеки детайл.
+              Георги Гушев е млад професионалист с интереси в графичния дизайн,
+              дигиталните приложения и QA мисленето, с фокус върху яснота,
+              последователност и внимание към детайла.
             </p>
 
             <p className="mt-4 max-w-2xl text-base text-slate-400">
@@ -98,13 +98,6 @@ export function HomeHero() {
                     </p>
                   </div>
                 ))}
-              </div>
-
-              <div className="rounded-[1.5rem] border border-primary/20 bg-primary/10 p-5">
-                <p className="text-sm text-primaryGlow">
-                  Подготвена основа за бъдещо разширение към услуги, дигитални
-                  продукти и по-задълбочени case studies.
-                </p>
               </div>
             </div>
           </div>
