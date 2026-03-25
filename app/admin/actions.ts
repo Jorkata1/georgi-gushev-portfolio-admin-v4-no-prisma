@@ -11,7 +11,7 @@ import {
   requireAdmin,
   verifyAdminCredentials
 } from "@/lib/admin-auth";
-import { makeId } from "@/lib/content-store";
+import { makeId, readStore, writeStore } from "@/lib/content-store";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { parseLanguageLines } from "@/lib/content-utils";
 import { joinLines, splitLines } from "@/lib/project-helpers";
