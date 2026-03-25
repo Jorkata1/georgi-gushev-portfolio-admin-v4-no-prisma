@@ -111,7 +111,10 @@ export async function saveProjectAction(
       .map((file, index) => uploadProjectImage(file, `${slugBase}-gallery-${index + 1}`))
   );
 
-  const galleryLines = [...splitLines(extractField(formData, "gallery")), ...uploadedGalleryImages];
+  const galleryLines = [
+    ...splitLines(extractField(formData, "gallery")),
+    ...uploadedGalleryImages
+  ];
 
   const rawValues = {
     id: extractField(formData, "id") || undefined,
@@ -240,6 +243,40 @@ export async function deleteProjectAction(formData: FormData) {
 
   revalidatePortfolioPaths(slug);
   redirect("/admin/projects?status=deleted");
+}
+
+export async function toggleFeaturedProjectAction(formData: FormData) {
+  await requireAdmin();
+
+  const id = extractField(formData, "id");
+  const slug = extractField(formData, "slug");
+  const currentFeatured = extractField(formData, "featured") === "true";
+
+  if (!id) {
+    redirect("/admin/projects?status=error");
+  }
+
+  try {
+    const supabase = createSupabaseAdminClient();
+
+    const { error } = await supabase
+      .from("portfolio_projects")
+      .update({
+        featured: !currentFeatured,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", id);
+
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
+    console.error("Toggle featured project error:", error);
+    redirect("/admin/projects?status=error");
+  }
+
+  revalidatePortfolioPaths(slug);
+  redirect("/admin/projects?status=toggled");
 }
 
 export async function saveAboutAction(
