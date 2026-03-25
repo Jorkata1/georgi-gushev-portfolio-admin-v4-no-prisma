@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Container } from "@/components/shared/container";
+import { AdaptiveProjectGallery } from "@/components/portfolio/adaptive-project-gallery";
 import { getProjectBySlug } from "@/lib/projects";
 import { siteConfig } from "@/data/site";
 
@@ -83,6 +83,7 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
                 </span>
                 <span className="text-sm font-medium text-white">{project.year}</span>
               </div>
+
               <div className="mt-5 grid gap-4 sm:grid-cols-3">
                 <div className="rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Цели</p>
@@ -90,12 +91,14 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
                     {project.goals.length}
                   </p>
                 </div>
+
                 <div className="rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Стъпки</p>
                   <p className="mt-2 text-xl font-semibold text-white">
                     {project.process.length}
                   </p>
                 </div>
+
                 <div className="rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Резултати</p>
                   <p className="mt-2 text-xl font-semibold text-white">
@@ -110,37 +113,11 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
 
       <section className="section-padding">
         <Container>
-          <div className="grid gap-6">
-            <div className="surface overflow-hidden">
-              <div className="relative min-h-[340px] sm:min-h-[460px]">
-                <Image
-                  src={project.heroImage}
-                  alt={project.title}
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
-                  unoptimized
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              {project.gallery.map((image, index) => (
-                <div key={`${image}-${index}`} className="surface overflow-hidden">
-                  <div className="relative min-h-[260px]">
-                    <Image
-                      src={image}
-                      alt={`${project.title} gallery ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      unoptimized
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <AdaptiveProjectGallery
+            title={project.title}
+            heroImage={project.heroImage}
+            gallery={project.gallery}
+          />
 
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             <article className="surface p-6">
@@ -189,6 +166,7 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
                   визуални галерии и задълбочени описания.
                 </p>
               </div>
+
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-primaryGlow"
