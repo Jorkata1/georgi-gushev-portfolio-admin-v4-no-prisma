@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone, Send } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
 import { Container } from "@/components/shared/container";
 import { PageHero } from "@/components/page-hero";
@@ -18,7 +18,7 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Контакт"
         title="Нека започнем професионален разговор."
-        description="Страницата е подготвена за директен контакт при възможности за работа, стаж, collaboration или freelance ангажименти."
+        description=""
       />
 
       <section className="section-padding">
@@ -62,22 +62,6 @@ export default function ContactPage() {
                       </p>
                       <p className="mt-1 text-white">{siteConfig.location}</p>
                     </div>
-                  </div>
-                </div>
-              </article>
-
-              <article className="surface p-6 sm:p-8">
-                <span className="eyebrow">Подходящо за</span>
-                <ul className="mt-5 space-y-3 text-sm text-slate-300">
-                  <li>• Junior / entry-level позиции в дизайн, QA или support среди.</li>
-                  <li>• Freelance разговори и малки визуални или UI задачи.</li>
-                  <li>• Възможности за стаж, растеж и работа по реални дигитални продукти.</li>
-                </ul>
-
-                <div className="mt-6 rounded-[1.25rem] border border-primary/20 bg-primary/10 px-4 py-4 text-sm text-primaryGlow">
-                  <div className="flex items-center gap-3">
-                    <Send size={16} />
-                    <span>Изпращането на формата работи след конфигуриране на SMTP данните.</span>
                   </div>
                 </div>
               </article>
