@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { useFormState } from "react-dom";
 import { saveProjectAction } from "@/app/admin/actions";
 import { initialAdminFormState } from "@/app/admin/form-state";
@@ -20,10 +20,14 @@ export function ProjectForm({ project }: ProjectFormProps) {
   const fieldErrors = state?.fieldErrors ?? {};
   const message = state?.message;
 
-  const [heroPreview, setHeroPreview] = useState<string | null>(null);
-  const [galleryPreview, setGalleryPreview] = useState<string[]>([]);
+  const heroFileInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryFileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const currentGallery = useMemo(() => project?.gallery ?? [], [project?.gallery]);
+  const [heroImageValue, setHeroImageValue] = useState(project?.heroImage ?? "");
+  const [heroPreview, setHeroPreview] = useState<string | null>(null);
+
+  const [galleryValue, setGalleryValue] = useState<string[]>(project?.gallery ?? []);
+  const [galleryPreview, setGalleryPreview] = useState<string[]>([]);
 
   function handleHeroImageChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -49,8 +53,28 @@ export function ProjectForm({ project }: ProjectFormProps) {
     setGalleryPreview(previews);
   }
 
-  const displayedHeroImage = heroPreview || project?.heroImage || "";
-  const displayedGallery = galleryPreview.length > 0 ? galleryPreview : currentGallery;
+  function handleRemoveHeroImage() {
+    setHeroPreview(null);
+    setHeroImageValue("");
+
+    if (heroFileInputRef.current) {
+      heroFileInputRef.current.value = "";
+    }
+  }
+
+  function handleRemoveGalleryImage(indexToRemove: number) {
+    setGalleryValue((current) => current.filter((_, index) => index !== indexToRemove));
+  }
+
+  function handleClearSelectedGalleryFiles() {
+    setGalleryPreview([]);
+
+    if (galleryFileInputRef.current) {
+      galleryFileInputRef.current.value = "";
+    }
+  }
+
+  const displayedHeroImage = heroPreview || heroImageValue;
 
   return (
     <form action={formAction} encType="multipart/form-data" className="space-y-8">
@@ -87,7 +111,10 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <label htmlFor="category" className="mb-2 block text-sm font-medium text-slate-200">
+          <label
+            htmlFor="category"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
             Категория
           </label>
           <select
@@ -107,14 +134,29 @@ export function ProjectForm({ project }: ProjectFormProps) {
           ) : null}
         </div>
 
-        <AdminField
-          label="Hero image URL"
-          name="heroImage"
-          defaultValue={project?.heroImage}
-          error={fieldErrors.heroImage?.[0]}
-          placeholder="https://... или /projects/project-1.svg"
-          hint="Можеш да оставиш URL или да качиш ново hero изображение от полето отдолу."
-        />
+        <div>
+          <label
+            htmlFor="heroImage"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            Hero image URL
+          </label>
+          <input
+            id="heroImage"
+            name="heroImage"
+            type="text"
+            value={heroImageValue}
+            onChange={(event) => setHeroImageValue(event.target.value)}
+            placeholder="https://... или /projects/project-1.svg"
+            className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-primary/40"
+          />
+          {fieldErrors.heroImage?.[0] ? (
+            <p className="mt-2 text-sm text-rose-300">{fieldErrors.heroImage[0]}</p>
+          ) : null}
+          <p className="mt-2 text-sm text-slate-400">
+            Можеш да оставиш URL или да качиш ново hero изображение от полето отдолу.
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -126,6 +168,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             Качи hero изображение
           </label>
           <input
+            ref={heroFileInputRef}
             id="heroImageFile"
             name="heroImageFile"
             type="file"
@@ -146,6 +189,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             Качи gallery изображения
           </label>
           <input
+            ref={galleryFileInputRef}
             id="galleryImageFiles"
             name="galleryImageFiles"
             type="file"
@@ -163,7 +207,17 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       {displayedHeroImage ? (
         <div className="surface p-5">
-          <p className="mb-4 text-sm font-medium text-slate-200">Hero preview</p>
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <p className="text-sm font-medium text-slate-200">Hero preview</p>
+            <button
+              type="button"
+              onClick={handleRemoveHeroImage}
+              className="rounded-full border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-400/15"
+            >
+              Delete
+            </button>
+          </div>
+
           <div className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/5">
             <img
               src={displayedHeroImage}
@@ -202,32 +256,99 @@ export function ProjectForm({ project }: ProjectFormProps) {
           textarea
           rows={6}
         />
-        <AdminField
-          label="Gallery images (по един URL на ред)"
-          name="gallery"
-          defaultValue={project?.gallery.join("\n")}
-          error={fieldErrors.gallery?.[0]}
-          textarea
-          rows={6}
-          hint="Можеш да комбинираш URL адреси и качени файлове."
-        />
+
+        <div>
+          <label
+            htmlFor="gallery"
+            className="mb-2 block text-sm font-medium text-slate-200"
+          >
+            Gallery images (по един URL на ред)
+          </label>
+          <textarea
+            id="gallery"
+            name="gallery"
+            value={galleryValue.join("\n")}
+            onChange={(event) =>
+              setGalleryValue(
+                event.target.value
+                  .split("\n")
+                  .map((item) => item.trim())
+                  .filter(Boolean)
+              )
+            }
+            rows={6}
+            className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-primary/40"
+          />
+          {fieldErrors.gallery?.[0] ? (
+            <p className="mt-2 text-sm text-rose-300">{fieldErrors.gallery[0]}</p>
+          ) : null}
+          <p className="mt-2 text-sm text-slate-400">
+            Можеш да комбинираш URL адреси и качени файлове.
+          </p>
+        </div>
       </div>
 
-      {displayedGallery.length > 0 ? (
+      {galleryValue.length > 0 ? (
         <div className="surface p-5">
-          <p className="mb-4 text-sm font-medium text-slate-200">Gallery preview</p>
+          <p className="mb-4 text-sm font-medium text-slate-200">
+            Текущи gallery изображения
+          </p>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {displayedGallery.map((image, index) => (
+            {galleryValue.map((image, index) => (
               <div
                 key={`${image}-${index}`}
                 className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/5"
               >
                 <img
                   src={image}
-                  alt={`Gallery preview ${index + 1}`}
+                  alt={`Gallery image ${index + 1}`}
                   className="h-44 w-full object-cover"
                 />
-                <p className="break-all px-3 py-3 text-xs text-slate-400">{image}</p>
+                <div className="space-y-3 px-3 py-3">
+                  <p className="break-all text-xs text-slate-400">{image}</p>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveGalleryImage(index)}
+                    className="rounded-full border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-400/15"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {galleryPreview.length > 0 ? (
+        <div className="surface p-5">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <p className="text-sm font-medium text-slate-200">
+              Новоизбрани gallery изображения
+            </p>
+            <button
+              type="button"
+              onClick={handleClearSelectedGalleryFiles}
+              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+            >
+              Изчисти избраните
+            </button>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {galleryPreview.map((image, index) => (
+              <div
+                key={`${image}-${index}`}
+                className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/5"
+              >
+                <img
+                  src={image}
+                  alt={`New gallery preview ${index + 1}`}
+                  className="h-44 w-full object-cover"
+                />
+                <p className="px-3 py-3 text-xs text-slate-400">
+                  Ще бъде добавено при запис.
+                </p>
               </div>
             ))}
           </div>
