@@ -215,8 +215,13 @@ export async function saveProjectAction(
     };
   }
 
-  revalidatePortfolioPaths(parsed.data.slug);
-  redirect("/admin/projects?status=saved");
+revalidatePortfolioPaths(parsed.data.slug);
+
+if (parsed.data.id) {
+  revalidatePath(`/admin/projects/${parsed.data.id}/edit`);
+}
+
+redirect("/admin/projects?status=saved");
 }
 
 export async function deleteProjectAction(formData: FormData) {

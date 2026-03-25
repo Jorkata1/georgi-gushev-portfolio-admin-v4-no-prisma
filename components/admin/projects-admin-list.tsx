@@ -190,11 +190,12 @@ export function ProjectsAdminList({ projects }: ProjectsAdminListProps) {
                 </Link>
 
                 <Link
-                  href={`/admin/projects/${project.id}/edit` as Route}
-                  className="inline-flex items-center justify-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/5"
-                >
-                  Редакция
-                </Link>
+  href={`/admin/projects/${project.id}/edit`}
+  prefetch={false}
+  className="inline-flex items-center justify-center rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/5"
+>
+  Редакция
+</Link>
 
                 <form action={toggleFeaturedProjectAction}>
                   <input type="hidden" name="id" value={project.id} />
