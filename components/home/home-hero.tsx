@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Download, Sparkles } from "lucide-react";
 import { Container } from "@/components/shared/container";
@@ -19,9 +20,9 @@ export function HomeHero() {
             </span>
 
             <h1 className="hero-title mt-6 text-balance">
-              Георги Гушев —
+              Георги Гушев
               <span className="block text-gradient">
-                дизайн, дигитални приложения и QA мислене
+                — дизайн, дигитални приложения и QA мислене
               </span>
             </h1>
 
@@ -56,48 +57,61 @@ export function HomeHero() {
             </div>
           </div>
 
-          <div className="surface-strong relative overflow-hidden p-6 sm:p-8">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(87,166,255,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(216,171,98,0.12),transparent_25%)]" />
+          <div className="relative pt-10 lg:pt-16">
+            <div className="pointer-events-none absolute -top-16 right-0 z-20 hidden w-[210px] select-none lg:block xl:-top-20 xl:w-[280px]">
+              <Image
+                src="/hero/georgi-hero.png"
+                alt="Георги Гушев"
+                width={900}
+                height={1400}
+                priority
+                className="h-auto w-full object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
+              />
+            </div>
 
-            <div className="relative grid gap-4">
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5">
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                  Позициониране
-                </p>
+            <div className="surface-strong relative overflow-hidden p-6 sm:p-8">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(87,166,255,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(216,171,98,0.12),transparent_25%)]" />
 
-                <p className="mt-3 text-2xl font-semibold text-white">
-                  Junior Graphic Designer / Digital Applications Specialist
-                </p>
-              </div>
+              <div className="relative grid gap-4">
+                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 pr-20 lg:pr-28 xl:pr-36">
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                    Позициониране
+                  </p>
 
-              <div className="grid gap-4 sm:grid-cols-3">
-                {quickFacts.map((fact) => (
-                  <div
-                    key={fact.label}
-                    className="min-w-0 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4"
-                  >
-                    {fact.label === "Професионален опит" ? (
-                      <p className="text-[9px] uppercase tracking-[0.06em] leading-[1.35] text-slate-400 sm:text-[10px]">
-                        <span className="block whitespace-nowrap">
-                          Професионален
-                        </span>
-                        <span className="block whitespace-nowrap">опит</span>
+                  <p className="mt-3 text-2xl font-semibold text-white">
+                    Junior Graphic Designer / Digital Applications Specialist
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {quickFacts.map((fact) => (
+                    <div
+                      key={fact.label}
+                      className="min-w-0 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4"
+                    >
+                      {fact.label === "Професионален опит" ? (
+                        <p className="text-[9px] uppercase tracking-[0.06em] leading-[1.35] text-slate-400 sm:text-[10px]">
+                          <span className="block whitespace-nowrap">
+                            Професионален
+                          </span>
+                          <span className="block whitespace-nowrap">опит</span>
+                        </p>
+                      ) : (
+                        <p className="text-[9px] uppercase tracking-[0.08em] leading-[1.35] text-slate-400 sm:text-[10px]">
+                          {fact.label}
+                        </p>
+                      )}
+
+                      <p className="mt-3 min-w-0 break-words text-lg font-semibold leading-tight text-white">
+                        {fact.value}
                       </p>
-                    ) : (
-                      <p className="text-[9px] uppercase tracking-[0.08em] leading-[1.35] text-slate-400 sm:text-[10px]">
-                        {fact.label}
+
+                      <p className="mt-2 min-w-0 break-words text-sm leading-6 text-slate-400">
+                        {fact.description}
                       </p>
-                    )}
-
-                    <p className="mt-3 min-w-0 break-words text-lg font-semibold leading-tight text-white">
-                      {fact.value}
-                    </p>
-
-                    <p className="mt-2 min-w-0 break-words text-sm leading-6 text-slate-400">
-                      {fact.description}
-                    </p>
-                  </div>
-                ))}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
