@@ -63,15 +63,15 @@ export function HomeHero() {
 
           <div className="relative pt-10 lg:pt-16">
             <div className="pointer-events-none absolute -top-16 right-0 z-20 hidden w-[210px] select-none lg:block xl:-top-20 xl:w-[280px]">
-              <Image
-                src="/hero/georgi-hero.png"
-                alt="Георги Гушев"
-                width={900}
-                height={1400}
-                priority
-                className="h-auto w-full object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
-              />
-            </div>
+  <Image
+    src="/hero/georgi-hero.png"
+    alt="Георги Гушев"
+    width={900}
+    height={1400}
+    priority
+    className="h-auto w-full object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
+  />
+</div>
 
             <div className="surface-strong relative overflow-hidden p-6 sm:p-8">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(87,166,255,0.22),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(216,171,98,0.12),transparent_25%)]" />
@@ -88,25 +88,25 @@ export function HomeHero() {
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3">
-                  {quickFacts.map((fact) => (
-                    <div
-                      key={fact.label}
-                      className="min-w-0 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4"
-                    >
-                      <p className="text-[9px] uppercase tracking-[0.08em] leading-[1.35] text-slate-400 sm:text-[10px]">
-                        {fact.label}
-                      </p>
+  {quickFacts.map((fact) => (
+    <div
+      key={fact.label}
+      className="flex h-full min-w-0 flex-col rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-4"
+    >
+      <p className="text-[10px] uppercase tracking-[0.14em] leading-[1.3] text-slate-400">
+        {fact.label}
+      </p>
 
-                      <p className="mt-3 min-w-0 break-words text-lg font-semibold leading-tight text-white">
-                        {fact.value}
-                      </p>
+      <p className="mt-3 text-base font-semibold leading-snug text-white sm:text-lg">
+        {fact.value}
+      </p>
 
-                      <p className="mt-2 min-w-0 break-words text-sm leading-6 text-slate-400">
-                        {fact.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+      <p className="mt-2 text-sm leading-5 text-slate-400">
+        {fact.description}
+      </p>
+    </div>
+  ))}
+</div>
               </div>
             </div>
           </div>

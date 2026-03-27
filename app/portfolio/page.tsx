@@ -5,9 +5,9 @@ import { getAllProjects, getProjectCategories } from "@/lib/projects";
 import { createMetadata } from "@/lib/site-metadata";
 
 export const metadata = createMetadata({
-  title: "Портфолио",
+  title: "Проекти",
   description:
-    "Проекти в области като UI concepts, branding, graphic design и practice work, представени в premium portfolio формат.",
+    "Подбрани проекти в области като бранд идентичност, уеб визия, UI концепции и визуални решения с практическа насоченост.",
   path: "/portfolio"
 });
 
@@ -18,9 +18,9 @@ export default async function PortfolioPage() {
   return (
     <>
       <PageHero
-        eyebrow="Портфолио"
-        title="Визуално подредени концепции и практични проекти с фокус върху яснота, структура и детайл."
-        description="Подбрани проекти в области като графичен дизайн, branding, UI концепции и практическа работа."
+        eyebrow="Проекти"
+        title="Подбрани проекти, които показват подход към дизайн, структура, бранд логика и дигитално мислене."
+        description="Примери за работа в области като бранд идентичност, уеб визия, UI концепции и визуални решения с практическа насоченост."
       />
 
       <section className="section-padding">
