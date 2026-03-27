@@ -1,133 +1,218 @@
 import Link from "next/link";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  CheckCircle2,
+  LayoutGrid,
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  Sparkles,
+  Tag,
+  Target
+} from "lucide-react";
 import { Container } from "@/components/shared/container";
-import { PageHero } from "@/components/page-hero";
 import { Button } from "@/components/ui/button";
 import { createMetadata } from "@/lib/site-metadata";
+import { siteConfig } from "@/data/site";
 
 export const metadata = createMetadata({
   title: "За мен",
   description:
-    "Подход към работа, комбиниращ дизайн, дигитални решения и QA-oriented мислене с фокус върху яснота, последователност и practical execution.",
+    "Дизайн, дигитално мислене и QA-oriented подход с фокус върху яснота, визия и practical execution.",
   path: "/about"
 });
 
 const strengths = [
   "Аналитично мислене",
+  "Внимание към детайла",
   "Логическо мислене",
   "Критично мислене",
-  "Внимание към детайла",
   "Комуникативност",
   "Адаптивност",
-  "Любопитство",
-  "Желание за развитие",
   "Research mindset",
   "QA-oriented подход"
 ];
 
+const valuePoints = [
+  {
+    title: "Дизайн и структура",
+    text: "Търся баланс между добра визия, ясна йерархия и practical съдържание.",
+    icon: LayoutGrid
+  },
+  {
+    title: "QA mindset",
+    text: "Гледам на проектите не само визуално, а и през логиката на реалното използване.",
+    icon: ShieldCheck
+  },
+  {
+    title: "Дигитален подход",
+    text: "Подхождам към сайтове и брандове като към цялостни дигитални решения.",
+    icon: Sparkles
+  }
+];
+
 const focusAreas = [
-  "Уеб дизайн и визуална структура за сайтове",
-  "UI концепции за уеб и мобилни интерфейси",
-  "Бранд идентичност и визуална последователност",
-  "Поддръжка и визуално обновяване на сайтове",
-  "QA manual преглед и проверка на user flow",
-  "Консултации за структура, съдържание и дигитална посока"
+  "Уеб дизайн и визуална структура",
+  "UI посока за сайтове и интерфейси",
+  "Бранд идентичност и консистентност",
+  "Визуално обновяване и поддръжка",
+  "QA manual преглед и user flow проверка",
+  "Консултации за структура и дигитална посока"
+];
+
+const resultPoints = [
+  "По-ясна комуникация",
+  "По-подредена структура",
+  "По-професионално дигитално присъствие"
 ];
 
 export default function AboutPage() {
   return (
     <>
-      <PageHero
-        eyebrow="За мен"
-        title="Работя в пресечната точка между дизайн, дигитални решения и функционално мислене."
-        description="Подхождам към проектите с внимание към детайла, визуална култура и practical mindset, за да се стига до решения, които изглеждат добре, работят добре и се представят по-професионално онлайн."
-      />
+      <section className="relative overflow-hidden border-b border-white/6">
+        <div className="hero-grid absolute inset-0 opacity-40" />
+        <div className="absolute inset-x-0 top-[-8rem] h-[28rem] bg-[radial-gradient(circle_at_top,rgba(87,166,255,0.18),transparent_56%)]" />
+
+        <Container className="section-padding relative">
+          <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+            <div>
+              <span className="eyebrow">
+                <Sparkles size={14} />
+                За мен / Подход / Дигитално мислене
+              </span>
+
+              <h1 className="display-title mt-5 max-w-4xl text-balance">
+                Дизайн, дигитално мислене и QA логика в един по-подреден и practical подход.
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-lg text-slate-300">
+                Работя в пресечната точка между дизайн, дигитални решения и
+                функционално мислене. Подхождам към проектите с внимание към
+                детайла, визуална култура и ясна логика, за да се стига до
+                резултати, които изглеждат по-добре и работят по-добре.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link href="/contact">
+                  <Button>
+                    Изпрати запитване
+                    <ArrowRight size={16} />
+                  </Button>
+                </Link>
+
+                <Link href="/portfolio">
+                  <Button variant="secondary">Разгледай проекти</Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="surface-strong relative overflow-hidden p-6 sm:p-8">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(87,166,255,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(216,171,98,0.10),transparent_25%)]" />
+
+              <div className="relative grid gap-4">
+                {valuePoints.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <div
+                      key={item.title}
+                      className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5"
+                    >
+                      <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
+                        <Icon size={18} />
+                      </div>
+
+                      <h2 className="mt-4 text-xl font-semibold text-white">
+                        {item.title}
+                      </h2>
+
+                      <p className="mt-3 text-sm leading-7 text-slate-300">
+                        {item.text}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
 
       <section className="section-padding">
         <Container>
-          <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="space-y-6">
-              <article className="surface p-7 sm:p-8">
-                <span className="eyebrow">Подход</span>
-                <h2 className="mt-4 text-3xl font-semibold text-white">
-                  Комбинирам визуален подход, техническа дисциплина и желание за реално работещи резултати.
+          <article className="surface-strong p-8 sm:p-10 lg:p-12">
+            <span className="eyebrow">Подход, полезност и резултат</span>
+
+            <div className="mt-5 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+              <div>
+                <h2 className="section-title text-balance">
+                  Добрата визия работи най-добре, когато е част от ясна структура и реално полезно изживяване.
                 </h2>
 
                 <div className="mt-6 space-y-4 text-slate-300">
                   <p>
-                    Интересите ми са свързани с графичния дизайн, уеб визията,
-                    дигиталните приложения и качественото потребителско изживяване.
-                    Харесвам проекти, при които добрата визия не е самоцел, а част
-                    от по-ясна структура, по-добра логика и по-силно онлайн
-                    представяне.
+                    Харесвам проекти, при които визуалната посока не е самоцел,
+                    а помага на един сайт или бранд да се усеща по-подреден,
+                    по-ясен и по-професионален.
                   </p>
 
                   <p>
-                    За мен добрият дигитален проект трябва да съчетава визия,
-                    структура и функционалност. Затова подхождам не само с
-                    естетически поглед, а и с логика към начина, по който един сайт,
-                    интерфейс или бранд трябва да се усеща и използва.
-                  </p>
-
-                  <p>
-                    Стремя се към clean решения, ясна визуална йерархия, подредено
-                    съдържание и детайли, които правят крайния резултат по-професионален.
-                    Подходът ми е спокоен, аналитичен и насочен към това един проект
-                    да изглежда по-добре и да работи по-добре.
+                    Затова подхождам едновременно с дизайнерски поглед и с логика
+                    към структурата, съдържанието, използваемостта и малките
+                    детайли, които определят качеството на крайния резултат.
                   </p>
                 </div>
-              </article>
 
-              <article className="surface p-7 sm:p-8">
-                <span className="eyebrow">Професионална основа</span>
-                <h2 className="mt-4 text-2xl font-semibold text-white">
-                  Опит, който подкрепя работата ми по дигитални проекти
-                </h2>
-
-                <div className="mt-6 space-y-4 text-slate-300">
-                  <p>
-                    Професионалният ми опит включва работа с дигитални приложения,
-                    поддръжка, съдействие при потребителски затруднения, докладване
-                    на проблеми и участие в процеси, при които яснотата и
-                    надеждността са важни.
-                  </p>
-
-                  <p>
-                    Това ми помага да гледам на дигиталните проекти не само визуално,
-                    а и през логиката на реалното използване, потребителските
-                    затруднения и качеството на крайния резултат.
-                  </p>
-
-                  <p>
-                    Образованието и практическите ми проекти в графичния дизайн
-                    допълват този подход с визуална култура, композиция, типография
-                    и разбиране за цялостна идентичност.
-                  </p>
-                </div>
-              </article>
-            </div>
-
-            <div className="space-y-6">
-              <article className="surface p-7 sm:p-8">
-                <span className="eyebrow">Фокус</span>
-                <h2 className="mt-4 text-2xl font-semibold text-white">
-                  С какво мога да бъда полезен
-                </h2>
-
-                <div className="mt-6 space-y-4">
-                  {focusAreas.map((item) => (
-                    <div key={item} className="flex gap-3 text-sm text-slate-300">
-                      <CheckCircle2
-                        className="mt-0.5 shrink-0 text-primaryGlow"
-                        size={18}
-                      />
-                      <span>{item}</span>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  {resultPoints.map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-slate-300"
+                    >
+                      {item}
                     </div>
                   ))}
                 </div>
-              </article>
+              </div>
 
-              <article className="surface p-7 sm:p-8">
+              <div className="grid gap-6">
+                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6">
+                  <span className="eyebrow">С какво мога да бъда полезен</span>
+
+                  <div className="mt-5 space-y-4">
+                    {focusAreas.map((item) => (
+                      <div key={item} className="flex gap-3 text-sm text-slate-300">
+                        <CheckCircle2
+                          className="mt-0.5 shrink-0 text-primaryGlow"
+                          size={18}
+                        />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6">
+                  <span className="eyebrow">Какво носи този подход</span>
+                  <p className="mt-4 text-sm leading-7 text-slate-300">
+                    Когато дизайнът, структурата и функционалността вървят заедно,
+                    резултатът не просто изглежда по-добре — той комуникира
+                    по-уверено и работи по-ефективно.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </Container>
+      </section>
+
+      <section className="section-padding">
+        <Container>
+          <div className="mx-auto max-w-6xl space-y-6">
+            <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+              <article className="surface self-start p-7 sm:p-8">
                 <span className="eyebrow">Силни страни</span>
                 <h2 className="mt-4 text-2xl font-semibold text-white">
                   Подход, изграден върху внимание към детайла и practical мислене
@@ -137,7 +222,7 @@ export default function AboutPage() {
                   {strengths.map((item) => (
                     <div
                       key={item}
-                      className="rounded-[1.25rem] border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300"
+                      className="rounded-[1.25rem] border border-white/10 bg-white/[0.05] px-4 py-4 text-sm text-slate-300"
                     >
                       {item}
                     </div>
@@ -146,45 +231,114 @@ export default function AboutPage() {
               </article>
 
               <article className="surface p-7 sm:p-8">
-                <span className="eyebrow">Езици</span>
-                <h2 className="mt-4 text-2xl font-semibold text-white">
-                  Комуникация и работа в различен контекст
-                </h2>
+                <span className="eyebrow">Професионална основа</span>
 
-                <div className="mt-6 space-y-3 text-slate-300">
-                  <p>Български — майчин език</p>
-                  <p>Английски — B2</p>
+                <div className="mt-4 flex items-center gap-4">
+                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
+                    <BriefcaseBusiness size={18} />
+                  </div>
+
+                  <h2 className="text-2xl font-semibold text-white">
+                    Опит, който подкрепя работата ми по дигитални проекти
+                  </h2>
+                </div>
+
+                <div className="mt-5 space-y-4 text-slate-300">
+                  <p>
+                    Професионалният ми опит включва работа с дигитални приложения,
+                    поддръжка, съдействие при потребителски затруднения, докладване
+                    на проблеми и участие в процеси, при които яснотата и
+                    надеждността са важни.
+                  </p>
+
+                  <p>
+                    Това ми помага да гледам на дигиталните проекти не само
+                    визуално, а и през логиката на реалното използване,
+                    потребителските затруднения и качеството на крайния резултат.
+                  </p>
                 </div>
               </article>
             </div>
-          </div>
-        </Container>
-      </section>
 
-      <section className="pb-20">
-        <Container>
-          <div className="surface-strong max-w-4xl p-8 sm:p-10">
-            <span className="eyebrow">Контакт</span>
-            <h2 className="section-title mt-4 text-balance">
-              Ако търсиш човек с комбинация от дизайн, дигитално мислене и QA-oriented подход, можем да започнем с кратък разговор.
-            </h2>
-            <p className="mt-5 max-w-2xl text-slate-300">
-              Подходящо за нови сайтове, визуално обновяване, бранд посока,
-              UI идеи, поддръжка или преглед на съществуващ проект.
-            </p>
+            <article className="surface-strong p-7 sm:p-8">
+              <span className="eyebrow">Кратка информация</span>
 
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/contact">
-                <Button>
-                  Изпрати запитване
-                  <ArrowRight size={16} />
-                </Button>
-              </Link>
+              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.04] p-5">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
+                    <MapPin size={16} />
+                  </div>
 
-              <Link href="/portfolio">
-                <Button variant="secondary">Разгледай проекти</Button>
-              </Link>
-            </div>
+                  <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-400">
+                    Локация и езици
+                  </p>
+
+                  <p className="mt-3 text-sm leading-7 text-white">
+                    {siteConfig.location}
+                  </p>
+
+                  <div className="mt-4 border-t border-white/10 pt-4">
+                    <p className="text-sm text-white">Български — майчин език</p>
+                    <p className="mt-1 text-sm text-white">Английски — B2</p>
+                  </div>
+                </div>
+
+                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.04] p-5">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
+                    <Target size={16} />
+                  </div>
+
+                  <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-400">
+                    Подходящо за
+                  </p>
+
+                  <p className="mt-3 text-sm leading-7 text-white">
+                    Нови сайтове, визуално обновяване, бранд посока, UI идеи,
+                    поддръжка и QA-oriented подобрения
+                  </p>
+                </div>
+
+                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.04] p-5">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
+                    <Tag size={16} />
+                  </div>
+
+                  <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-400">
+                    Фокус
+                  </p>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {["Дизайн", "Уеб", "Бранд", "QA"].map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs text-slate-300"
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.04] p-5">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
+                    <Mail size={16} />
+                  </div>
+
+                  <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-400">
+                    Контакт
+                  </p>
+
+                  <p className="mt-3 break-words text-sm text-white">
+                    {siteConfig.email}
+                  </p>
+
+                  <div className="mt-4 flex items-center gap-2 text-sm text-white">
+                    <Phone size={14} className="text-primaryGlow" />
+                    <span>{siteConfig.phone}</span>
+                  </div>
+                </div>
+              </div>
+            </article>
           </div>
         </Container>
       </section>
