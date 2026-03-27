@@ -8,18 +8,27 @@ import {
 } from "lucide-react";
 import { navItems, siteConfig } from "@/data/site";
 
+const legalLinks = [
+  { href: "/privacy-policy", label: "Политика за поверителност" },
+  { href: "/cookie-policy", label: "Политика за бисквитки" },
+  { href: "/terms", label: "Общи условия" },
+  { href: "/legal", label: "Правна информация" }
+];
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-white/6 py-10">
-      <div className="container-shell grid gap-10 lg:grid-cols-[1.3fr_1fr_1fr]">
+      <div className="container-shell grid gap-10 lg:grid-cols-[1.1fr_0.9fr_1fr_1fr]">
         <div>
           <p className="eyebrow">GDX Studio</p>
           <h3 className="mt-4 text-2xl font-semibold text-white">
-            Дизайн, сайтове и дигитални решения с фокус върху яснота, визия и функционалност.
+            Дизайн, сайтове и дигитални решения с фокус върху яснота, визия и
+            функционалност.
           </h3>
           <p className="mt-4 max-w-xl text-slate-300">
             Помагам на лични брандове, малки бизнеси и нови проекти с уеб дизайн,
-            изграждане на сайтове, визуално обновяване, поддръжка и QA-oriented подобрения.
+            изграждане на сайтове, визуално обновяване, поддръжка и QA-oriented
+            подобрения.
           </p>
         </div>
 
@@ -29,6 +38,21 @@ export function SiteFooter() {
           </h4>
           <ul className="mt-4 space-y-3">
             {navItems.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="text-slate-300 hover:text-white">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Правна информация
+          </h4>
+          <ul className="mt-4 space-y-3">
+            {legalLinks.map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className="text-slate-300 hover:text-white">
                   {item.label}
@@ -100,11 +124,13 @@ export function SiteFooter() {
               </a>
             </li>
           </ul>
-
-          <p className="mt-6 text-sm text-slate-500">
-            © {new Date().getFullYear()} {siteConfig.name}. Всички права запазени.
-          </p>
         </div>
+      </div>
+
+      <div className="container-shell mt-10 border-t border-white/6 pt-6">
+        <p className="text-sm text-slate-500">
+          © {new Date().getFullYear()} {siteConfig.name}. Всички права запазени.
+        </p>
       </div>
     </footer>
   );
