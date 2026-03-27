@@ -16,20 +16,20 @@ export function HomeHero() {
           <div>
             <span className="eyebrow">
               <Sparkles size={14} />
-              Личен бранд / портфолио
+              Дигитални решения / Дизайн / Уеб
             </span>
 
             <h1 className="hero-title mt-6 text-balance">
-              Георги Гушев
+              Дизайн, сайтове и дигитални решения
               <span className="mt-1 block text-gradient">
-                — дизайн, дигитални приложения и QA мислене
+                с фокус върху яснота, визия и функционалност.
               </span>
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg text-slate-300">
-              Георги Гушев е млад професионалист с интереси в графичния дизайн,
-              дигиталните приложения и QA мисленето, с фокус върху яснота,
-              последователност и внимание към детайла.
+              Помагам на лични брандове, малки бизнеси и нови проекти с уеб дизайн,
+              изграждане на сайтове, бранд идентичност, визуално обновяване,
+              поддръжка и QA-oriented подобрения.
             </p>
 
             <p className="mt-4 max-w-2xl text-base text-slate-400">
@@ -37,15 +37,19 @@ export function HomeHero() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/portfolio">
+              <Link href="/services">
                 <Button>
-                  Виж портфолио
+                  Виж услугите
                   <ArrowRight size={16} />
                 </Button>
               </Link>
 
+              <Link href="/portfolio">
+                <Button variant="secondary">Разгледай проекти</Button>
+              </Link>
+
               <Link href="/contact">
-                <Button variant="secondary">Свържи се с мен</Button>
+                <Button variant="ghost">Изпрати запитване</Button>
               </Link>
 
               <a href="/Georgi-Gushev-CV.pdf" download>
@@ -75,11 +79,11 @@ export function HomeHero() {
               <div className="relative grid gap-4">
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 pr-20 lg:pr-28 xl:pr-36">
                   <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                    Позициониране
+                    Какво предлагам
                   </p>
 
                   <p className="mt-3 text-2xl font-semibold text-white">
-                    Junior Graphic Designer / Digital Applications Specialist
+                    Уеб дизайн, сайтове, бранд идентичност и дигитални подобрения
                   </p>
                 </div>
 
@@ -89,18 +93,9 @@ export function HomeHero() {
                       key={fact.label}
                       className="min-w-0 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4"
                     >
-                      {fact.label === "Професионален опит" ? (
-                        <p className="text-[9px] uppercase tracking-[0.06em] leading-[1.35] text-slate-400 sm:text-[10px]">
-                          <span className="block whitespace-nowrap">
-                            Професионален
-                          </span>
-                          <span className="block whitespace-nowrap">опит</span>
-                        </p>
-                      ) : (
-                        <p className="text-[9px] uppercase tracking-[0.08em] leading-[1.35] text-slate-400 sm:text-[10px]">
-                          {fact.label}
-                        </p>
-                      )}
+                      <p className="text-[9px] uppercase tracking-[0.08em] leading-[1.35] text-slate-400 sm:text-[10px]">
+                        {fact.label}
+                      </p>
 
                       <p className="mt-3 min-w-0 break-words text-lg font-semibold leading-tight text-white">
                         {fact.value}

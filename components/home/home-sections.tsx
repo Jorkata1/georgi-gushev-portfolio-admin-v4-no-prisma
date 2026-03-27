@@ -1,49 +1,42 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, MoveUpRight } from "lucide-react";
-import { whatIDo } from "@/data/site";
-import { skillGroups } from "@/data/skills";
 import {
-  getAboutContent,
-  getCertificationItems,
-  getEducationItems,
-  getExperienceItems
-} from "@/lib/content";
+  ArrowRight,
+  CheckCircle2,
+  MoveUpRight
+} from "lucide-react";
+import {
+  helpCases,
+  reasonsToWork,
+  siteConfig,
+  whatIDo,
+  workProcess
+} from "@/data/site";
 import { getFeaturedProjects } from "@/lib/projects";
 import { ProjectCard } from "@/components/cards/project-card";
-import { SkillCard } from "@/components/cards/skill-card";
 import { Container } from "@/components/shared/container";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
 
 export async function HomeSections() {
-  const [featuredProjects, aboutContent, experience, education, certifications] =
-    await Promise.all([
-      getFeaturedProjects(),
-      getAboutContent(),
-      getExperienceItems(),
-      getEducationItems(),
-      getCertificationItems()
-    ]);
+  const featuredProjects = await getFeaturedProjects();
 
   return (
     <>
       <section className="section-padding">
         <Container>
-          <Reveal>
-            <SectionHeading
-              eyebrow="Профил"
-              title={aboutContent.profileTitle}
-              description={aboutContent.profileParagraphs[0]}
-            />
-          </Reveal>
+          <SectionHeading
+            eyebrow="Услуги"
+            title="Услуги, които помагат на един проект да изглежда по-добре, да работи по-добре и да се представя по-професионално."
+            description="От уеб дизайн и изграждане на сайтове до бранд идентичност, визуално обновяване, поддръжка, QA проверки и консултации за по-силно дигитално присъствие."
+          />
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {whatIDo.map((item, index) => {
               const Icon = item.icon;
 
               return (
-                <Reveal key={item.title} delay={index * 0.08}>
+                <Reveal key={item.title} delay={index * 0.06}>
                   <article className="surface card-hover h-full p-6">
                     <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
                       <Icon size={20} />
@@ -57,20 +50,82 @@ export async function HomeSections() {
               );
             })}
           </div>
+
+          <div className="mt-8">
+            <Link href="/services">
+              <Button variant="secondary">
+                Виж всички услуги
+                <ArrowRight size={16} />
+              </Button>
+            </Link>
+          </div>
         </Container>
       </section>
 
       <section className="section-padding border-y border-white/6 bg-white/[0.015]">
         <Container>
+          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+            <div>
+              <SectionHeading
+                eyebrow="Как мога да помогна"
+                title="Подходящо, когато имаш нужда не просто от визия, а от по-добро цялостно дигитално решение."
+                description="Работя по проекти, при които дизайнът, структурата и функционалността трябва да вървят заедно, за да се стигне до по-ясен и професионален резултат."
+              />
+
+              <div className="mt-8 grid gap-4">
+                {helpCases.map((item, index) => (
+                  <Reveal key={item} delay={index * 0.06}>
+                    <div className="surface flex gap-3 p-5">
+                      <CheckCircle2
+                        className="mt-0.5 shrink-0 text-primaryGlow"
+                        size={18}
+                      />
+                      <p className="text-sm text-slate-300">{item}</p>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <SectionHeading
+                eyebrow="Кратко за мен"
+                title="Работя в пресечната точка между дизайн, дигитални решения и функционално мислене."
+                description={siteConfig.shortAbout}
+              />
+
+              <div className="mt-8 surface p-6">
+                <p className="text-sm text-slate-300">
+                  Комбинирам визуален подход, техническа дисциплина и QA mindset,
+                  за да се стига до решения, които са едновременно clean, practical
+                  и полезни за реалната употреба.
+                </p>
+
+                <div className="mt-6">
+                  <Link href="/about">
+                    <Button variant="secondary">
+                      Научи повече
+                      <ArrowRight size={16} />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <section className="section-padding">
+        <Container>
           <SectionHeading
-            eyebrow="Избрани проекти"
-            title="Подбрани проекти, които показват подход към визуална структура, дигитално мислене и внимание към детайла."
-            description="Селекция от проекти в области като графичен дизайн, branding, UI концепции и практическа работа."
+            eyebrow="Проекти"
+            title="Подбрани проекти, които показват подход към дизайн, структура, бранд логика и дигитално мислене."
+            description="Примери за работа в области като бранд идентичност, уеб визия, UI концепции и визуални решения с практическа насоченост."
           />
 
           <div className="mt-10 grid gap-6">
             {featuredProjects.map((project, index) => (
-              <Reveal key={project.id} delay={index * 0.1}>
+              <Reveal key={project.id} delay={index * 0.08}>
                 <ProjectCard project={project} />
               </Reveal>
             ))}
@@ -79,7 +134,7 @@ export async function HomeSections() {
           <div className="mt-8">
             <Link href="/portfolio">
               <Button variant="secondary">
-                Виж всички проекти
+                Разгледай всички проекти
                 <ArrowRight size={16} />
               </Button>
             </Link>
@@ -87,149 +142,52 @@ export async function HomeSections() {
         </Container>
       </section>
 
-      <section className="section-padding">
+      <section className="section-padding border-y border-white/6 bg-white/[0.015]">
         <Container>
           <SectionHeading
-            eyebrow="Умения"
-            title="Подредени в ясни категории, които показват хибридния профил на Георги."
-            description="Дизайнерски инструменти, QA/technical tools и soft skills, които подкрепят качествена и последователна работа."
+            eyebrow="Процес"
+            title="Ясен процес, за да се движим подредено от идея до работещ резултат."
+            description="Независимо дали става дума за нов сайт, редизайн, визуално обновяване или QA преглед, работя с подреден процес и ясен фокус върху резултата."
           />
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-3">
-            {skillGroups.map((group, index) => (
-              <Reveal key={group.title} delay={index * 0.08}>
-                <SkillCard group={group} />
+          <div className="mt-10 grid gap-6 lg:grid-cols-4">
+            {workProcess.map((item, index) => (
+              <Reveal key={item.title} delay={index * 0.08}>
+                <article className="surface h-full p-6">
+                  <p className="text-xs uppercase tracking-[0.24em] text-amber">
+                    Стъпка {index + 1}
+                  </p>
+                  <h3 className="mt-4 text-xl font-semibold text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm text-slate-300">{item.text}</p>
+                </article>
               </Reveal>
             ))}
           </div>
         </Container>
       </section>
 
-      <section className="section-padding border-y border-white/6 bg-white/[0.015]">
+      <section className="section-padding">
         <Container>
-          <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
-            <div>
-              <SectionHeading
-                eyebrow="Опит"
-                title="Реален професионален опит в среди, където точността и надеждността са ключови."
-                description="Работа с клиенти, дигитални приложения, системна проверка, докладване и поддръжка."
-              />
+          <SectionHeading
+            eyebrow="Подход"
+            title="Комбинация от визуално мислене, техническа дисциплина и внимание към реалното потребителско изживяване."
+            description="Подхождам към проектите не само като към визия, а като към цялостно решение, което трябва да бъде ясно, последователно и функционално."
+          />
 
-              <div className="mt-8 space-y-5">
-                {experience.map((item, index) => (
-                  <Reveal
-                    key={item.id ?? `${item.company}-${item.role}-${index}`}
-                    delay={index * 0.08}
-                  >
-                    <article className="surface p-6">
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div>
-                          <p className="text-sm uppercase tracking-[0.25em] text-amber">
-                            {item.company}
-                          </p>
-                          <h3 className="mt-3 text-xl font-semibold text-white">
-                            {item.role}
-                          </h3>
-                          <p className="mt-1 text-sm text-slate-400">
-                            {item.location}
-                          </p>
-                        </div>
-                        <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.22em] text-slate-300">
-                          {item.period}
-                        </span>
-                      </div>
-
-                      <p className="mt-4 text-sm text-slate-300">{item.summary}</p>
-                      <ul className="mt-5 space-y-3">
-                        {item.bullets.slice(0, 3).map((bullet) => (
-                          <li key={bullet} className="flex gap-3 text-sm text-slate-300">
-                            <CheckCircle2
-                              className="mt-0.5 shrink-0 text-primaryGlow"
-                              size={16}
-                            />
-                            <span>{bullet}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </article>
-                  </Reveal>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <SectionHeading
-                eyebrow="Образование и сертификати"
-                title="Силен фундамент между визуална култура, техническа дисциплина и QA развитие."
-                description="Образование, курсове и сертификати, които изграждат професионален профил с баланс между дизайн, техническо мислене и практическа подготовка."
-              />
-
-              <div className="mt-8 space-y-5">
-                {education.map((item, index) => (
-                  <Reveal
-                    key={item.id ?? `${item.institution}-${item.degree}-${index}`}
-                    delay={index * 0.08}
-                  >
-                    <article className="surface p-6">
-                      <p className="text-sm uppercase tracking-[0.25em] text-amber">
-                        {item.period}
-                      </p>
-                      <h3 className="mt-3 text-xl font-semibold text-white">
-                        {item.degree}
-                      </h3>
-                      <p className="mt-2 text-sm font-medium text-slate-200">
-                        {item.institution}
-                      </p>
-                      <p className="mt-3 text-sm text-slate-300">
-                        {item.description}
-                      </p>
-                    </article>
-                  </Reveal>
-                ))}
-
-                <Reveal delay={0.16}>
-                  <article className="surface p-6">
-                    <p className="text-sm uppercase tracking-[0.25em] text-amber">
-                      Сертификати
-                    </p>
-                    <div className="mt-4 space-y-4">
-                      {certifications.map((item, index) => {
-                        const body = (
-                          <>
-                            <div>
-                              <p className="font-medium text-white">{item.title}</p>
-                              <p className="text-sm text-slate-400">
-                                {item.issuer} · {item.year}
-                              </p>
-                            </div>
-                            <MoveUpRight size={18} className="text-primaryGlow" />
-                          </>
-                        );
-
-                        return item.href ? (
-                          <a
-                            key={item.id ?? `${item.title}-${item.year}-${index}`}
-                            href={item.href}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 hover:border-primary/30 hover:bg-white/[0.08]"
-                          >
-                            {body}
-                          </a>
-                        ) : (
-                          <div
-                            key={item.id ?? `${item.title}-${item.year}-${index}`}
-                            className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
-                          >
-                            {body}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </article>
-                </Reveal>
-              </div>
-            </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {reasonsToWork.map((item, index) => (
+              <Reveal key={item} delay={index * 0.05}>
+                <div className="surface flex gap-3 p-5">
+                  <MoveUpRight
+                    className="mt-0.5 shrink-0 text-primaryGlow"
+                    size={18}
+                  />
+                  <p className="text-sm text-slate-300">{item}</p>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </Container>
       </section>
@@ -241,24 +199,24 @@ export async function HomeSections() {
               <div>
                 <span className="eyebrow">Контакт</span>
                 <h2 className="section-title mt-4 text-balance">
-                  Отворен за работа, стаж, freelance възможности и качествени
-                  професионални разговори.
+                  Имаш нужда от нов сайт, визуално обновяване или по-силно дигитално присъствие?
                 </h2>
                 <p className="mt-5 max-w-2xl text-slate-300">
-                  Ако търсиш човек с комбинация от визуално мислене, QA логика и
-                  дисциплиниран подход към дигитални среди, това е подходящо място за
-                  първи контакт.
+                  Мога да помогна с дизайн, изграждане, обновяване, QA преглед и
+                  консултация за следващата правилна стъпка за твоя проект.
                 </p>
               </div>
+
               <div className="flex flex-wrap gap-4 lg:justify-end">
                 <Link href="/contact">
                   <Button>
-                    Свържи се с мен
+                    Изпрати запитване
                     <ArrowRight size={16} />
                   </Button>
                 </Link>
-                <Link href="/about">
-                  <Button variant="secondary">Научи повече</Button>
+
+                <Link href="/portfolio">
+                  <Button variant="secondary">Разгледай проекти</Button>
                 </Link>
               </div>
             </div>

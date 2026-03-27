@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Mail, Phone } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Mail,
+  Phone
+} from "lucide-react";
 import { navItems, siteConfig } from "@/data/site";
 
 export function SiteFooter() {
@@ -7,13 +13,13 @@ export function SiteFooter() {
     <footer className="border-t border-white/6 py-10">
       <div className="container-shell grid gap-10 lg:grid-cols-[1.3fr_1fr_1fr]">
         <div>
-          <p className="eyebrow">Георги Гушев</p>
+          <p className="eyebrow">GDX Studio</p>
           <h3 className="mt-4 text-2xl font-semibold text-white">
-            Дизайн, дигитални приложения и QA ориентиран подход.
+            Дизайн, сайтове и дигитални решения с фокус върху яснота, визия и функционалност.
           </h3>
           <p className="mt-4 max-w-xl text-slate-300">
-            Личен сайт на Георги Гушев, представящ опит, умения и проекти в
-            графичния дизайн, дигиталните приложения и QA ориентирания подход.
+            Помагам на лични брандове, малки бизнеси и нови проекти с уеб дизайн,
+            изграждане на сайтове, визуално обновяване, поддръжка и QA-oriented подобрения.
           </p>
         </div>
 
@@ -60,7 +66,7 @@ export function SiteFooter() {
 
             <li>
               <a
-                href="https://www.linkedin.com/in/georgi-gushev-82953417a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+                href={siteConfig.linkedin}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-3 text-slate-300 hover:text-white"
@@ -72,7 +78,7 @@ export function SiteFooter() {
 
             <li>
               <a
-                href="https://www.facebook.com/share/1B1Q5fxTZM/?mibextid=wwXIfr"
+                href={siteConfig.facebook}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-3 text-slate-300 hover:text-white"
@@ -84,7 +90,7 @@ export function SiteFooter() {
 
             <li>
               <a
-                href="https://www.instagram.com/goshkataaaa?igsh=dG9pbzQ2NGc2dGZz&utm_source=qr"
+                href={siteConfig.instagram}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-3 text-slate-300 hover:text-white"

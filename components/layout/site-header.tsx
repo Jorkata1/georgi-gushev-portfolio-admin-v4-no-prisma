@@ -23,7 +23,7 @@ export function SiteHeader() {
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-white">{siteConfig.name}</p>
             <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-              Personal Brand Portfolio
+              Дизайн / Уеб / Дигитални решения
             </p>
           </div>
         </Link>
@@ -46,6 +46,13 @@ export function SiteHeader() {
               </Link>
             );
           })}
+
+          <Link
+            href="/contact"
+            className="ml-3 inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primaryGlow transition hover:bg-primary/15"
+          >
+            Изпрати запитване
+          </Link>
         </nav>
 
         <button
@@ -85,7 +92,7 @@ export function SiteHeader() {
               onClick={() => setIsOpen(false)}
               className="block rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primaryGlow"
             >
-              Свържи се с мен
+              Изпрати запитване
             </Link>
           </div>
         </div>

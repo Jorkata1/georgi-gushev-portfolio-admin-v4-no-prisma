@@ -5,7 +5,7 @@ import { createMetadata } from "@/lib/site-metadata";
 export const metadata = createMetadata({
   title: "Начало",
   description:
-    "Premium personal brand portfolio на Георги Гушев — графичен дизайн, дигитални приложения, QA мислене и техническа дисциплина.",
+    "Уеб дизайн, създаване на сайтове, бранд идентичност, визуално обновяване, поддръжка, QA manual услуги и консултации.",
   path: "/"
 });
 
