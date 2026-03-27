@@ -30,22 +30,20 @@ type ServiceCard = {
   icon: LucideIcon;
 };
 
-const primaryService = {
-  label: "Водеща услуга",
-  title: "Уеб дизайн и създаване на сайтове",
-  description:
-    "Създавам clean и модерни сайтове с фокус върху ясна структура, силна визуална посока и работещо потребителско изживяване. Подходящо за лични брандове, услуги, малки бизнеси и проекти, които имат нужда от по-професионално онлайн присъствие.",
-  highlights: [
-    "Представителни сайтове",
-    "Portfolio сайтове",
-    "Landing pages",
-    "Редизайн на съществуващи сайтове",
-    "Responsive адаптация",
-    "По-добра визуална йерархия и CTA логика"
-  ]
-};
-
 const services: ServiceCard[] = [
+  {
+    label: "Уеб",
+    title: "Уеб дизайн и създаване на сайтове",
+    description:
+      "Създавам clean и модерни сайтове с фокус върху ясна структура, силна визуална посока и работещо потребителско изживяване.",
+    includes: [
+      "Представителни сайтове",
+      "Portfolio сайтове",
+      "Landing pages",
+      "Редизайн на съществуващи сайтове"
+    ],
+    icon: Globe
+  },
   {
     label: "UI / UX",
     title: "UI дизайн за сайтове и приложения",
@@ -55,7 +53,7 @@ const services: ServiceCard[] = [
       "Screen layouts",
       "Визуална йерархия",
       "UI секции и компоненти",
-      "Подобряване на navigation flow"
+      "Navigation flow"
     ],
     icon: LayoutGrid
   },
@@ -126,10 +124,13 @@ const services: ServiceCard[] = [
   }
 ];
 
-const valuePoints = [
-  "Ясна визуална посока",
-  "Практична структура",
-  "QA-oriented внимание към детайла"
+const suitableFor = [
+  "Лични брандове",
+  "Малки бизнеси",
+  "Представителни сайтове",
+  "Portfolio сайтове",
+  "Landing pages",
+  "Редизайн на съществуващи сайтове"
 ];
 
 const process = [
@@ -158,173 +159,68 @@ const process = [
 export default function ServicesPage() {
   return (
     <>
-      <section className="relative overflow-hidden border-b border-white/6">
-        <div className="hero-grid absolute inset-0 opacity-40" />
-        <div className="absolute inset-x-0 top-[-8rem] h-[28rem] bg-[radial-gradient(circle_at_top,rgba(87,166,255,0.22),transparent_56%)]" />
-
-        <Container className="section-padding relative">
-          <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-            <div>
-              <span className="eyebrow">
-                <Sparkles size={14} />
-                Услуги / Дигитални решения
-              </span>
-
-              <h1 className="display-title mt-5 max-w-4xl text-balance">
-                Премиум дигитални услуги с фокус върху визия, яснота и работещ резултат.
-              </h1>
-
-              <p className="mt-6 max-w-2xl text-lg text-slate-300">
-                Работя по проекти, при които добрата визия, правилната структура и
-                работещото потребителско изживяване трябва да вървят заедно — от
-                дизайн и изграждане на сайтове до бранд идентичност, QA прегледи и
-                визуално обновяване.
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link href="/contact">
-                  <Button>
-                    Изпрати запитване
-                    <ArrowRight size={16} />
-                  </Button>
-                </Link>
-
-                <Link href="/portfolio">
-                  <Button variant="secondary">Разгледай проекти</Button>
-                </Link>
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                {valuePoints.map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-slate-300"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="surface-strong relative overflow-hidden p-6 sm:p-8">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(87,166,255,0.2),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(216,171,98,0.12),transparent_25%)]" />
-
+      <section className="section-padding pt-16">
+        <Container>
+          <div className="mx-auto max-w-6xl">
+            <article className="surface-strong relative overflow-hidden p-8 sm:p-10 lg:p-12">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(87,166,255,0.14),transparent_45%),radial-gradient(circle_at_bottom,rgba(216,171,98,0.08),transparent_35%)]" />
               <div className="relative">
-                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6">
-                  <span className="eyebrow">Какво получаваш</span>
-                  <h2 className="mt-4 text-2xl font-semibold text-white">
-                    Дизайн, структура и по-професионално дигитално присъствие
-                  </h2>
-                  <p className="mt-4 text-sm text-slate-300">
-                    Подходящо за лични брандове, малки бизнеси и нови проекти,
-                    които имат нужда от clean визия, по-ясна комуникация и
-                    по-добро онлайн представяне.
+                <div className="mx-auto max-w-3xl text-center">
+                  <span className="eyebrow justify-center">Подходящо за</span>
+
+                  <h1 className="section-title mt-4 text-balance">
+                    Проекти, които имат нужда от повече от просто добра визия
+                  </h1>
+
+                  <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-slate-300">
+                    Работя по сайтове, брандове и дигитални решения, при които
+                    визията, структурата и функционалността трябва да вървят
+                    заедно, за да се стигне до по-ясен, по-подреден и по-професионален резултат.
                   </p>
                 </div>
 
-                <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-4">
-                    <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">
-                      Уеб и сайтове
-                    </p>
-                    <p className="mt-3 text-lg font-semibold text-white">
-                      Дизайн и изработка
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">
-                      Сайтове, редизайн и подобрения.
-                    </p>
-                  </div>
-
-                  <div className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-4">
-                    <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">
-                      Бранд и визия
-                    </p>
-                    <p className="mt-3 text-lg font-semibold text-white">
-                      Лице на бранда
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">
-                      По-силен облик и ясна посока.
-                    </p>
-                  </div>
-
-                  <div className="rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-4">
-                    <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">
-                      QA и детайл
-                    </p>
-                    <p className="mt-3 text-lg font-semibold text-white">
-                      Проверка и яснота
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">
-                      Функционален преглед и usability фокус.
-                    </p>
-                  </div>
+                <div className="mx-auto mt-8 flex max-w-4xl flex-wrap justify-center gap-3">
+                  {[
+                    "Ясна визуална посока",
+                    "Практична структура",
+                    "По-силно дигитално присъствие"
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-slate-300"
+                    >
+                      {item}
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
 
-      <section className="section-padding">
-        <Container>
-          <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-            <article className="surface-strong p-8 sm:p-10">
-              <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
-                <Globe size={24} />
-              </div>
+                <div className="mx-auto mt-10 grid max-w-5xl gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {suitableFor.map((item) => (
+                    <div
+                      key={item}
+                      className="group rounded-[1.35rem] border border-white/10 bg-white/[0.04] px-5 py-5 transition hover:border-primary/30 hover:bg-white/[0.06]"
+                    >
+                      <div className="flex items-center gap-3 text-left">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-primaryGlow">
+                          <CheckCircle2 size={16} />
+                        </div>
+                        <span className="text-sm font-medium text-slate-200">
+                          {item}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-              <div className="mt-6">
-                <span className="eyebrow">{primaryService.label}</span>
-                <h2 className="section-title mt-4 text-balance">
-                  {primaryService.title}
-                </h2>
-                <p className="mt-5 max-w-3xl text-slate-300">
-                  {primaryService.description}
-                </p>
-              </div>
-
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {primaryService.highlights.map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-[1.25rem] border border-white/10 bg-white/[0.04] px-4 py-4 text-sm text-slate-300"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </article>
-
-            <article className="surface p-8">
-              <span className="eyebrow">Подходящо за</span>
-              <h3 className="mt-4 text-2xl font-semibold text-white">
-                Проекти, които имат нужда от повече от просто добра визия
-              </h3>
-
-              <div className="mt-6 space-y-4">
-                {[
-                  "Лични брандове",
-                  "Малки бизнеси",
-                  "Представителни сайтове",
-                  "Portfolio сайтове",
-                  "Landing pages",
-                  "Редизайн на съществуващи сайтове"
-                ].map((item) => (
-                  <div key={item} className="flex gap-3 text-sm text-slate-300">
-                    <CheckCircle2
-                      className="mt-0.5 shrink-0 text-primaryGlow"
-                      size={18}
-                    />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-5">
-                <p className="text-sm text-slate-300">
-                  Целта не е само сайтът да изглежда по-добре, а да бъде по-ясен,
-                  по-подреден и по-полезен за реалната комуникация с клиента.
-                </p>
+                <div className="mx-auto mt-10 max-w-4xl rounded-[1.5rem] border border-white/10 bg-white/[0.05] p-6 sm:p-7">
+                  <p className="text-center text-base leading-7 text-slate-300 sm:text-lg">
+                    Целта не е само сайтът да изглежда по-добре, а да бъде
+                    <span className="font-medium text-white"> по-ясен</span>,
+                    <span className="font-medium text-white"> по-подреден</span> и
+                    <span className="font-medium text-white"> по-полезен</span> за
+                    реалната комуникация с клиента.
+                  </p>
+                </div>
               </div>
             </article>
           </div>
@@ -334,14 +230,14 @@ export default function ServicesPage() {
       <section className="section-padding border-y border-white/6 bg-white/[0.015]">
         <Container>
           <div className="max-w-3xl">
-            <span className="eyebrow">Останали услуги</span>
+            <span className="eyebrow">Услуги</span>
             <h2 className="section-title mt-4">
-              Допълващи услуги за по-силен и по-пълен дигитален резултат
+              Услуги за по-силен и по-пълен дигитален резултат
             </h2>
             <p className="mt-5 max-w-2xl text-slate-300">
-              Освен създаване на сайтове, предлагам и услуги, които помагат на
-              един проект да изглежда по-добре, да работи по-добре и да се
-              представя по-професионално.
+              От уеб дизайн и изграждане на сайтове до бранд идентичност,
+              поддръжка, QA преглед и консултации — всичко, което помага на
+              един проект да изглежда по-добре и да работи по-добре.
             </p>
           </div>
 
@@ -350,7 +246,10 @@ export default function ServicesPage() {
               const Icon = service.icon;
 
               return (
-                <article key={service.title} className="surface card-hover h-full p-6">
+                <article
+                  key={service.title}
+                  className="surface card-hover flex h-full flex-col p-6"
+                >
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
                     <Icon size={20} />
                   </div>
@@ -385,32 +284,55 @@ export default function ServicesPage() {
       </section>
 
       <section className="section-padding">
-        <Container>
-          <div className="max-w-3xl">
-            <span className="eyebrow">Процес</span>
-            <h2 className="section-title mt-4">
-              Подреден процес от първоначалната идея до финалния резултат
-            </h2>
-            <p className="mt-5 max-w-2xl text-slate-300">
-              Независимо дали става дума за нов сайт, редизайн, визуално
-              обновяване или QA преглед, работя с ясен ритъм и practical фокус.
-            </p>
-          </div>
+  <Container>
+    <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-3xl text-center">
+        <span className="eyebrow justify-center">Процес</span>
+        <h2 className="section-title mt-4 text-balance">
+          Подреден процес от първоначалната идея до финалния резултат
+        </h2>
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+          Независимо дали става дума за нов сайт, редизайн, визуално
+          обновяване или QA преглед, работя с ясен ритъм, practical фокус и
+          внимание към всеки ключов етап.
+        </p>
+      </div>
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-4">
-            {process.map((item) => (
-              <article key={item.step} className="surface relative h-full p-6">
-                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-sm font-semibold text-primaryGlow">
-                  {item.step}
+      <div className="relative mt-12">
+        <div className="absolute left-0 right-0 top-6 hidden h-px bg-gradient-to-r from-transparent via-white/10 to-transparent lg:block" />
+
+        <div className="grid gap-6 lg:grid-cols-4">
+          {process.map((item) => (
+            <article
+              key={item.step}
+              className="group surface-strong relative h-full overflow-hidden p-6 transition hover:-translate-y-1 hover:border-primary/20"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(87,166,255,0.08),transparent_40%)] opacity-0 transition group-hover:opacity-100" />
+
+              <div className="relative">
+                <div className="mb-6 flex items-center gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-sm font-semibold text-primaryGlow shadow-[0_0_0_6px_rgba(87,166,255,0.04)]">
+                    {item.step}
+                  </div>
+
+                  <div className="hidden h-px flex-1 bg-white/10 lg:block" />
                 </div>
 
-                <h3 className="text-xl font-semibold text-white">{item.title}</h3>
-                <p className="mt-3 text-sm text-slate-300">{item.text}</p>
-              </article>
-            ))}
-          </div>
-        </Container>
-      </section>
+                <h3 className="text-xl font-semibold leading-snug text-white">
+                  {item.title}
+                </h3>
+
+                <p className="mt-4 text-sm leading-7 text-slate-300">
+                  {item.text}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>
 
       <section className="pb-20">
         <Container>
