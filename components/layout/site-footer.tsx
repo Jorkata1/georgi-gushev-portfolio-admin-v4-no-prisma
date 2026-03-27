@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { navItems, siteConfig, socialLinks } from "@/data/site";
+import { Facebook, Instagram, Linkedin, Mail, Phone } from "lucide-react";
+import { navItems, siteConfig } from "@/data/site";
 
 export function SiteFooter() {
   return (
@@ -33,17 +34,67 @@ export function SiteFooter() {
 
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">
-            Контакт
+            Контакт и социални мрежи
           </h4>
+
           <ul className="mt-4 space-y-3">
-            {socialLinks.map((item) => (
-              <li key={item.label}>
-                <a href={item.href} className="text-slate-300 hover:text-white">
-                  {item.label}
-                </a>
-              </li>
-            ))}
+            <li>
+              <a
+                href={`mailto:${siteConfig.email}`}
+                className="inline-flex items-center gap-3 text-slate-300 hover:text-white"
+              >
+                <Mail size={16} />
+                <span>{siteConfig.email}</span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href={`tel:${siteConfig.phone.replace(/\s+/g, "")}`}
+                className="inline-flex items-center gap-3 text-slate-300 hover:text-white"
+              >
+                <Phone size={16} />
+                <span>{siteConfig.phone}</span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="https://www.linkedin.com/in/georgi-gushev-82953417a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-3 text-slate-300 hover:text-white"
+              >
+                <Linkedin size={16} />
+                <span>LinkedIn</span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="https://www.facebook.com/share/1B1Q5fxTZM/?mibextid=wwXIfr"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-3 text-slate-300 hover:text-white"
+              >
+                <Facebook size={16} />
+                <span>Facebook</span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="https://www.instagram.com/goshkataaaa?igsh=dG9pbzQ2NGc2dGZz&utm_source=qr"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-3 text-slate-300 hover:text-white"
+              >
+                <Instagram size={16} />
+                <span>Instagram</span>
+              </a>
+            </li>
           </ul>
+
           <p className="mt-6 text-sm text-slate-500">
             © {new Date().getFullYear()} {siteConfig.name}. Всички права запазени.
           </p>

@@ -3,7 +3,7 @@ import { Container } from "@/components/shared/container";
 type PageHeroProps = {
   eyebrow: string;
   title: string;
-  description: string;
+  description?: string;
 };
 
 export function PageHero({ eyebrow, title, description }: PageHeroProps) {
@@ -13,7 +13,9 @@ export function PageHero({ eyebrow, title, description }: PageHeroProps) {
       <Container className="section-padding relative">
         <span className="eyebrow">{eyebrow}</span>
         <h1 className="display-title mt-5 max-w-4xl text-balance">{title}</h1>
-        <p className="mt-6 max-w-2xl text-lg text-slate-300">{description}</p>
+        {description ? (
+          <p className="mt-6 max-w-2xl text-lg text-slate-300">{description}</p>
+        ) : null}
       </Container>
     </section>
   );

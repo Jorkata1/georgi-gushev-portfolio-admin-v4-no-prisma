@@ -21,7 +21,7 @@ export function HomeHero() {
 
             <h1 className="hero-title mt-6 text-balance">
               Георги Гушев
-              <span className="block text-gradient">
+              <span className="mt-1 block text-gradient">
                 — дизайн, дигитални приложения и QA мислене
               </span>
             </h1>
