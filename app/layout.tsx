@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { ScrollToTop } from "@/components/shared/scroll-to-top";
 import { LanguageProvider } from "@/lib/language-context";
 import { LocaleTransition } from "@/components/shared/locale-transition";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
@@ -57,6 +58,7 @@ export default function RootLayout({
             <ScrollToTop />
           </div>
         </LanguageProvider>
+        <Analytics />
       </body>
     </html>
   );
