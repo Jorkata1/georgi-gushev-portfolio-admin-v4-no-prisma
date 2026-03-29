@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
-import { navItems, siteConfig } from "@/data/site";
+import { navItems } from "@/data/site";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
@@ -17,13 +18,20 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-white/6 bg-background/70 backdrop-blur-xl">
       <div className="container-shell flex h-20 items-center justify-between gap-6">
         <Link href="/" className="group inline-flex items-center gap-3">
-          <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-lg font-semibold text-white shadow-soft transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:border-primary/[0.35]">
-            {siteConfig.shortName}
-          </span>
-          <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-white">{siteConfig.name}</p>
+          <div className="relative h-11 w-11 shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5">
+            <Image
+              src="/branding/logo-mark.png"
+              alt="GDX Studio"
+              fill
+              priority
+              className="object-contain"
+            />
+          </div>
+
+          <div className="hidden sm:block leading-tight">
+            <p className="text-sm font-semibold text-white">Георги Гушев</p>
             <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-              Дизайн / Уеб / Дигитални решения
+              GDX Studio
             </p>
           </div>
         </Link>
@@ -31,14 +39,16 @@ export function SiteHeader() {
         <nav className="hidden items-center gap-1 lg:flex">
           {links.map((item) => {
             const isActive =
-              item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
+              item.href === "/"
+                ? pathname === item.href
+                : pathname.startsWith(item.href);
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-full px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white",
+                  "rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white",
                   isActive && "bg-white/[0.07] text-white shadow-soft"
                 )}
               >
@@ -71,7 +81,9 @@ export function SiteHeader() {
           <div className="surface space-y-2 p-3">
             {links.map((item) => {
               const isActive =
-                item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
+                item.href === "/"
+                  ? pathname === item.href
+                  : pathname.startsWith(item.href);
 
               return (
                 <Link
@@ -79,7 +91,7 @@ export function SiteHeader() {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "block rounded-2xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-white/5 hover:text-white",
+                    "block rounded-2xl px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white",
                     isActive && "bg-white/[0.07] text-white"
                   )}
                 >
@@ -87,6 +99,7 @@ export function SiteHeader() {
                 </Link>
               );
             })}
+
             <Link
               href="/contact"
               onClick={() => setIsOpen(false)}

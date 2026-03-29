@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   Facebook,
@@ -18,14 +19,31 @@ const legalLinks = [
 export function SiteFooter() {
   return (
     <footer className="border-t border-white/6 py-10">
-      <div className="container-shell grid gap-10 lg:grid-cols-[1.1fr_0.9fr_1fr_1fr]">
+      <div className="container-shell grid gap-10 lg:grid-cols-[1.15fr_0.9fr_0.9fr_1fr]">
         <div>
-          <p className="eyebrow">GDX Studio</p>
-          <h3 className="mt-4 text-2xl font-semibold text-white">
+          <div className="group relative inline-flex">
+            <div className="pointer-events-none absolute -inset-x-5 -inset-y-4 -z-10 opacity-0 blur-2xl transition duration-300 group-hover:opacity-100">
+              <div className="absolute left-0 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-[rgba(87,166,255,0.18)]" />
+              <div className="absolute right-0 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-[rgba(87,166,255,0.12)]" />
+            </div>
+
+            <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4 transition duration-300 group-hover:-translate-y-0.5 group-hover:border-primary/20">
+              <Image
+                src="/branding/logo-full.png"
+                alt="GDX Studio"
+                width={220}
+                height={90}
+                className="h-auto w-[170px] object-contain sm:w-[200px]"
+              />
+            </div>
+          </div>
+
+          <p className="mt-5 max-w-xl text-slate-300">
             Дизайн, сайтове и дигитални решения с фокус върху яснота, визия и
             функционалност.
-          </h3>
-          <p className="mt-4 max-w-xl text-slate-300">
+          </p>
+
+          <p className="mt-4 max-w-xl text-sm text-slate-400">
             Помагам на лични брандове, малки бизнеси и нови проекти с уеб дизайн,
             изграждане на сайтове, визуално обновяване, поддръжка и QA-oriented
             подобрения.
