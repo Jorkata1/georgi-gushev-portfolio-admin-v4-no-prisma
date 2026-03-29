@@ -4,6 +4,7 @@ import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { ScrollToTop } from "@/components/shared/scroll-to-top";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
@@ -48,6 +49,7 @@ export default function RootLayout({
           <SiteHeader />
           <main>{children}</main>
           <SiteFooter />
+          <ScrollToTop />
         </div>
       </body>
     </html>

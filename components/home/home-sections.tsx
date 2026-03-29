@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   CheckCircle2,
@@ -11,18 +14,21 @@ import {
   whatIDo,
   workProcess
 } from "@/data/site";
-import { getFeaturedProjects } from "@/lib/projects";
 import { ProjectCard } from "@/components/cards/project-card";
 import { Container } from "@/components/shared/container";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
+import type { Project } from "@/types";
 
-export async function HomeSections() {
-  const featuredProjects = await getFeaturedProjects();
+type HomeSectionsProps = {
+  featuredProjects: Project[];
+};
 
+export function HomeSections({ featuredProjects }: HomeSectionsProps) {
   return (
     <>
+      {/* Услуги */}
       <section className="section-padding">
         <Container>
           <SectionHeading
@@ -31,14 +37,14 @@ export async function HomeSections() {
             description="От уеб дизайн и изграждане на сайтове до бранд идентичност, визуално обновяване, поддръжка, QA проверки и консултации за по-силно дигитално присъствие."
           />
 
-          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {whatIDo.map((item, index) => {
               const Icon = item.icon;
 
               return (
                 <Reveal key={item.title} delay={index * 0.06}>
                   <article className="surface card-hover h-full p-6">
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-accent/20 bg-accent/10 text-accentGlow">
                       <Icon size={20} />
                     </div>
                     <h3 className="mt-5 text-xl font-semibold text-white">
@@ -51,7 +57,7 @@ export async function HomeSections() {
             })}
           </div>
 
-          <div className="mt-8">
+          <div className="mt-10">
             <Link href="/services">
               <Button variant="secondary">
                 Виж всички услуги
@@ -62,9 +68,13 @@ export async function HomeSections() {
         </Container>
       </section>
 
-      <section className="section-padding border-y border-white/6 bg-white/[0.015]">
+      {/* Divider */}
+      <div className="section-divider" />
+
+      {/* Как мога да помогна + Кратко за мен */}
+      <section className="section-padding">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
               <SectionHeading
                 eyebrow="Как мога да помогна"
@@ -72,12 +82,12 @@ export async function HomeSections() {
                 description="Работя по проекти, при които дизайнът, структурата и функционалността трябва да вървят заедно, за да се стигне до по-ясен и професионален резултат."
               />
 
-              <div className="mt-8 grid gap-4">
+              <div className="mt-10 grid gap-4">
                 {helpCases.map((item, index) => (
                   <Reveal key={item} delay={index * 0.06}>
                     <div className="surface flex gap-3 p-5">
                       <CheckCircle2
-                        className="mt-0.5 shrink-0 text-primaryGlow"
+                        className="mt-0.5 shrink-0 text-accentGlow"
                         size={18}
                       />
                       <p className="text-sm text-slate-300">{item}</p>
@@ -94,7 +104,7 @@ export async function HomeSections() {
                 description={siteConfig.shortAbout}
               />
 
-              <div className="mt-8 surface p-6">
+              <div className="mt-10 surface p-6">
                 <p className="text-sm text-slate-300">
                   Комбинирам визуален подход, техническа дисциплина и QA mindset,
                   за да се стига до решения, които са едновременно clean, practical
@@ -115,6 +125,10 @@ export async function HomeSections() {
         </Container>
       </section>
 
+      {/* Divider */}
+      <div className="section-divider" />
+
+      {/* Проекти */}
       <section className="section-padding">
         <Container>
           <SectionHeading
@@ -123,7 +137,7 @@ export async function HomeSections() {
             description="Примери за работа в области като бранд идентичност, уеб визия, UI концепции и визуални решения с практическа насоченост."
           />
 
-          <div className="mt-10 grid gap-6">
+          <div className="mt-12 grid gap-8">
             {featuredProjects.map((project, index) => (
               <Reveal key={project.id} delay={index * 0.08}>
                 <ProjectCard project={project} />
@@ -131,7 +145,7 @@ export async function HomeSections() {
             ))}
           </div>
 
-          <div className="mt-8">
+          <div className="mt-10">
             <Link href="/portfolio">
               <Button variant="secondary">
                 Разгледай всички проекти
@@ -142,7 +156,11 @@ export async function HomeSections() {
         </Container>
       </section>
 
-      <section className="section-padding border-y border-white/6 bg-white/[0.015]">
+      {/* Divider */}
+      <div className="section-divider" />
+
+      {/* Процес */}
+      <section className="section-padding">
         <Container>
           <SectionHeading
             eyebrow="Процес"
@@ -150,11 +168,11 @@ export async function HomeSections() {
             description="Независимо дали става дума за нов сайт, редизайн, визуално обновяване или QA преглед, работя с подреден процес и ясен фокус върху резултата."
           />
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-4">
+          <div className="mt-12 grid gap-6 lg:grid-cols-4">
             {workProcess.map((item, index) => (
               <Reveal key={item.title} delay={index * 0.08}>
                 <article className="surface h-full p-6">
-                  <p className="text-xs uppercase tracking-[0.24em] text-amber">
+                  <p className="text-xs uppercase tracking-[0.24em] text-accent">
                     Стъпка {index + 1}
                   </p>
                   <h3 className="mt-4 text-xl font-semibold text-white">
@@ -168,6 +186,10 @@ export async function HomeSections() {
         </Container>
       </section>
 
+      {/* Divider */}
+      <div className="section-divider" />
+
+      {/* Подход */}
       <section className="section-padding">
         <Container>
           <SectionHeading
@@ -176,12 +198,12 @@ export async function HomeSections() {
             description="Подхождам към проектите не само като към визия, а като към цялостно решение, което трябва да бъде ясно, последователно и функционално."
           />
 
-          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {reasonsToWork.map((item, index) => (
               <Reveal key={item} delay={index * 0.05}>
                 <div className="surface flex gap-3 p-5">
                   <MoveUpRight
-                    className="mt-0.5 shrink-0 text-primaryGlow"
+                    className="mt-0.5 shrink-0 text-accentGlow"
                     size={18}
                   />
                   <p className="text-sm text-slate-300">{item}</p>
@@ -192,9 +214,10 @@ export async function HomeSections() {
         </Container>
       </section>
 
-      <section className="pb-20">
+      {/* CTA */}
+      <section className="section-padding-sm pb-24">
         <Container>
-          <div className="surface-strong overflow-hidden p-8 sm:p-10">
+          <div className="surface-strong overflow-hidden p-8 sm:p-10 lg:p-12">
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
                 <span className="eyebrow">Контакт</span>

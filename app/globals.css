@@ -13,15 +13,15 @@ html {
 body {
   @apply bg-background text-foreground antialiased;
   background-image:
-    radial-gradient(circle at top, rgba(87, 166, 255, 0.14), transparent 26%),
-    radial-gradient(circle at 85% 20%, rgba(216, 171, 98, 0.1), transparent 20%),
-    radial-gradient(circle at 15% 80%, rgba(87, 166, 255, 0.08), transparent 25%),
-    linear-gradient(180deg, #08111f 0%, #050c17 100%);
+    radial-gradient(circle at top, rgba(79, 156, 247, 0.12), transparent 26%),
+    radial-gradient(circle at 85% 20%, rgba(232, 164, 74, 0.08), transparent 20%),
+    radial-gradient(circle at 15% 80%, rgba(79, 156, 247, 0.06), transparent 25%),
+    linear-gradient(180deg, #060e1a 0%, #040a14 100%);
   min-height: 100vh;
 }
 
 ::selection {
-  background: rgba(87, 166, 255, 0.26);
+  background: rgba(232, 164, 74, 0.3);
   color: white;
 }
 
@@ -52,11 +52,15 @@ body {
   }
 
   .section-padding {
+    @apply py-20 sm:py-28 lg:py-36;
+  }
+
+  .section-padding-sm {
     @apply py-16 sm:py-20 lg:py-24;
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.35em] text-amber;
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.35em] text-accent;
   }
 
   .hero-title {
@@ -84,18 +88,23 @@ body {
 
   .hero-grid {
     background-image:
-      linear-gradient(rgba(87, 166, 255, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(87, 166, 255, 0.06) 1px, transparent 1px);
+      linear-gradient(rgba(79, 156, 247, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79, 156, 247, 0.05) 1px, transparent 1px);
     background-size: 100px 100px;
   }
 
   .text-gradient {
-    background: linear-gradient(90deg, #f5d29d 0%, #c5ddff 50%, #67b0ff 100%);
+    background: linear-gradient(90deg, #f4c97a 0%, #a7c8f2 50%, #4f9cf7 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .card-hover {
-    @apply transition-transform duration-500 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-glow;
+    @apply transition-all duration-500 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-glow;
+  }
+
+  .section-divider {
+    @apply mx-auto h-px w-full max-w-xs;
+    background: linear-gradient(90deg, transparent, rgba(232, 164, 74, 0.25), transparent);
   }
 }

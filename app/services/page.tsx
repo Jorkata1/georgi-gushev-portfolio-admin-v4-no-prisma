@@ -163,7 +163,7 @@ export default function ServicesPage() {
         <Container>
           <div className="mx-auto max-w-6xl">
             <article className="surface-strong relative overflow-hidden p-8 sm:p-10 lg:p-12">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(87,166,255,0.14),transparent_45%),radial-gradient(circle_at_bottom,rgba(216,171,98,0.08),transparent_35%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(79,156,247,0.12),transparent_45%),radial-gradient(circle_at_bottom,rgba(232,164,74,0.06),transparent_35%)]" />
               <div className="relative">
                 <div className="mx-auto max-w-3xl text-center">
                   <span className="eyebrow justify-center">Подходящо за</span>
@@ -187,7 +187,7 @@ export default function ServicesPage() {
                   ].map((item) => (
                     <div
                       key={item}
-                      className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-slate-300"
+                      className="rounded-full border border-accent/20 bg-accent/5 px-4 py-2 text-sm text-accent"
                     >
                       {item}
                     </div>
@@ -198,10 +198,10 @@ export default function ServicesPage() {
                   {suitableFor.map((item) => (
                     <div
                       key={item}
-                      className="group rounded-[1.35rem] border border-white/10 bg-white/[0.04] px-5 py-5 transition hover:border-primary/30 hover:bg-white/[0.06]"
+                      className="group rounded-[1.35rem] border border-white/10 bg-white/[0.04] px-5 py-5 transition hover:border-accent/30 hover:bg-white/[0.06]"
                     >
                       <div className="flex items-center gap-3 text-left">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-primaryGlow">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/20 bg-accent/10 text-accentGlow">
                           <CheckCircle2 size={16} />
                         </div>
                         <span className="text-sm font-medium text-slate-200">
@@ -250,7 +250,7 @@ export default function ServicesPage() {
                   key={service.title}
                   className="surface card-hover flex h-full flex-col p-6"
                 >
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-accent/20 bg-accent/10 text-accentGlow">
                     <Icon size={20} />
                   </div>
 
@@ -305,13 +305,13 @@ export default function ServicesPage() {
           {process.map((item) => (
             <article
               key={item.step}
-              className="group surface-strong relative h-full overflow-hidden p-6 transition hover:-translate-y-1 hover:border-primary/20"
+              className="group surface-strong relative h-full overflow-hidden p-6 transition hover:-translate-y-1 hover:border-accent/20"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(87,166,255,0.08),transparent_40%)] opacity-0 transition group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(232,164,74,0.06),transparent_40%)] opacity-0 transition group-hover:opacity-100" />
 
               <div className="relative">
                 <div className="mb-6 flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-sm font-semibold text-primaryGlow shadow-[0_0_0_6px_rgba(87,166,255,0.04)]">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-accent/20 bg-accent/10 text-sm font-semibold text-accentGlow shadow-[0_0_0_6px_rgba(232,164,74,0.04)]">
                     {item.step}
                   </div>
 

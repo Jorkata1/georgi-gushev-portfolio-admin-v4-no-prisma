@@ -59,7 +59,7 @@ export function SiteHeader() {
 
           <Link
             href="/contact"
-            className="ml-3 inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primaryGlow transition hover:bg-primary/15"
+            className="ml-3 inline-flex items-center justify-center rounded-full border border-accent/25 bg-accent/10 px-4 py-2 text-sm font-semibold text-accentGlow transition hover:bg-accent/20 hover:border-accent/40"
           >
             Изпрати запитване
           </Link>
@@ -103,7 +103,7 @@ export function SiteHeader() {
             <Link
               href="/contact"
               onClick={() => setIsOpen(false)}
-              className="block rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primaryGlow"
+              className="block rounded-2xl border border-accent/25 bg-accent/10 px-4 py-3 text-sm font-semibold text-accentGlow"
             >
               Изпрати запитване
             </Link>
