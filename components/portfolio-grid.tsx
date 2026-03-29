@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { Project } from "@/types";
 import { ProjectCard } from "@/components/cards/project-card";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/language-context";
+import { translations } from "@/data/translations";
 
 type PortfolioGridProps = {
   projects: Project[];
@@ -12,15 +14,20 @@ type PortfolioGridProps = {
 };
 
 export function PortfolioGrid({ projects, categories }: PortfolioGridProps) {
-  const [activeCategory, setActiveCategory] = useState<string>("Всички");
+  const { locale } = useLanguage();
+  const t = translations[locale].portfolio;
+
+  const [activeCategory, setActiveCategory] = useState<string>(t.all);
+
+  // Reset to translated "all" label when locale changes
+  const allLabel = t.all;
 
   const filteredProjects = useMemo(() => {
-    if (activeCategory === "Всички") {
+    if (activeCategory === allLabel || activeCategory === translations["bg"].portfolio.all || activeCategory === translations["en"].portfolio.all) {
       return projects;
     }
-
     return projects.filter((project) => project.category === activeCategory);
-  }, [activeCategory, projects]);
+  }, [activeCategory, projects, allLabel]);
 
   return (
     <div className="space-y-10">
@@ -42,10 +49,7 @@ export function PortfolioGrid({ projects, categories }: PortfolioGridProps) {
         ))}
       </div>
 
-      <motion.div
-        className="grid gap-8 lg:grid-cols-2"
-        layout
-      >
+      <motion.div className="grid gap-8 lg:grid-cols-2" layout>
         <AnimatePresence mode="popLayout">
           {filteredProjects.map((project) => (
             <motion.div
@@ -64,7 +68,7 @@ export function PortfolioGrid({ projects, categories }: PortfolioGridProps) {
 
       {filteredProjects.length === 0 && (
         <div className="surface py-16 text-center">
-          <p className="text-slate-400">Няма проекти в тази категория.</p>
+          <p className="text-slate-400">{t.noProjects}</p>
         </div>
       )}
     </div>

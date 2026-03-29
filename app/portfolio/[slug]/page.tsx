@@ -1,48 +1,40 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { notFound, useParams } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Container } from "@/components/shared/container";
 import { AdaptiveProjectGallery } from "@/components/portfolio/adaptive-project-gallery";
 import { getProjectBySlug } from "@/lib/projects";
-import { siteConfig } from "@/data/site";
+import { useLanguage } from "@/lib/language-context";
+import { translations } from "@/data/translations";
+import type { Project } from "@/types";
 
-type ProjectPageProps = {
-  params: { slug: string };
-};
+export default function ProjectDetailsPage() {
+  const params = useParams<{ slug: string }>();
+  const { locale } = useLanguage();
+  const t = translations[locale];
+  const p = t.portfolio;
 
-export async function generateMetadata({
-  params
-}: ProjectPageProps): Promise<Metadata> {
-  const project = await getProjectBySlug(params.slug);
+  const [project, setProject] = useState<Project | null | undefined>(undefined);
 
-  if (!project) {
-    return {
-      title: "Проектът не е намерен"
-    };
+  useEffect(() => {
+    getProjectBySlug(params.slug).then((data) => {
+      setProject(data ?? null);
+    });
+  }, [params.slug]);
+
+  // Loading state
+  if (project === undefined) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+      </div>
+    );
   }
 
-  const url = `${siteConfig.siteUrl}/portfolio/${project.slug}`;
-
-  return {
-    title: project.title,
-    description: project.summary,
-    alternates: {
-      canonical: url
-    },
-    openGraph: {
-      title: project.title,
-      description: project.summary,
-      url,
-      type: "article"
-    }
-  };
-}
-
-export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
-  const project = await getProjectBySlug(params.slug);
-
-  if (!project) {
+  if (project === null) {
     notFound();
   }
 
@@ -55,14 +47,16 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
             className="mb-6 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-accent"
           >
             <ArrowLeft size={16} />
-            Назад към портфолио
+            {p.backToPortfolio}
           </Link>
 
           <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
             <div>
               <span className="eyebrow">{project.category}</span>
               <h1 className="display-title mt-5 text-balance">{project.title}</h1>
-              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">{project.summary}</p>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">
+                {project.summary}
+              </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
                 {project.tools.map((tool) => (
@@ -79,28 +73,28 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
             <div className="surface p-6">
               <div className="flex items-center justify-between gap-4">
                 <span className="text-sm uppercase tracking-[0.25em] text-slate-400">
-                  Година
+                  {p.year}
                 </span>
                 <span className="text-sm font-medium text-accent">{project.year}</span>
               </div>
 
               <div className="mt-5 grid gap-4 sm:grid-cols-3">
                 <div className="rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Цели</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{p.goals}</p>
                   <p className="mt-2 text-xl font-semibold text-white">
                     {project.goals.length}
                   </p>
                 </div>
 
                 <div className="rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Стъпки</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{p.steps}</p>
                   <p className="mt-2 text-xl font-semibold text-white">
                     {project.process.length}
                   </p>
                 </div>
 
                 <div className="rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Резултати</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{p.results}</p>
                   <p className="mt-2 text-xl font-semibold text-white">
                     {project.outcome.length}
                   </p>
@@ -121,7 +115,7 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
 
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
             <article className="surface p-6">
-              <h2 className="text-xl font-semibold text-white">Цели</h2>
+              <h2 className="text-xl font-semibold text-white">{p.goals}</h2>
               <ul className="mt-5 space-y-3">
                 {project.goals.map((item) => (
                   <li key={item} className="flex gap-2 text-sm text-slate-300">
@@ -133,7 +127,7 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
             </article>
 
             <article className="surface p-6">
-              <h2 className="text-xl font-semibold text-white">Процес</h2>
+              <h2 className="text-xl font-semibold text-white">{p.process}</h2>
               <ul className="mt-5 space-y-3">
                 {project.process.map((item) => (
                   <li key={item} className="flex gap-2 text-sm text-slate-300">
@@ -145,7 +139,7 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
             </article>
 
             <article className="surface p-6">
-              <h2 className="text-xl font-semibold text-white">Резултат</h2>
+              <h2 className="text-xl font-semibold text-white">{p.result}</h2>
               <ul className="mt-5 space-y-3">
                 {project.outcome.map((item) => (
                   <li key={item} className="flex gap-2 text-sm text-slate-300">
@@ -160,13 +154,12 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
           <div className="mt-12 surface-strong p-8 sm:p-10">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <span className="eyebrow">Следваща стъпка</span>
+                <span className="eyebrow">{p.nextStep}</span>
                 <h2 className="mt-4 text-2xl font-semibold text-white">
-                  По-детайлни case studies и разширяване на project stories.
+                  {p.nextStepTitle}
                 </h2>
                 <p className="mt-3 max-w-2xl text-slate-300">
-                  Структурата на този сайт е готова за добавяне на нови проекти, по-богати
-                  визуални галерии и задълбочени описания.
+                  {p.nextStepDescription}
                 </p>
               </div>
 
@@ -174,7 +167,7 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
                 href="/contact"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accentGlow"
               >
-                Нека поговорим
+                {p.letsTalk}
                 <ArrowUpRight size={16} />
               </Link>
             </div>

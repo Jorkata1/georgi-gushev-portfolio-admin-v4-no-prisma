@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   ArrowRight,
@@ -14,61 +16,18 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
-import { createMetadata } from "@/lib/site-metadata";
 import { siteConfig } from "@/data/site";
+import { useLanguage } from "@/lib/language-context";
+import { translations } from "@/data/translations";
 
-export const metadata = createMetadata({
-  title: "За мен",
-  description:
-    "Дизайн, дигитално мислене и QA-oriented подход с фокус върху яснота, визия и practical execution.",
-  path: "/about"
-});
-
-const strengths = [
-  "Аналитично мислене",
-  "Внимание към детайла",
-  "Логическо мислене",
-  "Критично мислене",
-  "Комуникативност",
-  "Адаптивност",
-  "Research mindset",
-  "QA-oriented подход"
-];
-
-const valuePoints = [
-  {
-    title: "Дизайн и структура",
-    text: "Търся баланс между добра визия, ясна йерархия и practical съдържание.",
-    icon: LayoutGrid
-  },
-  {
-    title: "QA mindset",
-    text: "Гледам на проектите не само визуално, а и през логиката на реалното използване.",
-    icon: ShieldCheck
-  },
-  {
-    title: "Дигитален подход",
-    text: "Подхождам към сайтове и брандове като към цялостни дигитални решения.",
-    icon: Sparkles
-  }
-];
-
-const focusAreas = [
-  "Уеб дизайн и визуална структура",
-  "UI посока за сайтове и интерфейси",
-  "Бранд идентичност и консистентност",
-  "Визуално обновяване и поддръжка",
-  "QA manual преглед и user flow проверка",
-  "Консултации за структура и дигитална посока"
-];
-
-const resultPoints = [
-  "По-ясна комуникация",
-  "По-подредена структура",
-  "По-професионално дигитално присъствие"
-];
+// Icons mapped by index to match valuePoints order
+const valueIcons = [LayoutGrid, ShieldCheck, Sparkles];
 
 export default function AboutPage() {
+  const { locale } = useLanguage();
+  const t = translations[locale];
+  const a = t.aboutPage;
+
   return (
     <>
       <section className="relative overflow-hidden border-b border-white/6">
@@ -80,30 +39,27 @@ export default function AboutPage() {
             <div>
               <span className="eyebrow">
                 <Sparkles size={14} />
-                За мен / Подход / Дигитално мислене
+                {a.eyebrow}
               </span>
 
               <h1 className="display-title mt-5 max-w-4xl text-balance">
-                Дизайн, дигитално мислене и QA логика в един по-подреден и practical подход.
+                {a.title}
               </h1>
 
               <p className="mt-6 max-w-2xl text-lg text-slate-300">
-                Работя в пресечната точка между дизайн, дигитални решения и
-                функционално мислене. Подхождам към проектите с внимание към
-                детайла, визуална култура и ясна логика, за да се стига до
-                резултати, които изглеждат по-добре и работят по-добре.
+                {a.description}
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link href="/contact">
                   <Button>
-                    Изпрати запитване
+                    {a.sendInquiry}
                     <ArrowRight size={16} />
                   </Button>
                 </Link>
 
                 <Link href="/portfolio">
-                  <Button variant="secondary">Разгледай проекти</Button>
+                  <Button variant="secondary">{a.viewProjects}</Button>
                 </Link>
               </div>
             </div>
@@ -112,9 +68,8 @@ export default function AboutPage() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(87,166,255,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(216,171,98,0.10),transparent_25%)]" />
 
               <div className="relative grid gap-4">
-                {valuePoints.map((item) => {
-                  const Icon = item.icon;
-
+                {a.valuePoints.map((item, index) => {
+                  const Icon = valueIcons[index];
                   return (
                     <div
                       key={item.title}
@@ -123,11 +78,9 @@ export default function AboutPage() {
                       <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
                         <Icon size={18} />
                       </div>
-
                       <h2 className="mt-4 text-xl font-semibold text-white">
                         {item.title}
                       </h2>
-
                       <p className="mt-3 text-sm leading-7 text-slate-300">
                         {item.text}
                       </p>
@@ -143,30 +96,19 @@ export default function AboutPage() {
       <section className="section-padding">
         <Container>
           <article className="surface-strong p-8 sm:p-10 lg:p-12">
-            <span className="eyebrow">Подход, полезност и резултат</span>
+            <span className="eyebrow">{a.approachEyebrow}</span>
 
             <div className="mt-5 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
               <div>
-                <h2 className="section-title text-balance">
-                  Добрата визия работи най-добре, когато е част от ясна структура и реално полезно изживяване.
-                </h2>
+                <h2 className="section-title text-balance">{a.approachTitle}</h2>
 
                 <div className="mt-6 space-y-4 text-slate-300">
-                  <p>
-                    Харесвам проекти, при които визуалната посока не е самоцел,
-                    а помага на един сайт или бранд да се усеща по-подреден,
-                    по-ясен и по-професионален.
-                  </p>
-
-                  <p>
-                    Затова подхождам едновременно с дизайнерски поглед и с логика
-                    към структурата, съдържанието, използваемостта и малките
-                    детайли, които определят качеството на крайния резултат.
-                  </p>
+                  <p>{a.approachP1}</p>
+                  <p>{a.approachP2}</p>
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-3">
-                  {resultPoints.map((item) => (
+                  {a.resultPoints.map((item) => (
                     <div
                       key={item}
                       className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm text-slate-300"
@@ -179,10 +121,9 @@ export default function AboutPage() {
 
               <div className="grid gap-6">
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6">
-                  <span className="eyebrow">С какво мога да бъда полезен</span>
-
+                  <span className="eyebrow">{a.usefulEyebrow}</span>
                   <div className="mt-5 space-y-4">
-                    {focusAreas.map((item) => (
+                    {a.focusAreas.map((item) => (
                       <div key={item} className="flex gap-3 text-sm text-slate-300">
                         <CheckCircle2
                           className="mt-0.5 shrink-0 text-primaryGlow"
@@ -195,11 +136,9 @@ export default function AboutPage() {
                 </div>
 
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6">
-                  <span className="eyebrow">Какво носи този подход</span>
+                  <span className="eyebrow">{a.usefulResult}</span>
                   <p className="mt-4 text-sm leading-7 text-slate-300">
-                    Когато дизайнът, структурата и функционалността вървят заедно,
-                    резултатът не просто изглежда по-добре — той комуникира
-                    по-уверено и работи по-ефективно.
+                    {a.usefulResultText}
                   </p>
                 </div>
               </div>
@@ -213,13 +152,13 @@ export default function AboutPage() {
           <div className="mx-auto max-w-6xl space-y-6">
             <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
               <article className="surface self-start p-7 sm:p-8">
-                <span className="eyebrow">Силни страни</span>
+                <span className="eyebrow">{a.strengthsEyebrow}</span>
                 <h2 className="mt-4 text-2xl font-semibold text-white">
-                  Подход, изграден върху внимание към детайла и practical мислене
+                  {a.strengthsTitle}
                 </h2>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  {strengths.map((item) => (
+                  {a.strengths.map((item) => (
                     <div
                       key={item}
                       className="rounded-[1.25rem] border border-white/10 bg-white/[0.05] px-4 py-4 text-sm text-slate-300"
@@ -231,7 +170,7 @@ export default function AboutPage() {
               </article>
 
               <article className="surface p-7 sm:p-8">
-                <span className="eyebrow">Професионална основа</span>
+                <span className="eyebrow">{a.proEyebrow}</span>
 
                 <div className="mt-4 flex items-center gap-4">
                   <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
@@ -239,47 +178,34 @@ export default function AboutPage() {
                   </div>
 
                   <h2 className="text-2xl font-semibold text-white">
-                    Опит, който подкрепя работата ми по дигитални проекти
+                    {a.proTitle}
                   </h2>
                 </div>
 
                 <div className="mt-5 space-y-4 text-slate-300">
-                  <p>
-                    Професионалният ми опит включва работа с дигитални приложения,
-                    поддръжка, съдействие при потребителски затруднения, докладване
-                    на проблеми и участие в процеси, при които яснотата и
-                    надеждността са важни.
-                  </p>
-
-                  <p>
-                    Това ми помага да гледам на дигиталните проекти не само
-                    визуално, а и през логиката на реалното използване,
-                    потребителските затруднения и качеството на крайния резултат.
-                  </p>
+                  <p>{a.proP1}</p>
+                  <p>{a.proP2}</p>
                 </div>
               </article>
             </div>
 
             <article className="surface-strong p-7 sm:p-8">
-              <span className="eyebrow">Кратка информация</span>
+              <span className="eyebrow">{a.infoEyebrow}</span>
 
               <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.04] p-5">
                   <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
                     <MapPin size={16} />
                   </div>
-
                   <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Локация и езици
+                    {a.locationTitle}
                   </p>
-
                   <p className="mt-3 text-sm leading-7 text-white">
-                    {siteConfig.location}
+                    {a.location}
                   </p>
-
                   <div className="mt-4 border-t border-white/10 pt-4">
-                    <p className="text-sm text-white">Български — майчин език</p>
-                    <p className="mt-1 text-sm text-white">Английски — B2</p>
+                    <p className="text-sm text-white">{a.langBg}</p>
+                    <p className="mt-1 text-sm text-white">{a.langEn}</p>
                   </div>
                 </div>
 
@@ -287,14 +213,11 @@ export default function AboutPage() {
                   <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
                     <Target size={16} />
                   </div>
-
                   <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Подходящо за
+                    {a.suitableFor}
                   </p>
-
                   <p className="mt-3 text-sm leading-7 text-white">
-                    Нови сайтове, визуално обновяване, бранд посока, UI идеи,
-                    поддръжка и QA-oriented подобрения
+                    {a.suitableForText}
                   </p>
                 </div>
 
@@ -302,13 +225,11 @@ export default function AboutPage() {
                   <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
                     <Tag size={16} />
                   </div>
-
                   <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Фокус
+                    {a.focus}
                   </p>
-
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {["Дизайн", "Уеб", "Бранд", "QA"].map((item) => (
+                    {a.focusTags.map((item) => (
                       <div
                         key={item}
                         className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs text-slate-300"
@@ -323,15 +244,12 @@ export default function AboutPage() {
                   <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primaryGlow">
                     <Mail size={16} />
                   </div>
-
                   <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Контакт
+                    {t.footer.contactTitle}
                   </p>
-
                   <p className="mt-3 break-words text-sm text-white">
                     {siteConfig.email}
                   </p>
-
                   <div className="mt-4 flex items-center gap-2 text-sm text-white">
                     <Phone size={14} className="text-primaryGlow" />
                     <span>{siteConfig.phone}</span>

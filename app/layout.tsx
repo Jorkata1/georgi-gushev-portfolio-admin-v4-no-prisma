@@ -5,6 +5,8 @@ import { siteConfig } from "@/data/site";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { ScrollToTop } from "@/components/shared/scroll-to-top";
+import { LanguageProvider } from "@/lib/language-context";
+import { LocaleTransition } from "@/components/shared/locale-transition";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
@@ -44,13 +46,17 @@ export default function RootLayout({
   return (
     <html lang="bg">
       <body>
-        <div className="relative min-h-screen">
-          <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(87,166,255,0.12),transparent_24%),radial-gradient(circle_at_80%_15%,rgba(216,171,98,0.09),transparent_18%)]" />
-          <SiteHeader />
-          <main>{children}</main>
-          <SiteFooter />
-          <ScrollToTop />
-        </div>
+        <LanguageProvider>
+          <div className="relative min-h-screen">
+            <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(87,166,255,0.12),transparent_24%),radial-gradient(circle_at_80%_15%,rgba(216,171,98,0.09),transparent_18%)]" />
+            <SiteHeader />
+            <LocaleTransition>
+              <main>{children}</main>
+            </LocaleTransition>
+            <SiteFooter />
+            <ScrollToTop />
+          </div>
+        </LanguageProvider>
       </body>
     </html>
   );

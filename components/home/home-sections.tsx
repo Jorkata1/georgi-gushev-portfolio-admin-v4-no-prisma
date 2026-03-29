@@ -2,23 +2,15 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  ArrowRight,
-  CheckCircle2,
-  MoveUpRight
-} from "lucide-react";
-import {
-  helpCases,
-  reasonsToWork,
-  siteConfig,
-  whatIDo,
-  workProcess
-} from "@/data/site";
+import { ArrowRight, CheckCircle2, MoveUpRight } from "lucide-react";
+import { whatIDo, workProcess } from "@/data/site";
 import { ProjectCard } from "@/components/cards/project-card";
 import { Container } from "@/components/shared/container";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/lib/language-context";
+import { translations } from "@/data/translations";
 import type { Project } from "@/types";
 
 type HomeSectionsProps = {
@@ -26,27 +18,35 @@ type HomeSectionsProps = {
 };
 
 export function HomeSections({ featuredProjects }: HomeSectionsProps) {
+  const { locale } = useLanguage();
+  const t = translations[locale];
+  const s = t.sections;
+
   return (
     <>
-      {/* Услуги */}
+      {/* Services */}
       <section className="section-padding">
         <Container>
           <SectionHeading
-            eyebrow="Услуги"
-            title="Услуги, които помагат на един проект да изглежда по-добре, да работи по-добре и да се представя по-професионално."
-            description="От уеб дизайн и изграждане на сайтове до бранд идентичност, визуално обновяване, поддръжка, QA проверки и консултации за по-силно дигитално присъствие."
+            eyebrow={s.services.eyebrow}
+            title={s.services.title}
+            description={s.services.description}
           />
 
           <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {whatIDo.map((item, index) => {
-              const Icon = item.icon;
+            {t.whatIDo.map((item, index) => {
+              // Keep the icon from the original data by matching index
+              const originalItem = whatIDo[index];
+              const Icon = originalItem?.icon;
 
               return (
                 <Reveal key={item.title} delay={index * 0.06}>
                   <article className="surface card-hover h-full p-6">
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-accent/20 bg-accent/10 text-accentGlow">
-                      <Icon size={20} />
-                    </div>
+                    {Icon && (
+                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-accent/20 bg-accent/10 text-accentGlow">
+                        <Icon size={20} />
+                      </div>
+                    )}
                     <h3 className="mt-5 text-xl font-semibold text-white">
                       {item.title}
                     </h3>
@@ -60,7 +60,7 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
           <div className="mt-10">
             <Link href="/services">
               <Button variant="secondary">
-                Виж всички услуги
+                {s.services.viewAll}
                 <ArrowRight size={16} />
               </Button>
             </Link>
@@ -71,19 +71,19 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
       {/* Divider */}
       <div className="section-divider" />
 
-      {/* Как мога да помогна + Кратко за мен */}
+      {/* How I can help + Short about */}
       <section className="section-padding">
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
               <SectionHeading
-                eyebrow="Как мога да помогна"
-                title="Подходящо, когато имаш нужда не просто от визия, а от по-добро цялостно дигитално решение."
-                description="Работя по проекти, при които дизайнът, структурата и функционалността трябва да вървят заедно, за да се стигне до по-ясен и професионален резултат."
+                eyebrow={s.help.eyebrow}
+                title={s.help.title}
+                description={s.help.description}
               />
 
               <div className="mt-10 grid gap-4">
-                {helpCases.map((item, index) => (
+                {t.helpCases.map((item, index) => (
                   <Reveal key={item} delay={index * 0.06}>
                     <div className="surface flex gap-3 p-5">
                       <CheckCircle2
@@ -99,22 +99,18 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
 
             <div>
               <SectionHeading
-                eyebrow="Кратко за мен"
-                title="Работя в пресечната точка между дизайн, дигитални решения и функционално мислене."
-                description={siteConfig.shortAbout}
+                eyebrow={s.aboutShort.eyebrow}
+                title={s.aboutShort.title}
+                description={s.aboutShort.body}
               />
 
               <div className="mt-10 surface p-6">
-                <p className="text-sm text-slate-300">
-                  Комбинирам визуален подход, техническа дисциплина и QA mindset,
-                  за да се стига до решения, които са едновременно clean, practical
-                  и полезни за реалната употреба.
-                </p>
+                <p className="text-sm text-slate-300">{s.aboutShort.body}</p>
 
                 <div className="mt-6">
                   <Link href="/about">
                     <Button variant="secondary">
-                      Научи повече
+                      {s.aboutShort.learnMore}
                       <ArrowRight size={16} />
                     </Button>
                   </Link>
@@ -128,13 +124,13 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
       {/* Divider */}
       <div className="section-divider" />
 
-      {/* Проекти */}
+      {/* Projects */}
       <section className="section-padding">
         <Container>
           <SectionHeading
-            eyebrow="Проекти"
-            title="Подбрани проекти, които показват подход към дизайн, структура, бранд логика и дигитално мислене."
-            description="Примери за работа в области като бранд идентичност, уеб визия, UI концепции и визуални решения с практическа насоченост."
+            eyebrow={s.projects.eyebrow}
+            title={s.projects.title}
+            description={s.projects.description}
           />
 
           <div className="mt-12 grid gap-8">
@@ -148,7 +144,7 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
           <div className="mt-10">
             <Link href="/portfolio">
               <Button variant="secondary">
-                Разгледай всички проекти
+                {s.projects.viewAll}
                 <ArrowRight size={16} />
               </Button>
             </Link>
@@ -159,21 +155,21 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
       {/* Divider */}
       <div className="section-divider" />
 
-      {/* Процес */}
+      {/* Process */}
       <section className="section-padding">
         <Container>
           <SectionHeading
-            eyebrow="Процес"
-            title="Ясен процес, за да се движим подредено от идея до работещ резултат."
-            description="Независимо дали става дума за нов сайт, редизайн, визуално обновяване или QA преглед, работя с подреден процес и ясен фокус върху резултата."
+            eyebrow={s.process.eyebrow}
+            title={s.process.title}
+            description={s.process.description}
           />
 
           <div className="mt-12 grid gap-6 lg:grid-cols-4">
-            {workProcess.map((item, index) => (
+            {t.workProcess.map((item, index) => (
               <Reveal key={item.title} delay={index * 0.08}>
                 <article className="surface h-full p-6">
                   <p className="text-xs uppercase tracking-[0.24em] text-accent">
-                    Стъпка {index + 1}
+                    {s.process.step} {index + 1}
                   </p>
                   <h3 className="mt-4 text-xl font-semibold text-white">
                     {item.title}
@@ -189,17 +185,17 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
       {/* Divider */}
       <div className="section-divider" />
 
-      {/* Подход */}
+      {/* Approach */}
       <section className="section-padding">
         <Container>
           <SectionHeading
-            eyebrow="Подход"
-            title="Комбинация от визуално мислене, техническа дисциплина и внимание към реалното потребителско изживяване."
-            description="Подхождам към проектите не само като към визия, а като към цялостно решение, което трябва да бъде ясно, последователно и функционално."
+            eyebrow={s.approach.eyebrow}
+            title={s.approach.title}
+            description={s.approach.description}
           />
 
           <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {reasonsToWork.map((item, index) => (
+            {t.reasonsToWork.map((item, index) => (
               <Reveal key={item} delay={index * 0.05}>
                 <div className="surface flex gap-3 p-5">
                   <MoveUpRight
@@ -220,26 +216,23 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
           <div className="surface-strong overflow-hidden p-8 sm:p-10 lg:p-12">
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
-                <span className="eyebrow">Контакт</span>
-                <h2 className="section-title mt-4 text-balance">
-                  Имаш нужда от нов сайт, визуално обновяване или по-силно дигитално присъствие?
-                </h2>
+                <span className="eyebrow">{s.cta.eyebrow}</span>
+                <h2 className="section-title mt-4 text-balance">{s.cta.title}</h2>
                 <p className="mt-5 max-w-2xl text-slate-300">
-                  Мога да помогна с дизайн, изграждане, обновяване, QA преглед и
-                  консултация за следващата правилна стъпка за твоя проект.
+                  {s.cta.description}
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-4 lg:justify-end">
                 <Link href="/contact">
                   <Button>
-                    Изпрати запитване
+                    {s.cta.sendInquiry}
                     <ArrowRight size={16} />
                   </Button>
                 </Link>
 
                 <Link href="/portfolio">
-                  <Button variant="secondary">Разгледай проекти</Button>
+                  <Button variant="secondary">{s.cta.viewProjects}</Button>
                 </Link>
               </div>
             </div>
