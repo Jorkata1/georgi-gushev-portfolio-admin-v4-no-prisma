@@ -31,7 +31,7 @@ export function SectionHeading({
       ) : null}
 
       <motion.h2
-        className="section-title mt-4 text-balance"
+        className="section-title mt-3 text-balance sm:mt-4"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
@@ -42,7 +42,7 @@ export function SectionHeading({
 
       {description ? (
         <motion.p
-          className="mt-5 max-w-2xl text-base text-slate-300 sm:text-lg"
+          className="mt-3 max-w-2xl text-sm text-slate-300 sm:mt-5 sm:text-lg"
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}

@@ -49,64 +49,115 @@ export function HomeHero() {
       <div className="absolute right-0 top-0 h-[20rem] w-[20rem] bg-[radial-gradient(circle,rgba(232,164,74,0.08),transparent_60%)]" />
 
       <Container className="section-padding relative">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid items-center gap-8 lg:gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div variants={stagger} initial="hidden" animate="show">
+            {/* Eyebrow */}
             <motion.span className="eyebrow" variants={fadeUp}>
               <Sparkles size={14} />
-              {h.eyebrow}
+              <span className="sm:hidden">
+                {locale === "bg" ? "Дизайн / Уеб / Дигитално" : "Design / Web / Digital"}
+              </span>
+              <span className="hidden sm:inline">{h.eyebrow}</span>
             </motion.span>
 
+            {/* Title */}
             <motion.h1
-              className="hero-title mt-6 text-balance"
+              className="mt-4 text-balance font-semibold leading-[1.08] tracking-tight text-white lg:mt-6"
+              style={{ fontFamily: "Georgia, Cambria, 'Times New Roman', Times, serif" }}
               variants={fadeUp}
             >
-              {h.title}
-              <span className="mt-1 block text-gradient">{h.titleAccent}</span>
+              <span className="text-2xl sm:text-5xl lg:text-7xl">{h.title}</span>
+              <span className="mt-1 block text-gradient text-2xl sm:text-5xl lg:text-7xl">
+                {h.titleAccent}
+              </span>
             </motion.h1>
 
+            {/* Animated gradient line — wide on mobile, shimmer animation */}
+            <motion.div
+              className="relative mt-3 h-[2px] overflow-hidden rounded-full sm:mt-5"
+              style={{ width: "min(65%, 280px)" }}
+              initial={{ opacity: 0, scaleX: 0 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: "linear-gradient(90deg, #e8a44a, #7ab8ff, #4f9cf7, #e8a44a)",
+                  backgroundSize: "300% 100%",
+                }}
+                animate={{
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                }}
+                transition={{
+                  duration: 5,
+                  ease: "linear",
+                  repeat: Infinity,
+                }}
+              />
+            </motion.div>
+
+            {/* Description */}
             <motion.p
-              className="mt-6 max-w-2xl text-lg text-slate-300"
+              className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300 sm:mt-5 sm:text-lg"
               variants={fadeUp}
             >
-              {h.description}
+              <span className="sm:hidden">
+                {locale === "bg"
+                  ? "Уеб дизайн, бранд идентичност, визуално обновяване и QA подобрения за по-силно дигитално присъствие."
+                  : "Web design, brand identity, visual refresh and QA improvements for a stronger digital presence."}
+              </span>
+              <span className="hidden sm:inline">{h.description}</span>
             </motion.p>
 
+            {/* Tagline — desktop only */}
             <motion.p
-              className="mt-4 max-w-2xl text-base text-slate-400"
+              className="mt-3 hidden max-w-2xl text-base text-slate-400 sm:block lg:mt-4"
               variants={fadeUp}
             >
               {h.tagline}
             </motion.p>
 
+            {/* CTA buttons */}
             <motion.div
-              className="mt-8 flex flex-wrap gap-4"
+              className="mt-5 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-4"
               variants={fadeUp}
             >
-              <Link href="/services">
-                <Button>
+              <Link href="/services" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto">
                   {h.viewServices}
                   <ArrowRight size={16} />
                 </Button>
               </Link>
 
-              <Link href="/portfolio">
-                <Button variant="secondary">{h.viewProjects}</Button>
-              </Link>
+              <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-4">
+                <Link href="/portfolio">
+                  <Button variant="secondary" className="w-full sm:w-auto">
+                    {h.viewProjects}
+                  </Button>
+                </Link>
 
-              <Link href="/contact">
-                <Button variant="ghost">{h.sendInquiry}</Button>
-              </Link>
+                <Link href="/contact">
+                  <Button variant="secondary" className="w-full sm:w-auto">
+                    {h.sendInquiry}
+                  </Button>
+                </Link>
+              </div>
 
-              <a href="/Georgi-Gushev-CV.pdf" download>
-                <Button variant="ghost">
-                  {h.downloadCV}
-                  <Download size={16} />
-                </Button>
+              <a
+                href="/Georgi-Gushev-CV.pdf"
+                download
+                className="inline-flex items-center justify-center gap-2 text-xs text-slate-400 transition hover:text-accent sm:ml-1 sm:text-sm"
+              >
+                <Download size={14} />
+                {h.downloadCV}
               </a>
             </motion.div>
           </motion.div>
 
-          <div className="relative pt-10 lg:pt-16">
+          {/* Right column */}
+          <div className="relative lg:pt-16">
+            {/* Desktop hero image */}
             <motion.div
               className="pointer-events-none absolute -top-16 right-0 z-20 hidden w-[210px] select-none lg:block xl:-top-20 xl:w-[280px]"
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -128,46 +179,49 @@ export function HomeHero() {
             </motion.div>
 
             <motion.div
-              className="surface-strong relative overflow-hidden p-6 sm:p-8"
+              className="surface-strong relative overflow-hidden p-5 sm:p-8"
               variants={fadeScale}
               initial="hidden"
               animate="show"
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(79,156,247,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(232,164,74,0.1),transparent_25%)]" />
 
-              <div className="relative grid gap-4">
-                <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 pr-20 lg:pr-28 xl:pr-36">
+              <div className="relative grid gap-3 sm:gap-4">
+                {/* "What I offer" — hidden on mobile */}
+                <div className="hidden rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 pr-20 sm:block lg:pr-28 xl:pr-36">
                   <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
                     {h.whatIOffer}
                   </p>
-
                   <p className="mt-3 text-2xl font-semibold text-white">
                     {h.offerDescription}
                   </p>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-3">
+                {/* QuickFacts — animated entrance with hover */}
+                <div className="grid grid-cols-3 gap-2 sm:gap-4">
                   {qf.map((fact, index) => (
                     <motion.div
                       key={fact.label}
-                      className="flex h-full min-w-0 flex-col rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-4"
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      className="flex h-full min-w-0 flex-col rounded-[1.35rem] border border-white/10 bg-white/[0.03] p-3 sm:p-4"
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
                       transition={{
-                        duration: 0.5,
-                        delay: 0.6 + index * 0.1,
+                        duration: 0.6,
+                        delay: 0.5 + index * 0.12,
                         ease: [0.25, 0.1, 0.25, 1],
                       }}
+                      whileHover={{
+                        borderColor: "rgba(232, 164, 74, 0.25)",
+                        transition: { duration: 0.3 },
+                      }}
                     >
-                      <p className="text-[10px] uppercase tracking-[0.14em] leading-[1.3] text-accent/70">
+                      <p className="text-[9px] uppercase tracking-[0.12em] leading-[1.3] text-accent/70 sm:text-[10px] sm:tracking-[0.14em]">
                         {fact.label}
                       </p>
-
-                      <p className="mt-3 text-base font-semibold leading-snug text-white sm:text-lg">
+                      <p className="mt-2 text-sm font-semibold leading-snug text-white sm:mt-3 sm:text-lg">
                         {fact.value}
                       </p>
-
-                      <p className="mt-2 text-sm leading-5 text-slate-400">
+                      <p className="mt-1 hidden text-sm leading-5 text-slate-400 sm:mt-2 sm:block">
                         {fact.description}
                       </p>
                     </motion.div>

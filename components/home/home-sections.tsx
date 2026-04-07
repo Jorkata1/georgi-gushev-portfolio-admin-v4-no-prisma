@@ -24,7 +24,7 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
 
   return (
     <>
-      {/* Services */}
+      {/* Services — ✅ MOBILE FIX #4: 2-col grid on mobile */}
       <section className="section-padding">
         <Container>
           <SectionHeading
@@ -33,31 +33,33 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
             description={s.services.description}
           />
 
-          <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
             {t.whatIDo.map((item, index) => {
-              // Keep the icon from the original data by matching index
               const originalItem = whatIDo[index];
               const Icon = originalItem?.icon;
 
               return (
                 <Reveal key={item.title} delay={index * 0.06}>
-                  <article className="surface card-hover h-full p-6">
+                  <article className="surface card-hover h-full p-4 sm:p-6">
                     {Icon && (
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-accent/20 bg-accent/10 text-accentGlow">
-                        <Icon size={20} />
+                      <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-accent/20 bg-accent/10 text-accentGlow sm:h-12 sm:w-12 sm:rounded-2xl">
+                        <Icon size={16} className="sm:hidden" />
+                        <Icon size={20} className="hidden sm:block" />
                       </div>
                     )}
-                    <h3 className="mt-5 text-xl font-semibold text-white">
+                    <h3 className="mt-3 text-sm font-semibold text-white sm:mt-5 sm:text-xl">
                       {item.title}
                     </h3>
-                    <p className="mt-3 text-sm text-slate-300">{item.text}</p>
+                    <p className="mt-1.5 text-xs leading-relaxed text-slate-300 sm:mt-3 sm:text-sm">
+                      {item.text}
+                    </p>
                   </article>
                 </Reveal>
               );
             })}
           </div>
 
-          <div className="mt-10">
+          <div className="mt-6 sm:mt-10">
             <Link href="/services">
               <Button variant="secondary">
                 {s.services.viewAll}
@@ -71,10 +73,10 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
       {/* Divider */}
       <div className="section-divider" />
 
-      {/* How I can help + Short about */}
+      {/* How I can help + Short about — ✅ MOBILE FIX #5: Compact 2-col help cases */}
       <section className="section-padding">
         <Container>
-          <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
             <div>
               <SectionHeading
                 eyebrow={s.help.eyebrow}
@@ -82,15 +84,17 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
                 description={s.help.description}
               />
 
-              <div className="mt-10 grid gap-4">
+              <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-10 sm:grid-cols-1 sm:gap-4">
                 {t.helpCases.map((item, index) => (
-                  <Reveal key={item} delay={index * 0.06}>
-                    <div className="surface flex gap-3 p-5">
+                  <Reveal key={item} delay={index * 0.06} className="h-full">
+                    <div className="surface flex h-full gap-2 p-3 sm:gap-3 sm:p-5">
                       <CheckCircle2
                         className="mt-0.5 shrink-0 text-accentGlow"
-                        size={18}
+                        size={14}
                       />
-                      <p className="text-sm text-slate-300">{item}</p>
+                      <p className="text-xs leading-snug text-slate-300 sm:text-sm">
+                        {item}
+                      </p>
                     </div>
                   </Reveal>
                 ))}
@@ -101,15 +105,16 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
               <SectionHeading
                 eyebrow={s.aboutShort.eyebrow}
                 title={s.aboutShort.title}
-                description={s.aboutShort.body}
               />
 
-              <div className="mt-10 surface p-6">
-                <p className="text-sm text-slate-300">{s.aboutShort.body}</p>
+              <div className="mt-6 surface p-5 sm:mt-10 sm:p-6">
+                <p className="text-xs leading-relaxed text-slate-300 sm:text-sm">
+                  {s.aboutShort.body}
+                </p>
 
-                <div className="mt-6">
+                <div className="mt-4 sm:mt-6">
                   <Link href="/about">
-                    <Button variant="secondary">
+                    <Button variant="secondary" size="sm" className="sm:h-11 sm:px-5 sm:text-sm">
                       {s.aboutShort.learnMore}
                       <ArrowRight size={16} />
                     </Button>
@@ -124,7 +129,7 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
       {/* Divider */}
       <div className="section-divider" />
 
-      {/* Projects */}
+      {/* Projects — ✅ MOBILE FIX #8: Tighter project cards */}
       <section className="section-padding">
         <Container>
           <SectionHeading
@@ -133,7 +138,7 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
             description={s.projects.description}
           />
 
-          <div className="mt-12 grid gap-8">
+          <div className="mt-8 grid gap-6 sm:mt-12 sm:gap-8">
             {featuredProjects.map((project, index) => (
               <Reveal key={project.id} delay={index * 0.08}>
                 <ProjectCard project={project} />
@@ -141,7 +146,7 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
             ))}
           </div>
 
-          <div className="mt-10">
+          <div className="mt-6 sm:mt-10">
             <Link href="/portfolio">
               <Button variant="secondary">
                 {s.projects.viewAll}
@@ -155,7 +160,7 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
       {/* Divider */}
       <div className="section-divider" />
 
-      {/* Process */}
+      {/* Process — ✅ MOBILE FIX #9: Horizontal scroll on mobile */}
       <section className="section-padding">
         <Container>
           <SectionHeading
@@ -164,20 +169,29 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
             description={s.process.description}
           />
 
-          <div className="mt-12 grid gap-6 lg:grid-cols-4">
-            {t.workProcess.map((item, index) => (
-              <Reveal key={item.title} delay={index * 0.08}>
-                <article className="surface h-full p-6">
-                  <p className="text-xs uppercase tracking-[0.24em] text-accent">
-                    {s.process.step} {index + 1}
-                  </p>
-                  <h3 className="mt-4 text-xl font-semibold text-white">
-                    {item.title}
-                  </h3>
-                  <p className="mt-3 text-sm text-slate-300">{item.text}</p>
-                </article>
-              </Reveal>
-            ))}
+          {/* Horizontal scroll on mobile, 4-col grid on desktop */}
+          <div className="mt-8 sm:mt-12">
+            <div className="-mx-4 flex gap-4 overflow-x-auto overflow-y-hidden px-4 pb-4 snap-x snap-mandatory sm:mx-0 sm:px-0 sm:pb-0 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible">
+              {t.workProcess.map((item, index) => (
+                <Reveal key={item.title} delay={index * 0.08}>
+                  <article className="surface h-full min-w-[240px] shrink-0 snap-start p-5 sm:min-w-0 sm:p-6">
+                    <p className="text-xs uppercase tracking-[0.24em] text-accent">
+                      {s.process.step} {index + 1}
+                    </p>
+                    <h3 className="mt-3 text-lg font-semibold text-white sm:mt-4 sm:text-xl">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-xs leading-relaxed text-slate-300 sm:mt-3 sm:text-sm">
+                      {item.text}
+                    </p>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+            {/* Scroll hint on mobile */}
+            <p className="mt-2 text-center text-[10px] uppercase tracking-widest text-slate-500 sm:hidden">
+              ← Плъзни →
+            </p>
           </div>
         </Container>
       </section>
@@ -194,15 +208,17 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
             description={s.approach.description}
           />
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-8 grid grid-cols-2 gap-2 sm:mt-12 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
             {t.reasonsToWork.map((item, index) => (
-              <Reveal key={item} delay={index * 0.05}>
-                <div className="surface flex gap-3 p-5">
+              <Reveal key={item} delay={index * 0.05} className="h-full">
+                <div className="surface flex h-full gap-2 p-3 sm:gap-3 sm:p-5">
                   <MoveUpRight
                     className="mt-0.5 shrink-0 text-accentGlow"
-                    size={18}
+                    size={14}
                   />
-                  <p className="text-sm text-slate-300">{item}</p>
+                  <p className="text-xs leading-snug text-slate-300 sm:text-sm">
+                    {item}
+                  </p>
                 </div>
               </Reveal>
             ))}
@@ -211,28 +227,30 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
       </section>
 
       {/* CTA */}
-      <section className="section-padding-sm pb-24">
+      <section className="section-padding-sm pb-20 sm:pb-24">
         <Container>
-          <div className="surface-strong overflow-hidden p-8 sm:p-10 lg:p-12">
-            <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div className="surface-strong overflow-hidden p-6 sm:p-10 lg:p-12">
+            <div className="grid gap-6 sm:gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
                 <span className="eyebrow">{s.cta.eyebrow}</span>
-                <h2 className="section-title mt-4 text-balance">{s.cta.title}</h2>
-                <p className="mt-5 max-w-2xl text-slate-300">
+                <h2 className="section-title mt-3 text-balance sm:mt-4">{s.cta.title}</h2>
+                <p className="mt-3 max-w-2xl text-sm text-slate-300 sm:mt-5 sm:text-base">
                   {s.cta.description}
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-4 lg:justify-end">
-                <Link href="/contact">
-                  <Button>
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4 lg:justify-end">
+                <Link href="/contact" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto">
                     {s.cta.sendInquiry}
                     <ArrowRight size={16} />
                   </Button>
                 </Link>
 
-                <Link href="/portfolio">
-                  <Button variant="secondary">{s.cta.viewProjects}</Button>
+                <Link href="/portfolio" className="w-full sm:w-auto">
+                  <Button variant="secondary" className="w-full sm:w-auto">
+                    {s.cta.viewProjects}
+                  </Button>
                 </Link>
               </div>
             </div>

@@ -32,7 +32,7 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-            <div className="absolute inset-0 flex flex-col justify-end p-6">
+            <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6">
               <div className="flex items-center justify-between gap-4">
                 <span className="text-[11px] uppercase tracking-[0.25em] text-accent">
                   {project.category}
@@ -42,11 +42,11 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
                 </span>
               </div>
 
-              <h3 className="mt-2 text-xl font-semibold text-white">
+              <h3 className="mt-2 text-lg font-semibold text-white sm:text-xl">
                 {project.title}
               </h3>
 
-              <div className="mt-3 flex flex-wrap gap-1.5">
+              <div className="mt-2 flex flex-wrap gap-1.5 sm:mt-3">
                 {project.tools.slice(0, 3).map((tool) => (
                   <span
                     key={tool}
@@ -77,7 +77,8 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
       className="surface overflow-hidden grid gap-0 lg:grid-cols-[1.1fr_0.9fr]"
       whileHover={{ y: -6, transition: { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] } }}
     >
-      <div className="group relative min-h-[300px] overflow-hidden">
+      {/* ✅ MOBILE FIX #8: Reduced min-height on mobile */}
+      <div className="group relative min-h-[200px] overflow-hidden sm:min-h-[300px]">
         <Image
           src={project.heroImage}
           alt={project.title}
@@ -89,7 +90,8 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       </div>
 
-      <div className="flex flex-col justify-between p-7 sm:p-9">
+      {/* ✅ MOBILE FIX #8: Tighter padding on mobile */}
+      <div className="flex flex-col justify-between p-5 sm:p-9">
         <div>
           <div className="flex items-center justify-between gap-4">
             <span className="text-xs uppercase tracking-[0.25em] text-accent">
@@ -100,14 +102,18 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
             </span>
           </div>
 
-          <h3 className="mt-4 text-2xl font-semibold text-white">{project.title}</h3>
-          <p className="mt-4 text-sm leading-relaxed text-slate-300">{project.summary}</p>
+          <h3 className="mt-3 text-xl font-semibold text-white sm:mt-4 sm:text-2xl">
+            {project.title}
+          </h3>
+          <p className="mt-3 text-xs leading-relaxed text-slate-300 sm:mt-4 sm:text-sm">
+            {project.summary}
+          </p>
 
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2">
             {project.tools.map((tool) => (
               <span
                 key={tool}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300"
+                className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] text-slate-300 sm:px-3 sm:py-1 sm:text-xs"
               >
                 {tool}
               </span>
@@ -117,7 +123,7 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
 
         <Link
           href={`/portfolio/${project.slug}` as Route}
-          className="group/link mt-8 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accentGlow"
+          className="group/link mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accentGlow sm:mt-8"
         >
           Виж проекта
           <ArrowUpRight

@@ -24,7 +24,7 @@ export function PageHero({ eyebrow, title, description }: PageHeroProps) {
         </motion.span>
 
         <motion.h1
-          className="display-title mt-5 max-w-4xl text-balance"
+          className="display-title mt-4 max-w-4xl text-balance sm:mt-5"
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
@@ -34,7 +34,7 @@ export function PageHero({ eyebrow, title, description }: PageHeroProps) {
 
         {description ? (
           <motion.p
-            className="mt-6 max-w-2xl text-lg text-slate-300"
+            className="mt-4 max-w-2xl text-base text-slate-300 sm:mt-6 sm:text-lg"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
