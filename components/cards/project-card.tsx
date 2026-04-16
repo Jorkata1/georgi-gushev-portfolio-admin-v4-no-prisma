@@ -6,12 +6,16 @@ import { motion } from "framer-motion";
 import type { Route } from "next";
 import { ArrowUpRight } from "lucide-react";
 import type { Project } from "@/types";
-import { cn } from "@/lib/utils";
 
 type ProjectCardProps = {
   project: Project;
   compact?: boolean;
 };
+
+// Blur placeholder — 1x1 dark slate pixel, avoids layout shift and gives a
+// graceful fade-in while Next.js streams the optimized image.
+const BLUR_DATA_URL =
+  "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
 
 export function ProjectCard({ project, compact = false }: ProjectCardProps) {
   if (compact) {
@@ -26,9 +30,11 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
               src={project.heroImage}
               alt={project.title}
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
               className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              unoptimized
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
@@ -77,20 +83,20 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
       className="surface overflow-hidden grid gap-0 lg:grid-cols-[1.1fr_0.9fr]"
       whileHover={{ y: -6, transition: { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] } }}
     >
-      {/* ✅ MOBILE FIX #8: Reduced min-height on mobile */}
       <div className="group relative min-h-[200px] overflow-hidden sm:min-h-[300px]">
         <Image
           src={project.heroImage}
           alt={project.title}
           fill
+          sizes="(max-width: 1024px) 100vw, 720px"
           className="object-cover transition-transform duration-700 group-hover:scale-[1.05]"
-          sizes="(max-width: 1024px) 100vw, 60vw"
-          unoptimized
+          placeholder="blur"
+          blurDataURL={BLUR_DATA_URL}
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       </div>
 
-      {/* ✅ MOBILE FIX #8: Tighter padding on mobile */}
       <div className="flex flex-col justify-between p-5 sm:p-9">
         <div>
           <div className="flex items-center justify-between gap-4">

@@ -15,9 +15,9 @@ const stagger = {
   hidden: {},
   show: {
     transition: {
-      staggerChildren: 0.12,
-    },
-  },
+      staggerChildren: 0.12
+    }
+  }
 };
 
 const fadeUp = {
@@ -25,8 +25,8 @@ const fadeUp = {
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] },
-  },
+    transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }
+  }
 };
 
 const fadeScale = {
@@ -34,8 +34,8 @@ const fadeScale = {
   show: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.8, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] },
-  },
+    transition: { duration: 0.8, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }
+  }
 };
 
 export function HomeHero() {
@@ -47,17 +47,18 @@ export function HomeHero() {
   const controls = useAnimationControls();
   const cardControls = useAnimationControls();
 
-  const counters = locale === "bg"
-    ? [
-        { value: 10, suffix: "+", label: "Проекта" },
-        { value: 3, suffix: "+", label: "Години опит" },
-        { value: 6, suffix: "", label: "Услуги" },
-      ]
-    : [
-        { value: 10, suffix: "+", label: "Projects" },
-        { value: 3, suffix: "+", label: "Years exp." },
-        { value: 6, suffix: "", label: "Services" },
-      ];
+  const counters =
+    locale === "bg"
+      ? [
+          { value: 10, suffix: "+", label: "Проекта" },
+          { value: 3, suffix: "+", label: "Години опит" },
+          { value: 6, suffix: "", label: "Услуги" }
+        ]
+      : [
+          { value: 10, suffix: "+", label: "Projects" },
+          { value: 3, suffix: "+", label: "Years exp." },
+          { value: 6, suffix: "", label: "Services" }
+        ];
 
   useEffect(() => {
     function onIntroComplete() {
@@ -66,7 +67,6 @@ export function HomeHero() {
       cardControls.start("show");
     }
 
-    // If intro was already seen (sessionStorage), fire immediately
     if (sessionStorage.getItem("intro-seen") === "true") {
       onIntroComplete();
     }
@@ -84,7 +84,6 @@ export function HomeHero() {
       <Container className="section-padding relative">
         <div className="grid items-center gap-8 lg:gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div variants={stagger} initial="hidden" animate={controls}>
-            {/* Eyebrow */}
             <motion.span className="eyebrow" variants={fadeUp}>
               <Sparkles size={14} />
               <span className="sm:hidden">
@@ -93,7 +92,6 @@ export function HomeHero() {
               <span className="hidden sm:inline">{h.eyebrow}</span>
             </motion.span>
 
-            {/* Title */}
             <motion.h1
               className="mt-4 text-balance font-semibold leading-[1.08] tracking-tight text-white lg:mt-6"
               style={{ fontFamily: "Georgia, Cambria, 'Times New Roman', Times, serif" }}
@@ -105,7 +103,6 @@ export function HomeHero() {
               </span>
             </motion.h1>
 
-            {/* Animated gradient line */}
             <motion.div
               className="relative mt-3 h-[2px] overflow-hidden rounded-full sm:mt-5"
               style={{ width: "min(65%, 280px)" }}
@@ -117,20 +114,19 @@ export function HomeHero() {
                 className="absolute inset-0 rounded-full"
                 style={{
                   background: "linear-gradient(90deg, #e8a44a, #7ab8ff, #4f9cf7, #e8a44a)",
-                  backgroundSize: "300% 100%",
+                  backgroundSize: "300% 100%"
                 }}
                 animate={{
-                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
                 }}
                 transition={{
                   duration: 5,
                   ease: "linear",
-                  repeat: Infinity,
+                  repeat: Infinity
                 }}
               />
             </motion.div>
 
-            {/* Description */}
             <motion.p
               className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300 sm:mt-5 sm:text-lg"
               variants={fadeUp}
@@ -143,7 +139,6 @@ export function HomeHero() {
               <span className="hidden sm:inline">{h.description}</span>
             </motion.p>
 
-            {/* Tagline — desktop only */}
             <motion.p
               className="mt-3 hidden max-w-2xl text-base text-slate-400 sm:block lg:mt-4"
               variants={fadeUp}
@@ -151,7 +146,6 @@ export function HomeHero() {
               {h.tagline}
             </motion.p>
 
-            {/* CTA buttons */}
             <motion.div
               className="mt-5 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-4"
               variants={fadeUp}
@@ -187,7 +181,6 @@ export function HomeHero() {
               </a>
             </motion.div>
 
-            {/* Animated counters */}
             <motion.div
               className="mt-8 grid grid-cols-3 gap-4 rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-4 sm:mt-10 sm:p-6"
               variants={fadeUp}
@@ -203,9 +196,7 @@ export function HomeHero() {
             </motion.div>
           </motion.div>
 
-          {/* Right column */}
           <div className="relative lg:pt-16">
-            {/* Desktop hero image */}
             <motion.div
               className="pointer-events-none absolute -top-16 right-0 z-20 hidden w-[210px] select-none lg:block xl:-top-20 xl:w-[280px]"
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -213,15 +204,21 @@ export function HomeHero() {
               transition={{
                 duration: 0.9,
                 delay: 0.5,
-                ease: [0.25, 0.1, 0.25, 1],
+                ease: [0.25, 0.1, 0.25, 1]
               }}
             >
+              {/*
+                Hero image: served from /public/hero/georgi-hero.webp (~24 KB).
+                Rendered width is 210-280px, so 560px source at 2x DPR is perfect.
+                next/image generates AVIF on the fly via Vercel's image optimizer.
+              */}
               <Image
-                src="/hero/georgi-hero.png"
+                src="/hero/georgi-hero.webp"
                 alt="Георги Гушев"
-                width={900}
-                height={1400}
+                width={560}
+                height={746}
                 priority
+                sizes="(max-width: 1280px) 210px, 280px"
                 className="h-auto w-full object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.45)]"
               />
             </motion.div>
@@ -254,11 +251,11 @@ export function HomeHero() {
                       transition={{
                         duration: 0.6,
                         delay: 0.5 + index * 0.12,
-                        ease: [0.25, 0.1, 0.25, 1],
+                        ease: [0.25, 0.1, 0.25, 1]
                       }}
                       whileHover={{
                         borderColor: "rgba(232, 164, 74, 0.25)",
-                        transition: { duration: 0.3 },
+                        transition: { duration: 0.3 }
                       }}
                     >
                       <p className="text-[9px] uppercase tracking-[0.12em] leading-[1.3] text-accent/70 sm:text-[10px] sm:tracking-[0.14em]">
