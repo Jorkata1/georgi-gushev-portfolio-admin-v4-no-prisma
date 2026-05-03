@@ -264,7 +264,7 @@ export function HomeHero() {
                       <p className="mt-2 text-sm font-semibold leading-snug text-white sm:mt-3 sm:text-lg">
                         {fact.value}
                       </p>
-                      <p className="mt-1 hidden text-sm leading-5 text-slate-400 sm:mt-2 sm:block">
+                      <p className="hidden text-sm leading-5 text-slate-400 sm:mt-2 sm:block">
                         {fact.description}
                       </p>
                     </motion.div>

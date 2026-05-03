@@ -54,7 +54,7 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
                       <h3 className="mt-3 text-sm font-semibold text-white sm:mt-5 sm:text-xl">
                         {item.title}
                       </h3>
-                      <p className="mt-1.5 text-xs leading-relaxed text-slate-300 sm:mt-3 sm:text-sm">
+                      <p className="mt-1.5 hidden text-xs leading-relaxed text-slate-300 sm:mt-3 sm:block sm:text-sm">
                         {item.text}
                       </p>
                     </article>
@@ -78,7 +78,7 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
       <AnimatedDivider />
 
       {/* Help cases */}
-      <section className="section-padding">
+      <section className="hidden section-padding sm:block">
         <Container>
           <SectionHeading
             eyebrow={s.help.eyebrow}

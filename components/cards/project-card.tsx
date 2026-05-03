@@ -111,7 +111,7 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
           <h3 className="mt-3 text-xl font-semibold text-white sm:mt-4 sm:text-2xl">
             {project.title}
           </h3>
-          <p className="mt-3 text-xs leading-relaxed text-slate-300 sm:mt-4 sm:text-sm">
+          <p className="mt-3 hidden text-xs leading-relaxed text-slate-300 sm:mt-4 sm:block sm:text-sm">
             {project.summary}
           </p>
 
