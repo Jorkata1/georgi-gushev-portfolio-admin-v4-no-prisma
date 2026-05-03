@@ -1,0 +1,173 @@
+import { mkdir, writeFile } from 'fs/promises';
+import path from 'path';
+
+const storeDirectory = path.join(process.cwd(), 'storage');
+const storeFile = path.join(storeDirectory, 'content-store.json');
+
+const seedStore = {
+  projects: [
+    {
+      id: 'project-1',
+      slug: 'pulsebank-support-flow',
+      title: 'PulseBank Support Flow',
+      shortTitle: 'PulseBank',
+      excerpt: 'UI concept за по-ясен поток при сигнализиране на проблеми в мобилно банково приложение.',
+      summary: 'Концептуален проект, насочен към по-добра видимост на потребителски затруднения, по-бърза ориентация и по-структурирана комуникация между потребител и support среда.',
+      category: 'UI Concepts',
+      tools: ['Figma', 'UX Logic', 'QA Thinking'],
+      year: '2025',
+      featured: true,
+      heroImage: '/projects/project-1.svg',
+      gallery: ['/projects/project-1.svg', '/projects/project-2.svg'],
+      goals: ['Да се създаде ясен потребителски поток при сигнализиране на проблем.', 'Да се намали объркването при navigation и избор на тип затруднение.', 'Да се покаже комбинация от визуално и аналитично мислене.'],
+      process: ['Структуриране на user flow и подреждане на екраните по логика на реално приложение.', 'Избор на контрастна dark UI посока с ясно диференцирани стъпки.', 'Добавяне на states за грешка, помощ и потвърждение.'],
+      outcome: ['По-ясна последователност от действия за крайния потребител.', 'Визуално решение, което комбинира премиум усещане и продуктова дисциплина.', 'Силен пример за дизайн с QA насоченост.'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'project-2',
+      slug: 'solaris-system-health-dashboard',
+      title: 'Solaris System Health Dashboard',
+      shortTitle: 'Solaris Dashboard',
+      excerpt: 'Dashboard concept за наблюдение на системна стабилност, статуси и отчетност.',
+      summary: 'Концепция за интерфейс, който обединява наблюдение на системни показатели, бърза ориентация при отклонения и визуална яснота за екипи по поддръжка и анализ.',
+      category: 'UI Concepts',
+      tools: ['Figma', 'Data Thinking', 'System Monitoring'],
+      year: '2024',
+      featured: true,
+      heroImage: '/projects/project-2.svg',
+      gallery: ['/projects/project-2.svg', '/projects/project-3.svg'],
+      goals: ['Да се представят ключови системни показатели по ясен начин.', 'Да се даде приоритет на отклонения, аларми и отчетност.', 'Да се покаже разбиране за продуктови и системни екрани.'],
+      process: ['Организиране на информационна архитектура за dashboard среда.', 'Избор на визуален език със силен контраст и премиум data cards.', 'Изграждане на структура за trend cards, alerts и system logs.'],
+      outcome: ['Визуално чист интерфейс с добър hierarchy за данни.', 'Практична структура за по-късна реална имплементация.', 'Подходящ пример за връзката между техническо мислене и дизайн.'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'project-3',
+      slug: 'nova-brand-identity',
+      title: 'Nova Brand Identity',
+      shortTitle: 'Nova Identity',
+      excerpt: 'Концептуална бранд идентичност за модерен дигитален продукт с clean premium стил.',
+      summary: 'Branding проект, който изследва типография, форма, цвят и визуална система за по-силно и консистентно бранд присъствие.',
+      category: 'Branding',
+      tools: ['Adobe Illustrator', 'Photoshop', 'Brand System'],
+      year: '2024',
+      featured: false,
+      heroImage: '/projects/project-3.svg',
+      gallery: ['/projects/project-3.svg', '/projects/project-4.svg'],
+      goals: ['Да се създаде ясна и разпознаваема бранд система.', 'Да се изгради премиум усещане чрез минимализъм и детайл.', 'Да се развие силна композиция за дигитални и статични носители.'],
+      process: ['Работа върху символ, wordmark и цветови акценти.', 'Подбор на композиционни правила и application примери.', 'Тестове за адаптация в различни визуални контексти.'],
+      outcome: ['Последователно визуално присъствие и силна идентичност.', 'Готовност за използване в презентации, web и social assets.', 'Добър showcase проект за бранд мислене.'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'project-4',
+      slug: 'qa-task-companion',
+      title: 'QA Task Companion',
+      shortTitle: 'QA Companion',
+      excerpt: 'Practice проект за проследяване на QA задачи, статути и notes с clean интерфейсна логика.',
+      summary: 'Практически проект, който показва как могат да се структурират задачите, bug report notes и статуси в интерфейс, ориентиран към яснота и контрол.',
+      category: 'Practice Projects',
+      tools: ['Figma', 'Jira Logic', 'HTML'],
+      year: '2025',
+      featured: false,
+      heroImage: '/projects/project-4.svg',
+      gallery: ['/projects/project-4.svg', '/projects/project-1.svg'],
+      goals: ['Да се организира работен интерфейс за QA-oriented процес.', 'Да се съчетаят status logic, notes и простота на работа.', 'Да се представи практически проект с ясна полезност.'],
+      process: ['Картографиране на основните status states и task interactions.', 'Избор на card-based layout с ясни приоритети.', 'Фокус върху компактна, лесна за сканиране информация.'],
+      outcome: ['Показва системно мислене и фокус върху детайлите.', 'Подходящ проект за комбиниране на интерфейсна логика и QA mindset.', 'Готова основа за бъдещо case study представяне.'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  ],
+  about: {
+    heroTitle: 'Профил с пресечна точка между визуална култура, системно мислене и QA ориентиран подход.',
+    heroDescription: 'Тази страница представя по-задълбочено професионалния профил, начина на работа и силните страни на Георги Гушев.',
+    profileTitle: 'Графичен дизайн, дигитални среди и дисциплина към качеството.',
+    profileParagraphs: [
+      'Георги Гушев е млад професионалист с background в графичния дизайн и силен интерес към дигиталните приложения, QA мисленето и техническата поддръжка.',
+      'Силната страна на профила му е именно в комбинацията от визуално мислене и способност да наблюдава структура, логика и детайли в реална продуктова или системна среда.',
+      'Това създава добра основа за работа по интерфейси, support процеси, QA насочени задачи и професионално позициониране в tech/creative контекст.'
+    ],
+    workTitle: 'Спокойна системност, ясна комуникация и фокус върху последователността.',
+    workParagraphs: [
+      'В работата си Георги търси баланс между естетика и практичност — решение, което изглежда добре, но и служи ясно на конкретна цел.',
+      'Подходът му е аналитичен, любопитен и ориентиран към подобрение, което го прави подходящ както за визуални концепции, така и за роли с нужда от проверка, комуникация и внимание към качеството.'
+    ],
+    strengths: ['Аналитично мислене', 'Логическо мислене', 'Критично мислене', 'Внимание към малките детайли', 'Комуникативност', 'Адаптивност', 'Любопитство', 'Желание за развитие'],
+    languages: [{ name: 'Български', level: 'Майчин език' }, { name: 'Английски', level: 'B2 — говоримо и писмено' }]
+  },
+  experience: [
+    {
+      id: 'experience-1',
+      sortOrder: 0,
+      company: 'Първа Инвестиционна Банка АД',
+      role: 'Специалист Дигитални Приложения',
+      location: 'София',
+      period: 'Юли 2025 — до момента',
+      summary: 'Подкрепа на потребители и съдействие при работа с дигитални банкови приложения, с фокус върху проблеми, обратна връзка и подобряване на потребителското изживяване.',
+      bullets: ['Съдействие при затруднения с мобилното приложение на ПИБ.', 'Докладване на бъгове и събиране на точна информация за проблеми.', 'Съдействие по отстраняване на установени затруднения.', 'Комуникация с клиенти и ориентация към ясно и спокойно решение.']
+    },
+    {
+      id: 'experience-2',
+      sortOrder: 1,
+      company: 'Хоризон Соларис ЕООД',
+      role: 'Дата анализатор / Софтуерна поддръжка',
+      location: 'Стара Загора',
+      period: '2023 — 2025',
+      summary: 'Работа, свързана с непрекъснато наблюдение на системи, проверка на стабилност, анализ на състояние и тестване на функционалност и нефункционалност.',
+      bullets: ['Осигуряване на безпроблемна работа на софтуерни и технически системи.', 'Ежедневна проверка на изправната работа на системите.', 'Изготвяне на седмични, месечни и годишни доклади.', 'Тестване на функционалността и нефункционалността на системите.', 'Поддръжка на системите и проследяване на отклонения.']
+    }
+  ],
+  education: [
+    {
+      id: 'education-1',
+      sortOrder: 0,
+      institution: 'Варненски Свободен Университет',
+      degree: 'Бакалавър — Графичен дизайн',
+      period: '2020 — 2025',
+      description: 'Фокус върху визуална комуникация, композиция, дигитална среда и развитие на дизайнерско мислене.'
+    },
+    {
+      id: 'education-2',
+      sortOrder: 1,
+      institution: 'ПГ „Св. Иван Рилски“',
+      degree: 'Машинен техник',
+      period: '2016 — 2020',
+      description: 'Изграждане на техническа дисциплина, логическо мислене и структурирано решаване на задачи.'
+    }
+  ],
+  certifications: [
+    {
+      id: 'certification-1',
+      sortOrder: 0,
+      title: 'Quality Assurance Course',
+      issuer: 'Software University',
+      year: '2025',
+      href: 'https://softuni.bg/certificates/details/235469/df357b22'
+    },
+    {
+      id: 'certification-2',
+      sortOrder: 1,
+      title: 'TestDome Certificate',
+      issuer: 'TestDome',
+      year: '2025',
+      href: 'https://www.testdome.com/certificates/d5bc854b48d24e2a8b9c8ae79dc89345'
+    },
+    {
+      id: 'certification-3',
+      sortOrder: 2,
+      title: 'QA Practice / Exercises',
+      issuer: 'Практически задачи',
+      year: '2025',
+      href: 'https://drive.google.com/drive/folders/12_fdjJVIeZmVKRoqwN6jtfQu_hvD0nT_?usp=sharing'
+    }
+  ]
+};
+
+await mkdir(storeDirectory, { recursive: true });
+await writeFile(storeFile, JSON.stringify(seedStore, null, 2), 'utf8');
+console.log(`Initialized content store at ${storeFile}`);
