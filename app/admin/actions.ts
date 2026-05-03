@@ -131,7 +131,8 @@ export async function saveProjectAction(
     gallery: joinLines(galleryLines),
     goals: extractField(formData, "goals"),
     process: extractField(formData, "process"),
-    outcome: extractField(formData, "outcome")
+    outcome: extractField(formData, "outcome"),
+    liveUrl: extractField(formData, "liveUrl") || undefined
   };
 
   const parsed = projectFormSchema.safeParse(rawValues);
@@ -189,6 +190,7 @@ export async function saveProjectAction(
       goals: splitLines(parsed.data.goals),
       process: splitLines(parsed.data.process),
       outcome: splitLines(parsed.data.outcome),
+      live_url: parsed.data.liveUrl ?? null,
       updated_at: now
     };
 

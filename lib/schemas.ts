@@ -37,7 +37,8 @@ export const projectFormSchema = z.object({
   gallery: z.string().min(2, "Добави поне един gallery image URL или upload."),
   goals: z.string().min(2, "Добави поне една цел."),
   process: z.string().min(2, "Добави поне една стъпка от процеса."),
-  outcome: z.string().min(2, "Добави поне един резултат.")
+  outcome: z.string().min(2, "Добави поне един резултат."),
+  liveUrl: z.union([z.literal(""), z.string().url("Въведи валиден URL адрес.")]).optional()
 });
 
 export const aboutFormSchema = z.object({

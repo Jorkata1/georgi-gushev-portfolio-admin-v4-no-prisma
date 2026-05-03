@@ -49,6 +49,7 @@ function mapProject(item: any): Project {
     goals: item.goals ?? [],
     process: item.process ?? [],
     outcome: item.outcome ?? [],
+    liveUrl: item.live_url ?? undefined,
     createdAt: item.created_at,
     updatedAt: item.updated_at
   };

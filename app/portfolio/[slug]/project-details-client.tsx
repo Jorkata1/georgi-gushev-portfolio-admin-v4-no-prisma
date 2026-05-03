@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   motion,
   useScroll,
@@ -10,7 +10,7 @@ import {
   useSpring,
   AnimatePresence,
 } from "framer-motion";
-import { ArrowLeft, ArrowUpRight, Target, Layers, CheckCircle2, X } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Target, Layers, CheckCircle2, X, ExternalLink, Monitor } from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/data/translations";
@@ -227,6 +227,11 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
         </section>
       )}
 
+      {/* ── Live Site Preview ──────────────────────────────────────────── */}
+      {project.liveUrl && (
+        <LiveSitePreview url={project.liveUrl} title={project.title} />
+      )}
+
       {/* ── Goals / Process / Outcome ───────────────────────────────── */}
       <section className="section-padding border-b border-white/6">
         <Container>
@@ -435,5 +440,117 @@ function InfoCard({
         ))}
       </motion.ul>
     </motion.article>
+  );
+}
+
+// ─── Live Site Preview ────────────────────────────────────────────────────────
+
+function LiveSitePreview({ url, title }: { url: string; title: string }) {
+  return (
+    <section className="section-padding-sm border-b border-white/6">
+      <Container>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          {/* Header row */}
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <Monitor size={16} className="text-accent/70" />
+              <span className="text-sm font-medium text-slate-300">Live сайт</span>
+            </div>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-xs font-semibold text-accentGlow transition-all duration-300 hover:bg-accent/20 hover:shadow-[0_0_20px_rgba(232,164,74,0.15)]"
+            >
+              <ExternalLink size={13} />
+              Отвори сайта
+              <ArrowUpRight
+                size={13}
+                className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            </a>
+          </div>
+
+          {/* Browser chrome mockup */}
+          <div className="surface overflow-hidden">
+            {/* Fake browser bar */}
+            <div className="flex items-center gap-3 border-b border-white/8 bg-white/[0.03] px-4 py-3">
+              <div className="flex gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
+              </div>
+              <div className="flex flex-1 items-center gap-2 rounded-md border border-white/8 bg-white/5 px-3 py-1">
+                <span className="text-[11px] text-slate-500">{url.replace("https://", "")}</span>
+              </div>
+            </div>
+
+            {/* iframe — scaled to fit */}
+            <ScaledIframe url={url} title={title} />
+          </div>
+        </motion.div>
+      </Container>
+    </section>
+  );
+}
+
+// ─── Scaled Iframe ────────────────────────────────────────────────────────────
+
+function ScaledIframe({ url, title }: { url: string; title: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const inner = innerRef.current;
+    if (!container || !inner) return;
+
+    function rescale() {
+      if (!container || !inner) return;
+      const scale = container.clientWidth / 1280;
+      inner.style.transform = `scale(${scale})`;
+      container.style.height = `${Math.round(800 * scale)}px`;
+    }
+
+    rescale();
+    const ro = new ResizeObserver(rescale);
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative w-full overflow-hidden bg-slate-950">
+      <div
+        ref={innerRef}
+        className="absolute top-0 left-0 origin-top-left"
+        style={{ width: "1280px", height: "800px" }}
+      >
+        <iframe
+          src={url}
+          title={`Live preview — ${title}`}
+          className="border-0"
+          style={{ width: "1280px", height: "800px" }}
+          loading="lazy"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        />
+      </div>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute inset-0 flex items-end justify-end p-4 opacity-0 hover:opacity-100 transition-opacity duration-300"
+        aria-label={`Отвори ${title} в нов таб`}
+      >
+        <span className="flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-[11px] text-white backdrop-blur-sm">
+          <ExternalLink size={11} />
+          Отвори в нов таб
+        </span>
+      </a>
+    </div>
   );
 }

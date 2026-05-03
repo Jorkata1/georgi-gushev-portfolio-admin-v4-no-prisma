@@ -230,6 +230,13 @@ export function ProjectForm({ project }: ProjectFormProps) {
       ) : null}
 
       <AdminField
+        label="Live сайт URL (незадължително)"
+        name="liveUrl"
+        defaultValue={project?.liveUrl ?? ""}
+        placeholder="https://example.com"
+      />
+
+      <AdminField
         label="Кратък excerpt"
         name="excerpt"
         defaultValue={project?.excerpt}
