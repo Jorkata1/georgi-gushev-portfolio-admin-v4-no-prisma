@@ -1,41 +1,17 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Container } from "@/components/shared/container";
-import { PageHero } from "@/components/page-hero";
-import { BentoPortfolioGrid } from "@/components/portfolio/bento-portfolio-grid";
 import { getAllProjects, getProjectCategories } from "@/lib/projects";
-import { useLanguage } from "@/lib/language-context";
-import { translations } from "@/data/translations";
+import { Container } from "@/components/shared/container";
+import { BentoPortfolioGrid } from "@/components/portfolio/bento-portfolio-grid";
+import { PortfolioPageClient } from "./portfolio-page-client";
 import type { Project } from "@/types";
 
-export default function PortfolioPage() {
-  const { locale } = useLanguage();
-  const t = translations[locale];
+// Revalidate на всеки час — спестява Supabase заявки
+export const revalidate = 3600;
 
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [categories, setCategories] = useState<readonly string[]>([]);
-
-  useEffect(() => {
-    getAllProjects().then((data) => {
-      setProjects(data);
-      setCategories(getProjectCategories(data));
-    });
-  }, []);
+export default async function PortfolioPage() {
+  const projects = await getAllProjects();
+  const categories = getProjectCategories(projects);
 
   return (
-    <>
-      <PageHero
-        eyebrow={t.nav.portfolio}
-        title={t.sections.projects.title}
-        description={t.sections.projects.description}
-      />
-
-      <section className="section-padding">
-        <Container>
-          <BentoPortfolioGrid projects={projects} categories={categories} />
-        </Container>
-      </section>
-    </>
+    <PortfolioPageClient projects={projects} categories={categories} />
   );
 }

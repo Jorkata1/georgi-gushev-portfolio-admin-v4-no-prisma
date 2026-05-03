@@ -2,7 +2,7 @@
 
 import { Container } from "@/components/shared/container";
 import { PageHero } from "@/components/page-hero";
-import { PortfolioGrid } from "@/components/portfolio-grid";
+import { BentoPortfolioGrid } from "@/components/portfolio/bento-portfolio-grid";
 import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/data/translations";
 import type { Project } from "@/types";
@@ -14,7 +14,7 @@ type PortfolioPageClientProps = {
 
 export function PortfolioPageClient({
   projects,
-  categories
+  categories,
 }: PortfolioPageClientProps) {
   const { locale } = useLanguage();
   const t = translations[locale];
@@ -29,7 +29,7 @@ export function PortfolioPageClient({
 
       <section className="section-padding">
         <Container>
-          <PortfolioGrid projects={projects} categories={categories} />
+          <BentoPortfolioGrid projects={projects} categories={categories} />
         </Container>
       </section>
     </>
