@@ -6,9 +6,6 @@ import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import {
   motion,
-  useScroll,
-  useTransform,
-  useSpring,
   AnimatePresence,
 } from "framer-motion";
 import {
@@ -44,16 +41,6 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
   const p = t.portfolio;
 
   const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const heroScale = useSpring(
-    useTransform(scrollYProgress, [0, 1], [1, 1.1]),
-    { stiffness: 60, damping: 20 }
-  );
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
 
   const allImages = [project.heroImage, ...project.gallery];
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -84,28 +71,32 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
   return (
     <>
       {/* ── Hero ── */}
-      <section ref={heroRef} className="relative overflow-hidden">
-        {/* Image with natural aspect ratio — never crops on any screen */}
-        <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
-          <motion.div className="absolute inset-0" style={{ scale: heroScale }}>
-            <Image
-              src={project.heroImage}
-              alt={project.title}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover object-center"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-            />
-          </motion.div>
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/20 to-transparent" />
+      <section
+        ref={heroRef}
+        className="relative flex flex-col"
+        style={{ minHeight: "clamp(480px, 75vw, 700px)" }}
+      >
+        {/* Full-bleed background image */}
+        <div className="absolute inset-0">
+          <Image
+            src={project.heroImage}
+            alt={project.title}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+          />
         </div>
 
-        {/* Text — overlaps image bottom via negative margin */}
-        <div className="-mt-28 sm:-mt-44 lg:-mt-60 relative z-10">
-          <Container className="pb-10 sm:pb-14 lg:pb-20">
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/25 to-transparent" />
+
+        {/* Text pinned to bottom */}
+        <div className="relative z-10 mt-auto">
+          <Container className="pb-10 sm:pb-14 lg:pb-20 pt-24 sm:pt-32">
             <motion.div
               initial="hidden"
               animate="show"
