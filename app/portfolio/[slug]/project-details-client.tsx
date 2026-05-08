@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
@@ -201,30 +202,10 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
         </div>
       </NarrativeSection>
 
-      {/* ── 02 Цели ── */}
-      {project.goals.length > 0 && (
-        <NarrativeSection num="02" label={locale === "bg" ? "Цели" : "Goals"} alt>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {project.goals.map((goal, i) => (
-              <motion.div
-                key={goal}
-                className="group relative overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] p-6 transition-all duration-500 hover:border-accent/25 hover:bg-accent/[0.04]"
-                initial={{ opacity: 0, y: 32 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.6, delay: i * 0.07, ease: [0.25, 0.1, 0.25, 1] }}
-              >
-                <span
-                  className="absolute -right-2 -top-3 font-semibold text-white/[0.04] select-none pointer-events-none"
-                  style={{ fontSize: "5rem", lineHeight: 1, fontFamily: "Georgia, serif" }}
-                  aria-hidden
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <p className="relative text-sm leading-relaxed text-slate-200 sm:text-base">{goal}</p>
-              </motion.div>
-            ))}
-          </div>
+      {/* ── 02 Цели / Процес / Резултати — обединена секция ── */}
+      {(project.goals.length > 0 || project.process.length > 0 || project.outcome.length > 0) && (
+        <NarrativeSection num="02" label={locale === "bg" ? "Подход" : "Approach"} alt>
+          <ProjectApproach project={project} locale={locale} />
         </NarrativeSection>
       )}
 
@@ -240,64 +221,6 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
             title={project.title}
             onOpen={(i) => setLightboxIndex(i + 1)}
           />
-        </NarrativeSection>
-      )}
-
-      {/* ── 04 Процес ── */}
-      {project.process.length > 0 && (
-        <NarrativeSection
-          num={project.gallery.length > 0 ? "04" : "03"}
-          label={locale === "bg" ? "Процес" : "Process"}
-        >
-          <div className="relative">
-            <div className="absolute left-[19px] top-0 bottom-0 w-px bg-gradient-to-b from-accent/30 via-primary/20 to-transparent hidden sm:block" />
-            <div className="flex flex-col gap-0">
-              {project.process.map((step, i) => (
-                <motion.div
-                  key={step}
-                  className="relative flex gap-6 pb-8 last:pb-0"
-                  initial={{ opacity: 0, x: -24 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.6, delay: i * 0.08, ease: [0.25, 0.1, 0.25, 1] }}
-                >
-                  <div className="relative z-10 mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-background text-xs font-semibold text-accentGlow">
-                    {String(i + 1).padStart(2, "0")}
-                  </div>
-                  <div className="flex-1 pt-2">
-                    <p className="text-sm leading-relaxed text-slate-300 sm:text-base">{step}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </NarrativeSection>
-      )}
-
-      {/* ── 05 Резултати ── */}
-      {project.outcome.length > 0 && (
-        <NarrativeSection
-          num={project.gallery.length > 0 ? "05" : project.process.length > 0 ? "04" : "03"}
-          label={locale === "bg" ? "Резултати" : "Outcomes"}
-          alt
-        >
-          <div className="grid gap-3 sm:gap-4">
-            {project.outcome.map((item, i) => (
-              <motion.div
-                key={item}
-                className="flex items-start gap-4 rounded-2xl border border-white/8 bg-white/[0.02] px-5 py-4 transition-all duration-300 hover:border-white/14 hover:bg-white/[0.04]"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.55, delay: i * 0.06, ease: [0.25, 0.1, 0.25, 1] }}
-              >
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/15 text-[10px] font-semibold text-accentGlow">
-                  ✓
-                </span>
-                <p className="text-sm leading-relaxed text-slate-200 sm:text-base">{item}</p>
-              </motion.div>
-            ))}
-          </div>
         </NarrativeSection>
       )}
 
@@ -734,24 +657,177 @@ function LiveSiteSection({
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+// ─── ProjectApproach — Goals + Process + Outcome в едно ──────────────────────
+
+function ProjectApproach({ project, locale }: { project: Project; locale: string }) {
+  const cols = [
+    project.goals.length > 0 && {
+      key: "goals",
+      label: locale === "bg" ? "Цели" : "Goals",
+      num: "01",
+      items: project.goals,
+      renderItem: (item: string, i: number) => (
+        <div key={item} className="relative overflow-hidden">
+          <span
+            className="absolute -right-1 -top-2 font-semibold text-white/[0.04] select-none pointer-events-none"
+            style={{ fontSize: "3.5rem", lineHeight: 1, fontFamily: "Georgia, serif" }}
+            aria-hidden
+          >
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <p className="relative text-sm leading-relaxed text-slate-200">{item}</p>
+        </div>
+      ),
+    },
+    project.process.length > 0 && {
+      key: "process",
+      label: locale === "bg" ? "Процес" : "Process",
+      num: "02",
+      items: project.process,
+      renderItem: (item: string, i: number) => (
+        <div key={item} className="flex gap-3">
+          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-background text-[10px] font-semibold text-accentGlow">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <p className="text-sm leading-relaxed text-slate-300">{item}</p>
+        </div>
+      ),
+    },
+    project.outcome.length > 0 && {
+      key: "outcome",
+      label: locale === "bg" ? "Резултати" : "Outcomes",
+      num: "03",
+      items: project.outcome,
+      renderItem: (item: string, _i: number) => (
+        <div key={item} className="flex items-start gap-3">
+          <span className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-accent/15 text-[9px] font-semibold text-accentGlow">
+            ✓
+          </span>
+          <p className="text-sm leading-relaxed text-slate-200">{item}</p>
+        </div>
+      ),
+    },
+  ].filter(Boolean) as NonNullable<{
+    key: string;
+    label: string;
+    num: string;
+    items: string[];
+    renderItem: (item: string, i: number) => React.ReactNode;
+  }>[];
+
+  // Mobile accordion state
+  const [openCol, setOpenCol] = React.useState<string>(cols[0]?.key ?? "");
+
+  return (
+    <>
+      {/* Desktop — 3 columns */}
+      <div className="hidden lg:grid lg:grid-cols-3 lg:divide-x lg:divide-white/6">
+        {cols.map((col, ci) => (
+          <motion.div
+            key={col.key}
+            className="px-8 first:pl-0 last:pr-0"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6, delay: ci * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            {/* Column header */}
+            <div className="mb-6 flex items-center gap-3">
+              <span
+                className="font-semibold text-white/10 tabular-nums select-none"
+                style={{ fontSize: "2rem", lineHeight: 1, fontFamily: "Georgia, serif" }}
+                aria-hidden
+              >
+                {col.num}
+              </span>
+              <div className="h-px flex-1 bg-accent/20" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">
+                {col.label}
+              </span>
+            </div>
+
+            {/* Items */}
+            <div className="flex flex-col gap-5">
+              {col.items.map((item, i) => col.renderItem(item, i))}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Mobile — accordion */}
+      <div className="flex flex-col divide-y divide-white/6 lg:hidden">
+        {cols.map((col) => {
+          const isOpen = openCol === col.key;
+          return (
+            <div key={col.key}>
+              <button
+                type="button"
+                onClick={() => setOpenCol(isOpen ? "" : col.key)}
+                className="flex w-full items-center justify-between gap-4 py-4 text-left"
+                aria-expanded={isOpen}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="font-semibold text-white/10 tabular-nums select-none"
+                    style={{ fontSize: "1.5rem", lineHeight: 1, fontFamily: "Georgia, serif" }}
+                    aria-hidden
+                  >
+                    {col.num}
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">
+                    {col.label}
+                  </span>
+                </div>
+                <motion.span
+                  className="text-slate-400"
+                  animate={{ rotate: isOpen ? 180 : 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </motion.span>
+              </button>
+
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex flex-col gap-4 pb-6">
+                      {col.items.map((item, i) => col.renderItem(item, i))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
 function getBrandNum(project: Project): string {
-  let n = 1;
-  if (project.goals.length > 0) n++;
-  if (project.gallery.length > 0) n++;
-  if (project.process.length > 0) n++;
-  if (project.outcome.length > 0) n++;
-  n++;
+  let n = 1; // 01 summary
+  const hasApproach = project.goals.length > 0 || project.process.length > 0 || project.outcome.length > 0;
+  if (hasApproach) n++; // 02 approach
+  if (project.gallery.length > 0) n++; // 03 visuals
+  n++; // brand
   return String(n).padStart(2, "0");
 }
 
 function getLiveNum(project: Project): string {
-  let n = 1;
-  if (project.goals.length > 0) n++;
-  if (project.gallery.length > 0) n++;
-  if (project.process.length > 0) n++;
-  if (project.outcome.length > 0) n++;
+  let n = 1; // 01 summary
+  const hasApproach = project.goals.length > 0 || project.process.length > 0 || project.outcome.length > 0;
+  if (hasApproach) n++; // 02 approach
+  if (project.gallery.length > 0) n++; // 03 visuals
   const hasBrand = (project.colors && project.colors.length > 0) || (project.fonts && project.fonts.length > 0);
-  if (hasBrand) n++;
-  n++;
+  if (hasBrand) n++; // brand
+  n++; // live
   return String(n).padStart(2, "0");
 }
