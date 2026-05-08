@@ -389,6 +389,25 @@ export function ProjectForm({ project }: ProjectFormProps) {
         />
       </div>
 
+      <div className="grid gap-6 md:grid-cols-2">
+        <AdminField
+          label="Цветове (по един hex на ред, пр. #1A1A2E)"
+          name="colors"
+          defaultValue={project?.colors?.join("\n")}
+          textarea
+          rows={5}
+          placeholder={"#1A1A2E\n#E8A44A\n#FFFFFF"}
+        />
+        <AdminField
+          label="Шрифтове (по един на ред, пр. Inter — Headlines)"
+          name="fonts"
+          defaultValue={project?.fonts?.join("\n")}
+          textarea
+          rows={5}
+          placeholder={"Inter — Headlines\nGeorgia — Body"}
+        />
+      </div>
+
       <label className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
         <input
           type="checkbox"

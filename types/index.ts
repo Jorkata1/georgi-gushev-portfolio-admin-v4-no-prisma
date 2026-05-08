@@ -35,6 +35,8 @@ export type Project = {
   goals: string[];
   process: string[];
   outcome: string[];
+  colors?: string[];
+  fonts?: string[];
   liveUrl?: string;
   createdAt?: string;
   updatedAt?: string;

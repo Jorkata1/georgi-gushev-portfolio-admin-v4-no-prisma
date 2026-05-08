@@ -132,7 +132,9 @@ export async function saveProjectAction(
     goals: extractField(formData, "goals"),
     process: extractField(formData, "process"),
     outcome: extractField(formData, "outcome"),
-    liveUrl: extractField(formData, "liveUrl") || undefined
+    liveUrl: extractField(formData, "liveUrl") || undefined,
+    colors: extractField(formData, "colors") || undefined,
+    fonts: extractField(formData, "fonts") || undefined
   };
 
   const parsed = projectFormSchema.safeParse(rawValues);
@@ -191,6 +193,8 @@ export async function saveProjectAction(
       process: splitLines(parsed.data.process),
       outcome: splitLines(parsed.data.outcome),
       live_url: parsed.data.liveUrl ?? null,
+      colors: splitLines(parsed.data.colors ?? ""),
+      fonts: splitLines(parsed.data.fonts ?? ""),
       updated_at: now
     };
 

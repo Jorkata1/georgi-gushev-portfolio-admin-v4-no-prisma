@@ -82,26 +82,29 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
 
   return (
     <>
-      {/* ── Cinematic Hero ── */}
-      <section ref={heroRef} className="relative h-[75vh] min-h-[600px] sm:h-[85vh] sm:min-h-[560px] overflow-hidden">
-        <motion.div className="absolute inset-0" style={{ scale: heroScale, y: heroY }}>
-          <Image
-            src={project.heroImage}
-            alt={project.title}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center"
-            placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
-          />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/55 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/50 to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(232,164,74,0.06),transparent_50%)]" />
+      {/* ── Hero ── */}
+      <section ref={heroRef} className="relative overflow-hidden">
+        {/* Image with natural aspect ratio — never crops on any screen */}
+        <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[21/9]">
+          <motion.div className="absolute inset-0" style={{ scale: heroScale }}>
+            <Image
+              src={project.heroImage}
+              alt={project.title}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+            />
+          </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/20 to-transparent" />
+        </div>
 
-        <motion.div className="absolute inset-x-0 bottom-0" style={{ opacity: heroOpacity }}>
-          <Container className="pb-12 sm:pb-16 lg:pb-20">
+        {/* Text — overlaps image bottom via negative margin */}
+        <div className="-mt-28 sm:-mt-44 lg:-mt-60 relative z-10">
+          <Container className="pb-10 sm:pb-14 lg:pb-20">
             <motion.div
               initial="hidden"
               animate="show"
@@ -139,22 +142,7 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
               </motion.div>
             </motion.div>
           </Container>
-        </motion.div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 right-8 hidden lg:flex flex-col items-center gap-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.6 }}
-          style={{ opacity: heroOpacity }}
-        >
-          <motion.div
-            className="h-8 w-px bg-gradient-to-b from-transparent via-accent/40 to-transparent"
-            animate={{ scaleY: [0, 1, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </motion.div>
+        </div>
       </section>
 
       {/* ── Meta Bar ── */}
@@ -309,6 +297,81 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
                 <p className="text-sm leading-relaxed text-slate-200 sm:text-base">{item}</p>
               </motion.div>
             ))}
+          </div>
+        </NarrativeSection>
+      )}
+
+      {/* ── Brand Identity (colors + fonts) ── */}
+      {((project.colors && project.colors.length > 0) || (project.fonts && project.fonts.length > 0)) && (
+        <NarrativeSection
+          num={getBrandNum(project)}
+          label={locale === "bg" ? "Идентичност" : "Identity"}
+          alt
+        >
+          <div className="grid gap-10 lg:grid-cols-2">
+            {/* Colors */}
+            {project.colors && project.colors.length > 0 && (
+              <div>
+                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
+                  {locale === "bg" ? "Цветова палитра" : "Colour palette"}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {project.colors.map((hex) => {
+                    const clean = hex.trim();
+                    return (
+                      <motion.div
+                        key={clean}
+                        className="group flex flex-col items-center gap-2"
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                      >
+                        <div
+                          className="h-16 w-16 rounded-2xl border border-white/10 shadow-lg transition-transform duration-300 group-hover:scale-110 sm:h-20 sm:w-20"
+                          style={{ backgroundColor: clean }}
+                          aria-label={clean}
+                        />
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
+                          {clean}
+                        </span>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Fonts */}
+            {project.fonts && project.fonts.length > 0 && (
+              <div>
+                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
+                  {locale === "bg" ? "Типография" : "Typography"}
+                </p>
+                <div className="flex flex-col gap-3">
+                  {project.fonts.map((entry, i) => {
+                    const [name, role] = entry.split("—").map((s) => s.trim());
+                    return (
+                      <motion.div
+                        key={entry}
+                        className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/[0.03] px-5 py-4"
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{ duration: 0.5, delay: i * 0.07, ease: [0.25, 0.1, 0.25, 1] }}
+                      >
+                        <span className="text-base font-semibold text-white">{name}</span>
+                        {role && (
+                          <span className="text-xs font-medium uppercase tracking-widest text-slate-500">
+                            {role}
+                          </span>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </NarrativeSection>
       )}
@@ -671,12 +734,24 @@ function LiveSiteSection({
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function getLiveNum(project: Project): string {
-  let n = 1; // 01 = summary always
+function getBrandNum(project: Project): string {
+  let n = 1;
   if (project.goals.length > 0) n++;
   if (project.gallery.length > 0) n++;
   if (project.process.length > 0) n++;
   if (project.outcome.length > 0) n++;
-  n++; // live is the next one
+  n++;
+  return String(n).padStart(2, "0");
+}
+
+function getLiveNum(project: Project): string {
+  let n = 1;
+  if (project.goals.length > 0) n++;
+  if (project.gallery.length > 0) n++;
+  if (project.process.length > 0) n++;
+  if (project.outcome.length > 0) n++;
+  const hasBrand = (project.colors && project.colors.length > 0) || (project.fonts && project.fonts.length > 0);
+  if (hasBrand) n++;
+  n++;
   return String(n).padStart(2, "0");
 }

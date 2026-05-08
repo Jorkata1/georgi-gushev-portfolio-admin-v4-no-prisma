@@ -38,7 +38,9 @@ export const projectFormSchema = z.object({
   goals: z.string().min(2, "Добави поне една цел."),
   process: z.string().min(2, "Добави поне една стъпка от процеса."),
   outcome: z.string().min(2, "Добави поне един резултат."),
-  liveUrl: z.union([z.literal(""), z.string().url("Въведи валиден URL адрес.")]).optional()
+  liveUrl: z.union([z.literal(""), z.string().url("Въведи валиден URL адрес.")]).optional(),
+  colors: z.string().optional(),
+  fonts: z.string().optional()
 });
 
 export const aboutFormSchema = z.object({
