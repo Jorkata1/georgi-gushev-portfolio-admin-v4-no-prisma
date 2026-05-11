@@ -648,7 +648,7 @@ function LiveSiteSection({
 
 // ─── ProjectApproach — Goals + Process + Outcome в едно ──────────────────────
 
-function ProjectApproach({ project, p }: { project: Project; p: ReturnType<typeof translations[keyof typeof translations]["portfolio"]> }) {
+function ProjectApproach({ project, p }: { project: Project; p: typeof translations["bg"]["portfolio"] }) {
   const cols = [
     project.goals.length > 0 && {
       key: "goals",
