@@ -141,10 +141,10 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
       <div className="border-b border-white/6 bg-background/60 backdrop-blur-sm">
         <Container>
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3 py-5">
-            <MetaItem label={locale === "bg" ? "Категория" : "Category"} value={project.category} />
-            <MetaItem label={locale === "bg" ? "Година" : "Year"} value={project.year} />
+            <MetaItem label={p.category} value={project.category} />
+            <MetaItem label={p.year} value={project.year} />
             <MetaItem
-              label={locale === "bg" ? "Инструменти" : "Tools"}
+              label={p.tools}
               value={project.tools.join(" · ")}
             />
             {project.liveUrl && (
@@ -155,7 +155,7 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
                 className="ml-auto inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/8 px-4 py-2 text-xs font-semibold text-accentGlow transition-all duration-300 hover:bg-accent/15 hover:border-accent/40"
               >
                 <ExternalLink size={12} />
-                {locale === "bg" ? "Виж онлайн" : "View live"}
+                {p.viewLive}
               </a>
             )}
           </div>
@@ -163,7 +163,7 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
       </div>
 
       {/* ── 01 За проекта ── */}
-      <NarrativeSection num="01" label={locale === "bg" ? "За проекта" : "About the project"}>
+      <NarrativeSection num="01" label={p.aboutSection}>
         <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-start lg:gap-20">
           <motion.p
             className="text-lg leading-relaxed text-slate-200 sm:text-xl sm:leading-loose"
@@ -195,8 +195,8 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
 
       {/* ── 02 Цели / Процес / Резултати — обединена секция ── */}
       {(project.goals.length > 0 || project.process.length > 0 || project.outcome.length > 0) && (
-        <NarrativeSection num="02" label={locale === "bg" ? "Подход" : "Approach"} alt>
-          <ProjectApproach project={project} locale={locale} />
+        <NarrativeSection num="02" label={p.approachSection} alt>
+          <ProjectApproach project={project} p={p} />
         </NarrativeSection>
       )}
 
@@ -204,7 +204,7 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
       {project.gallery.length > 0 && (
         <NarrativeSection
           num="03"
-          label={locale === "bg" ? "Визуали" : "Visuals"}
+          label={p.visualsSection}
           fullWidthMedia
         >
           <ProjectGallery
@@ -219,7 +219,7 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
       {((project.colors && project.colors.length > 0) || (project.fonts && project.fonts.length > 0)) && (
         <NarrativeSection
           num={getBrandNum(project)}
-          label={locale === "bg" ? "Идентичност" : "Identity"}
+          label={p.identitySection}
           alt
         >
           <div className="grid gap-10 lg:grid-cols-2">
@@ -227,7 +227,7 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
             {project.colors && project.colors.length > 0 && (
               <div>
                 <p className="mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
-                  {locale === "bg" ? "Цветова палитра" : "Colour palette"}
+                  {p.colourPalette}
                 </p>
                 <div className="flex flex-wrap gap-3">
                   {project.colors.map((hex) => {
@@ -260,7 +260,7 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
             {project.fonts && project.fonts.length > 0 && (
               <div>
                 <p className="mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
-                  {locale === "bg" ? "Типография" : "Typography"}
+                  {p.typography}
                 </p>
                 <div className="flex flex-col gap-3">
                   {project.fonts.map((entry, i) => {
@@ -296,7 +296,7 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
           num={getLiveNum(project)}
           label="Live"
         >
-          <LiveSiteSection url={project.liveUrl} title={project.title} locale={locale} />
+          <LiveSiteSection url={project.liveUrl} title={project.title} p={p} />
         </NarrativeSection>
       )}
 
@@ -315,12 +315,10 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
               <div>
                 <span className="eyebrow">{p.nextStep}</span>
                 <h2 className="section-title mt-3 text-balance">
-                  {locale === "bg" ? "Имаш подобен проект?" : "Have a similar project?"}
+                  {p.ctaTitle}
                 </h2>
                 <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-                  {locale === "bg"
-                    ? "Нека поговорим за целите ти и как мога да помогна с дизайн, изработка или подобрения."
-                    : "Let's talk about your goals and how I can help with design, development or improvements."}
+                  {p.ctaDescription}
                 </p>
               </div>
               <Link
@@ -548,11 +546,11 @@ function GalleryImage({
 function LiveSiteSection({
   url,
   title,
-  locale,
+  p,
 }: {
   url: string;
   title: string;
-  locale: string;
+  p: { liveDescription: string; liveOpen: string; liveOpenTab: string };
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -584,7 +582,7 @@ function LiveSiteSection({
     >
       <div className="mb-5 flex items-center justify-between gap-4">
         <p className="text-sm text-slate-400">
-          {locale === "bg" ? "Разгледай проекта на живо" : "Browse the live project"}
+          {p.liveDescription}
         </p>
         <a
           href={url}
@@ -593,7 +591,7 @@ function LiveSiteSection({
           className="group inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-xs font-semibold text-accentGlow transition-all duration-300 hover:bg-accent/20"
         >
           <ExternalLink size={12} />
-          {locale === "bg" ? "Отвори сайта" : "Open site"}
+          {p.liveOpen}
           <ArrowUpRight
             size={12}
             className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -633,11 +631,11 @@ function LiveSiteSection({
             target="_blank"
             rel="noopener noreferrer"
             className="absolute inset-0 flex items-end justify-end p-4 opacity-0 transition-opacity duration-300 hover:opacity-100"
-            aria-label={`${locale === "bg" ? "Отвори" : "Open"} ${title}`}
+            aria-label={`${p.liveOpen} ${title}`}
           >
             <span className="flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-[11px] text-white backdrop-blur-sm">
               <ExternalLink size={11} />
-              {locale === "bg" ? "Отвори в нов таб" : "Open in new tab"}
+              {p.liveOpenTab}
             </span>
           </a>
         </div>
@@ -650,11 +648,11 @@ function LiveSiteSection({
 
 // ─── ProjectApproach — Goals + Process + Outcome в едно ──────────────────────
 
-function ProjectApproach({ project, locale }: { project: Project; locale: string }) {
+function ProjectApproach({ project, p }: { project: Project; p: ReturnType<typeof translations[keyof typeof translations]["portfolio"]> }) {
   const cols = [
     project.goals.length > 0 && {
       key: "goals",
-      label: locale === "bg" ? "Цели" : "Goals",
+      label: p.goalsCol,
       num: "01",
       items: project.goals,
       renderItem: (item: string, i: number) => (
@@ -672,7 +670,7 @@ function ProjectApproach({ project, locale }: { project: Project; locale: string
     },
     project.process.length > 0 && {
       key: "process",
-      label: locale === "bg" ? "Процес" : "Process",
+      label: p.processCol,
       num: "02",
       items: project.process,
       renderItem: (item: string, i: number) => (
@@ -686,7 +684,7 @@ function ProjectApproach({ project, locale }: { project: Project; locale: string
     },
     project.outcome.length > 0 && {
       key: "outcome",
-      label: locale === "bg" ? "Резултати" : "Outcomes",
+      label: p.outcomesCol,
       num: "03",
       items: project.outcome,
       renderItem: (item: string, _i: number) => (
