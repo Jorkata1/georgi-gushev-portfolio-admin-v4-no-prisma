@@ -21,6 +21,8 @@ import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/data/translations";
 import type { Project } from "@/types";
 
+type PortfolioTranslations = typeof translations["bg"]["portfolio"] | typeof translations["en"]["portfolio"];
+
 const BLUR_DATA_URL =
   "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
 
@@ -550,7 +552,7 @@ function LiveSiteSection({
 }: {
   url: string;
   title: string;
-  p: { liveDescription: string; liveOpen: string; liveOpenTab: string };
+  p: PortfolioTranslations;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -648,7 +650,7 @@ function LiveSiteSection({
 
 // ─── ProjectApproach — Goals + Process + Outcome в едно ──────────────────────
 
-function ProjectApproach({ project, p }: { project: Project; p: typeof translations["bg"]["portfolio"] }) {
+function ProjectApproach({ project, p }: { project: Project; p: PortfolioTranslations }) {
   const cols = [
     project.goals.length > 0 && {
       key: "goals",
