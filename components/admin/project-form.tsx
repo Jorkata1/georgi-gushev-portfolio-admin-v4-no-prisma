@@ -6,6 +6,7 @@ import { useFormState } from "react-dom";
 import { saveProjectAction } from "@/app/admin/actions";
 import { initialAdminFormState } from "@/app/admin/form-state";
 import { AdminField } from "@/components/admin/form-field";
+import { FormErrorSummary } from "@/components/admin/form-error-summary";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { projectCategories, type Project } from "@/types";
 
@@ -77,8 +78,10 @@ export function ProjectForm({ project }: ProjectFormProps) {
   const displayedHeroImage = heroPreview || heroImageValue;
 
   return (
-    <form action={formAction} encType="multipart/form-data" className="space-y-8">
+    <form action={formAction} encType="multipart/form-data" className="space-y-8" noValidate={false}>
       {project?.id ? <input type="hidden" name="id" value={project.id} /> : null}
+
+      <FormErrorSummary message={message} fieldErrors={fieldErrors} />
 
       <div className="grid gap-6 md:grid-cols-2">
         <AdminField
@@ -86,12 +89,18 @@ export function ProjectForm({ project }: ProjectFormProps) {
           name="title"
           defaultValue={project?.title}
           error={fieldErrors.title?.[0]}
+          required
+          minLength={2}
+          title="Заглавието трябва да е поне 2 символа."
         />
         <AdminField
           label="Кратко заглавие"
           name="shortTitle"
           defaultValue={project?.shortTitle}
           error={fieldErrors.shortTitle?.[0]}
+          required
+          minLength={2}
+          title="Краткото заглавие е задължително (поне 2 символа)."
         />
         <AdminField
           label="Slug"
@@ -99,6 +108,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
           defaultValue={project?.slug}
           error={fieldErrors.slug?.[0]}
           placeholder="пример: my-awesome-project"
+          required
+          pattern="^[a-z0-9]+(-[a-z0-9]+)*$"
+          title="Само малки букви, цифри и тирета — напр. my-awesome-project (без интервали, главни букви или подчертавки)."
         />
         <AdminField
           label="Година"
@@ -106,6 +118,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
           defaultValue={project?.year}
           error={fieldErrors.year?.[0]}
           placeholder="2025"
+          required
+          pattern="^\d{4}$"
+          title="Използвай формат от 4 цифри, напр. 2025."
         />
       </div>
 
@@ -115,13 +130,19 @@ export function ProjectForm({ project }: ProjectFormProps) {
             htmlFor="category"
             className="mb-2 block text-sm font-medium text-slate-200"
           >
-            Категория
+            Категория<span className="ml-1 text-rose-300">*</span>
           </label>
           <select
             id="category"
             name="category"
+            required
             defaultValue={project?.category ?? projectCategories[0]}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-primary/40"
+            aria-invalid={Boolean(fieldErrors.category?.[0])}
+            className={`w-full rounded-2xl border px-4 py-3 text-white outline-none transition focus:border-primary/40 ${
+              fieldErrors.category?.[0]
+                ? "border-rose-400/60 bg-rose-400/5"
+                : "border-white/10 bg-slate-950"
+            }`}
           >
             {projectCategories.map((category) => (
               <option key={category} value={category}>
@@ -130,7 +151,10 @@ export function ProjectForm({ project }: ProjectFormProps) {
             ))}
           </select>
           {fieldErrors.category?.[0] ? (
-            <p className="mt-2 text-sm text-rose-300">{fieldErrors.category[0]}</p>
+            <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-rose-300">
+              <span aria-hidden="true">⚠</span>
+              {fieldErrors.category[0]}
+            </p>
           ) : null}
         </div>
 
@@ -139,7 +163,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             htmlFor="heroImage"
             className="mb-2 block text-sm font-medium text-slate-200"
           >
-            Hero image URL
+            Hero image URL<span className="ml-1 text-rose-300">*</span>
           </label>
           <input
             id="heroImage"
@@ -148,13 +172,22 @@ export function ProjectForm({ project }: ProjectFormProps) {
             value={heroImageValue}
             onChange={(event) => setHeroImageValue(event.target.value)}
             placeholder="https://... или /projects/project-1.svg"
-            className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-primary/40"
+            aria-invalid={Boolean(fieldErrors.heroImage?.[0])}
+            className={`w-full rounded-2xl border px-4 py-3 text-white outline-none transition focus:border-primary/40 ${
+              fieldErrors.heroImage?.[0]
+                ? "border-rose-400/60 bg-rose-400/5"
+                : "border-white/10 bg-slate-950"
+            }`}
           />
           {fieldErrors.heroImage?.[0] ? (
-            <p className="mt-2 text-sm text-rose-300">{fieldErrors.heroImage[0]}</p>
+            <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-rose-300">
+              <span aria-hidden="true">⚠</span>
+              {fieldErrors.heroImage[0]}
+            </p>
           ) : null}
           <p className="mt-2 text-sm text-slate-400">
-            Можеш да оставиш URL или да качиш ново hero изображение от полето отдолу.
+            Задължително е поне едно от двете: URL тук ИЛИ файл в полето &quot;Качи hero
+            изображение&quot; отдолу.
           </p>
         </div>
       </div>
@@ -174,8 +207,19 @@ export function ProjectForm({ project }: ProjectFormProps) {
             type="file"
             accept="image/*"
             onChange={handleHeroImageChange}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-950"
+            aria-invalid={Boolean(fieldErrors.heroImageFile?.[0])}
+            className={`w-full rounded-2xl border px-4 py-3 text-white file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-950 ${
+              fieldErrors.heroImageFile?.[0]
+                ? "border-rose-400/60 bg-rose-400/5"
+                : "border-white/10 bg-slate-950"
+            }`}
           />
+          {fieldErrors.heroImageFile?.[0] ? (
+            <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-rose-300">
+              <span aria-hidden="true">⚠</span>
+              {fieldErrors.heroImageFile[0]}
+            </p>
+          ) : null}
           <p className="mt-2 text-sm text-slate-400">
             Ако качиш файл, той ще замени URL стойността за hero изображението.
           </p>
@@ -196,8 +240,19 @@ export function ProjectForm({ project }: ProjectFormProps) {
             accept="image/*"
             multiple
             onChange={handleGalleryImagesChange}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-950"
+            aria-invalid={Boolean(fieldErrors.galleryImageFiles?.[0])}
+            className={`w-full rounded-2xl border px-4 py-3 text-white file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-950 ${
+              fieldErrors.galleryImageFiles?.[0]
+                ? "border-rose-400/60 bg-rose-400/5"
+                : "border-white/10 bg-slate-950"
+            }`}
           />
+          {fieldErrors.galleryImageFiles?.[0] ? (
+            <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-rose-300">
+              <span aria-hidden="true">⚠</span>
+              {fieldErrors.galleryImageFiles[0]}
+            </p>
+          ) : null}
           <p className="mt-2 text-sm text-slate-400">
             Можеш да избереш няколко файла наведнъж. Качените изображения се
             добавят към галерията.
@@ -234,6 +289,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
         name="liveUrl"
         defaultValue={project?.liveUrl ?? ""}
         placeholder="https://example.com"
+        error={fieldErrors.liveUrl?.[0]}
+        type="url"
+        title="Ако попълниш това поле, трябва да е валиден URL адрес (напр. https://example.com)."
       />
 
       <AdminField
@@ -243,6 +301,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
         error={fieldErrors.excerpt?.[0]}
         textarea
         rows={3}
+        required
+        minLength={12}
+        title="Excerpt трябва да е поне 12 символа."
       />
 
       <AdminField
@@ -252,6 +313,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
         error={fieldErrors.summary?.[0]}
         textarea
         rows={4}
+        required
+        minLength={20}
+        title="Summary трябва да е поне 20 символа."
       />
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -262,6 +326,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
           error={fieldErrors.tools?.[0]}
           textarea
           rows={6}
+          required
+          minLength={2}
+          title="Добави поне един инструмент."
         />
 
         <div>
@@ -270,6 +337,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             className="mb-2 block text-sm font-medium text-slate-200"
           >
             Gallery images (по един URL на ред)
+            <span className="ml-1 text-rose-300">*</span>
           </label>
           <textarea
             id="gallery"
@@ -284,13 +352,22 @@ export function ProjectForm({ project }: ProjectFormProps) {
               )
             }
             rows={6}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-primary/40"
+            aria-invalid={Boolean(fieldErrors.gallery?.[0])}
+            className={`w-full rounded-2xl border px-4 py-3 text-white outline-none transition focus:border-primary/40 ${
+              fieldErrors.gallery?.[0]
+                ? "border-rose-400/60 bg-rose-400/5"
+                : "border-white/10 bg-slate-950"
+            }`}
           />
           {fieldErrors.gallery?.[0] ? (
-            <p className="mt-2 text-sm text-rose-300">{fieldErrors.gallery[0]}</p>
+            <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-rose-300">
+              <span aria-hidden="true">⚠</span>
+              {fieldErrors.gallery[0]}
+            </p>
           ) : null}
           <p className="mt-2 text-sm text-slate-400">
-            Можеш да комбинираш URL адреси и качени файлове.
+            Задължително поне едно изображение — URL тук или качен файл в полето
+            &quot;Качи gallery изображения&quot; по-горе.
           </p>
         </div>
       </div>
@@ -370,6 +447,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
           error={fieldErrors.goals?.[0]}
           textarea
           rows={7}
+          required
+          minLength={2}
+          title="Добави поне една цел."
         />
         <AdminField
           label="Процес (по една стъпка на ред)"
@@ -378,6 +458,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
           error={fieldErrors.process?.[0]}
           textarea
           rows={7}
+          required
+          minLength={2}
+          title="Добави поне една стъпка от процеса."
         />
         <AdminField
           label="Резултати (по един на ред)"
@@ -386,6 +469,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
           error={fieldErrors.outcome?.[0]}
           textarea
           rows={7}
+          required
+          minLength={2}
+          title="Добави поне един резултат."
         />
       </div>
 

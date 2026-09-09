@@ -100,16 +100,49 @@ export async function saveProjectAction(
   const heroUpload = formData.get("heroImageFile");
   const galleryUploads = formData.getAll("galleryImageFiles");
 
-  const uploadedHeroImage =
-    heroUpload instanceof File && heroUpload.size > 0
-      ? await uploadProjectImage(heroUpload, slugBase)
-      : "";
+  let uploadedHeroImage = "";
 
-  const uploadedGalleryImages = await Promise.all(
-    galleryUploads
-      .filter((item): item is File => item instanceof File && item.size > 0)
-      .map((file, index) => uploadProjectImage(file, `${slugBase}-gallery-${index + 1}`))
-  );
+  if (heroUpload instanceof File && heroUpload.size > 0) {
+    try {
+      uploadedHeroImage = await uploadProjectImage(heroUpload, slugBase);
+    } catch (error) {
+      console.error("Hero image upload error:", error);
+      return {
+        status: "error",
+        message: "Hero изображението не можа да се качи. Виж полето отдолу за причината.",
+        fieldErrors: {
+          heroImageFile: [
+            error instanceof Error
+              ? `Качването се провали: ${error.message}`
+              : "Качването се провали поради непозната грешка в Supabase Storage."
+          ]
+        }
+      };
+    }
+  }
+
+  let uploadedGalleryImages: string[] = [];
+
+  try {
+    uploadedGalleryImages = await Promise.all(
+      galleryUploads
+        .filter((item): item is File => item instanceof File && item.size > 0)
+        .map((file, index) => uploadProjectImage(file, `${slugBase}-gallery-${index + 1}`))
+    );
+  } catch (error) {
+    console.error("Gallery image upload error:", error);
+    return {
+      status: "error",
+      message: "Едно от gallery изображенията не можа да се качи. Виж полето отдолу за причината.",
+      fieldErrors: {
+        galleryImageFiles: [
+          error instanceof Error
+            ? `Качването се провали: ${error.message}`
+            : "Качването се провали поради непозната грешка в Supabase Storage."
+        ]
+      }
+    };
+  }
 
   const galleryLines = [
     ...splitLines(extractField(formData, "gallery")),
@@ -215,9 +248,15 @@ export async function saveProjectAction(
     }
   } catch (error) {
     console.error("Save project error:", error);
+    const reason =
+      error && typeof error === "object" && "message" in error
+        ? String((error as { message?: unknown }).message)
+        : null;
     return {
       status: "error",
-      message: "Проектът не можа да бъде записан."
+      message: reason
+        ? `Проектът не можа да бъде записан: ${reason}`
+        : "Проектът не можа да бъде записан поради непозната грешка."
     };
   }
 
