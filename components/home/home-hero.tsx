@@ -172,7 +172,7 @@ export function HomeHero() {
               </div>
 
               <a
-                href="/Georgi-Gushev-CV.pdf"
+                href="/Georgi-Gushev-CV-2026.pdf"
                 download
                 className="inline-flex items-center justify-center gap-2 text-xs text-slate-400 transition hover:text-accent sm:ml-1 sm:text-sm"
               >
