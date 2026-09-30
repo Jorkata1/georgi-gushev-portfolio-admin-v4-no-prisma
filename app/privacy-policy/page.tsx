@@ -29,7 +29,7 @@ export default function PrivacyPolicyPage() {
                 <div className="mt-4 space-y-2 text-sm">
                   <p>Администратор/доставчик: Георги Гушев / GDX Studio</p>
                   <p>Домейн: https://www.gdxstudio.com</p>
-                  <p>Контакт: g.gushevwork@gmail.com • +359 888 9797 39</p>
+                  <p>Контакт: business@gdxstudio.com • +359 888 9797 39</p>
                 </div>
               </section>
 
@@ -46,7 +46,7 @@ export default function PrivacyPolicyPage() {
                   <div className="rounded-[1.25rem] border border-white/10 bg-white/5 p-5 text-sm">
                     <p>Администратор: Георги Гушев / GDX Studio</p>
                     <p>Домейн: https://www.gdxstudio.com</p>
-                    <p>Имейл: g.gushevwork@gmail.com</p>
+                    <p>Имейл: business@gdxstudio.com</p>
                     <p>Телефон: +359 888 9797 39</p>
                     <p>Адрес за кореспонденция: Бул. Георги Димитров 26</p>
                     <p>ЕИК/Булстат: —</p>
@@ -167,7 +167,7 @@ export default function PrivacyPolicyPage() {
                 </ul>
                 <p className="mt-4">
                   За упражняване на правата си посетителят може да се свърже на:
-                  {" "}g.gushevwork@gmail.com.
+                  {" "}business@gdxstudio.com.
                 </p>
               </section>
 

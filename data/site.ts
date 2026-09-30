@@ -16,7 +16,7 @@ export const siteConfig = {
   description:
     "Уеб дизайн, създаване на сайтове, бранд идентичност, визуално обновяване, поддръжка, QA manual услуги и консултации.",
   siteUrl: process.env.SITE_URL || "http://localhost:3000",
-  email: "g.gushevwork@gmail.com",
+  email: "business@gdxstudio.com",
   phone: "+359 888 9797 39",
   linkedin:
     "https://www.linkedin.com/in/georgi-gushev-82953417a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",

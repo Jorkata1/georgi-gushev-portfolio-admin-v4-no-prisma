@@ -29,7 +29,7 @@ export default function CookiePolicyPage() {
                 <div className="mt-4 space-y-2 text-sm">
                   <p>Администратор/доставчик: Георги Гушев / GDX Studio</p>
                   <p>Домейн: https://www.gdxstudio.com</p>
-                  <p>Контакт: g.gushevwork@gmail.com • +359 888 9797 39</p>
+                  <p>Контакт: business@gdxstudio.com • +359 888 9797 39</p>
                 </div>
               </section>
 
