@@ -116,6 +116,15 @@ export function HomeHero() {
               />
             </motion.div>
 
+            <motion.p
+              className="mt-4 max-w-xl text-base leading-relaxed text-slate-300 sm:mt-6 sm:text-lg"
+              variants={fadeUp}
+            >
+              {locale === "bg"
+                ? "Сайтове и брандинг за малки бизнеси, които изглеждат добре и работят бързо."
+                : "Websites and branding for small businesses that look great and load fast."}
+            </motion.p>
+
             <motion.div
               className="mt-5 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-4"
               variants={fadeUp}

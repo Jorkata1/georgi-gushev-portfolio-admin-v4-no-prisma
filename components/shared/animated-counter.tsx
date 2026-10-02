@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 
 type AnimatedCounterProps = {
   value: number;
@@ -10,30 +10,30 @@ type AnimatedCounterProps = {
   duration?: number;
 };
 
-export function AnimatedCounter({
-  value,
-  suffix = "",
-  label,
-  duration = 2,
-}: AnimatedCounterProps) {
-  const ref = useRef(null);
+const COUNT_EASE = [0.16, 1, 0.3, 1] as const;
+
+export function AnimatedCounter({ value, suffix = "", label, duration = 2 }: AnimatedCounterProps) {
+  const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
-  const [count, setCount] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
+  // Start from the real value so the server HTML (search engines, link previews, no-JS) never shows "0+".
+  const [count, setCount] = useState(value);
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      setCount(value);
+      return;
+    }
     if (!isInView) return;
 
-    let start = 0;
-    const end = value;
-    const stepTime = (duration * 1000) / end;
-    const timer = setInterval(() => {
-      start += 1;
-      setCount(start);
-      if (start >= end) clearInterval(timer);
-    }, stepTime);
-
-    return () => clearInterval(timer);
-  }, [isInView, value, duration]);
+    // The block is still fading in at this point, so restarting from 0 is not visible as a jump.
+    const controls = animate(0, value, {
+      duration,
+      ease: COUNT_EASE,
+      onUpdate: (latest) => setCount(Math.round(latest)),
+    });
+    return () => controls.stop();
+  }, [isInView, value, duration, prefersReducedMotion]);
 
   return (
     <motion.div
@@ -43,11 +43,18 @@ export function AnimatedCounter({
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
     >
-      <span className="text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+      <span className="sr-only">
+        {value}
+        {suffix} {label}
+      </span>
+      <span aria-hidden="true" className="text-3xl font-bold tabular-nums text-white sm:text-4xl lg:text-5xl">
         {count}
         <span className="text-accent">{suffix}</span>
       </span>
-      <span className="text-[9px] uppercase tracking-[0.12em] text-slate-400 text-center sm:text-xs sm:tracking-[0.2em]">
+      <span
+        aria-hidden="true"
+        className="text-center text-[9px] uppercase tracking-[0.12em] text-slate-400 sm:text-xs sm:tracking-[0.2em]"
+      >
         {label}
       </span>
     </motion.div>
