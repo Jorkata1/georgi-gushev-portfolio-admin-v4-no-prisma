@@ -73,69 +73,58 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
   return (
     <>
       {/* ── Hero ── */}
-      <section
-        ref={heroRef}
-        className="relative flex flex-col"
-        style={{ minHeight: "clamp(480px, 75vw, 700px)" }}
-      >
-        {/* Full-bleed background image */}
-        <div className="absolute inset-0">
-          <Image
-            src={project.heroImage}
-            alt={project.title}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center"
-            placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
-          />
-        </div>
+      <section ref={heroRef} className="relative">
+        {/* Phones and tablets: the cover sits above the title in its full 16:10 frame, so nothing is cropped */}
+        <Container className="pb-8 pt-6 sm:pb-10 sm:pt-10 lg:hidden">
+          <BackLink label={p.backToPortfolio} />
+          <motion.div
+            className="relative mt-5 aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <Image
+              src={project.heroImage}
+              alt={project.title}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+            />
+          </motion.div>
+          <div className="mt-6">
+            <HeroText project={project} />
+          </div>
+        </Container>
 
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/25 to-transparent" />
+        {/* Desktop: full-bleed cover with the title over it */}
+        <div className="relative hidden flex-col lg:flex" style={{ minHeight: "clamp(480px, 75vw, 700px)" }}>
+          <div className="absolute inset-0">
+            <Image
+              src={project.heroImage}
+              alt={project.title}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+            />
+          </div>
 
-        {/* Text pinned to bottom */}
-        <div className="relative z-10 mt-auto">
-          <Container className="pb-10 sm:pb-14 lg:pb-20 pt-24 sm:pt-32">
-            <motion.div
-              initial="hidden"
-              animate="show"
-              variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-            >
-              <motion.div variants={fadeUp}>
-                <Link
-                  href="/portfolio"
-                  className="mb-6 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.25em] text-slate-400 transition-colors duration-300 hover:text-accent"
-                >
-                  <ArrowLeft size={13} />
-                  {p.backToPortfolio}
-                </Link>
-              </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/25 to-transparent" />
 
-              <motion.div variants={fadeUp} className="flex items-center gap-3 mb-4">
-                <span className="eyebrow">{project.category}</span>
-                <span className="h-px w-8 bg-accent/40" />
-                <span className="text-xs font-medium text-accent/80 tracking-widest">{project.year}</span>
-              </motion.div>
-
-              <motion.h1 className="display-title max-w-4xl text-balance leading-[1.06]" variants={fadeUp}>
-                {project.title}
-              </motion.h1>
-
-              <motion.div className="mt-6 flex flex-wrap gap-2" variants={fadeUp}>
-                {project.tools.map((tool) => (
-                  <span
-                    key={tool}
-                    className="rounded-full border border-white/12 bg-white/6 px-3 py-1 text-xs text-slate-300 backdrop-blur-sm"
-                  >
-                    {tool}
-                  </span>
-                ))}
-              </motion.div>
-            </motion.div>
-          </Container>
+          <div className="relative z-10 mt-auto">
+            <Container className="pb-20 pt-32">
+              <BackLink label={p.backToPortfolio} />
+              <div className="mt-6">
+                <HeroText project={project} />
+              </div>
+            </Container>
+          </div>
         </div>
       </section>
 
@@ -400,6 +389,53 @@ export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
   );
 }
 
+// ─── Hero pieces ──────────────────────────────────────────────────────────────
+
+function BackLink({ label }: { label: string }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+      <Link
+        href="/portfolio"
+        className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.25em] text-slate-400 transition-colors duration-300 hover:text-accent"
+      >
+        <ArrowLeft size={13} />
+        {label}
+      </Link>
+    </motion.div>
+  );
+}
+
+function HeroText({ project }: { project: Project }) {
+  return (
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{ show: { transition: { staggerChildren: 0.1 } } }}
+    >
+      <motion.div variants={fadeUp} className="mb-4 flex items-center gap-3">
+        <span className="eyebrow">{project.category}</span>
+        <span className="h-px w-8 bg-accent/40" />
+        <span className="text-xs font-medium tracking-widest text-accent/80">{project.year}</span>
+      </motion.div>
+
+      <motion.h1 className="display-title max-w-4xl text-balance leading-[1.06]" variants={fadeUp}>
+        {project.title}
+      </motion.h1>
+
+      <motion.div className="mt-6 flex flex-wrap gap-2" variants={fadeUp}>
+        {project.tools.map((tool) => (
+          <span
+            key={tool}
+            className="rounded-full border border-white/12 bg-white/6 px-3 py-1 text-xs text-slate-300 backdrop-blur-sm"
+          >
+            {tool}
+          </span>
+        ))}
+      </motion.div>
+    </motion.div>
+  );
+}
+
 // ─── NarrativeSection ─────────────────────────────────────────────────────────
 
 function NarrativeSection({
@@ -480,7 +516,6 @@ function ProjectGallery({
       <GalleryImage
         src={images[0]}
         alt={`${title} — visual 1`}
-        tall
         onClick={() => onOpen(0)}
       />
       {images.length > 1 && (
@@ -502,23 +537,18 @@ function ProjectGallery({
 function GalleryImage({
   src,
   alt,
-  tall = false,
   onClick,
 }: {
   src: string;
   alt: string;
-  tall?: boolean;
   onClick: () => void;
 }) {
   return (
     <motion.button
       type="button"
       aria-label={`Увеличи: ${alt}`}
-      className={`group relative w-full cursor-zoom-in overflow-hidden rounded-2xl border border-white/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
-        tall
-          ? "min-h-[280px] sm:min-h-[500px] lg:min-h-[600px]"
-          : "min-h-[200px] sm:min-h-[340px]"
-      }`}
+      // 16:10 matches the project visuals (1600×1000), so they show uncropped at every screen size.
+      className="group relative aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-2xl border border-white/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
       onClick={onClick}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
