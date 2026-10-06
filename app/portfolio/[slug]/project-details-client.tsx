@@ -1,854 +1,184 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, useEffect } from "react";
-import {
-  motion,
-  AnimatePresence,
-} from "framer-motion";
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  ExternalLink,
-  X,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowLeft, ArrowUpRight, ExternalLink } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import { Container } from "@/components/shared/container";
+import { LivePreviewDialog } from "@/components/portfolio/project/live-preview-dialog";
+import { EASE_OUT } from "@/components/portfolio/project/motion-presets";
+import { ProjectApproachTabs, type ApproachTab } from "@/components/portfolio/project/project-approach-tabs";
+import { ProjectFacts } from "@/components/portfolio/project/project-facts";
+import { ProjectLightbox } from "@/components/portfolio/project/project-lightbox";
+import { ProjectMedia } from "@/components/portfolio/project/project-media";
+import { useProjectCopy } from "@/components/portfolio/project/use-project-copy";
 import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/data/translations";
 import type { Project } from "@/types";
 
-type PortfolioTranslations = typeof translations["bg"]["portfolio"] | typeof translations["en"]["portfolio"];
+const SERIF = { fontFamily: "Georgia, Cambria, 'Times New Roman', Times, serif" };
 
-const BLUR_DATA_URL =
-  "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
+function SectionLabel({ num, label }: { num: string; label: string }) {
+  return (
+    <div className="mb-5 flex items-center gap-3">
+      <span className="font-semibold tabular-nums text-white/15" style={{ ...SERIF, fontSize: "1.75rem", lineHeight: 1 }} aria-hidden>
+        {num}
+      </span>
+      <span className="h-px w-8 bg-accent/50" />
+      <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">{label}</h2>
+    </div>
+  );
+}
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
-
-type ProjectDetailsClientProps = { project: Project };
-
-export function ProjectDetailsClient({ project }: ProjectDetailsClientProps) {
+export function ProjectDetailsClient({ project }: { project: Project }) {
   const { locale } = useLanguage();
-  const t = translations[locale];
-  const p = t.portfolio;
+  const p = translations[locale].portfolio;
+  const copy = useProjectCopy();
 
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  const allImages = [project.heroImage, ...project.gallery];
+  const images = useMemo(
+    () => Array.from(new Set([project.heroImage, ...project.gallery].filter(Boolean))),
+    [project.heroImage, project.gallery],
+  );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const closePreview = useCallback(() => setIsPreviewOpen(false), []);
 
-  function closeLightbox() { setLightboxIndex(null); }
-  function lightboxPrev() {
-    setLightboxIndex((i) =>
-      i === null ? null : (i - 1 + allImages.length) % allImages.length
-    );
-  }
-  function lightboxNext() {
-    setLightboxIndex((i) =>
-      i === null ? null : (i + 1) % allImages.length
-    );
-  }
-
-  useEffect(() => {
-    if (lightboxIndex === null) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowLeft") lightboxPrev();
-      if (e.key === "ArrowRight") lightboxNext();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [lightboxIndex]);
+  const approachTabs: ApproachTab[] = [
+    { key: "goals" as const, label: p.goalsCol, items: project.goals },
+    { key: "process" as const, label: p.processCol, items: project.process },
+    { key: "outcome" as const, label: p.outcomesCol, items: project.outcome },
+  ].filter((tab) => tab.items.length > 0);
 
   return (
     <>
-      {/* ── Hero ── */}
-      <section ref={heroRef} className="relative">
-        {/* Phones and tablets: the cover sits above the title in its full 16:10 frame, so nothing is cropped */}
-        <Container className="pb-8 pt-6 sm:pb-10 sm:pt-10 lg:hidden">
-          <BackLink label={p.backToPortfolio} />
-          <motion.div
-            className="relative mt-5 aspect-[16/10] w-full overflow-hidden rounded-2xl border border-white/8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+      {/* ── Header ── */}
+      <Container className="pb-6 pt-6 sm:pb-8 sm:pt-10">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE_OUT }}>
+          <Link
+            href="/portfolio"
+            className="inline-flex h-11 items-center gap-2 text-xs font-medium uppercase tracking-[0.25em] text-slate-400 transition-colors duration-300 hover:text-accent"
           >
-            <Image
-              src={project.heroImage}
-              alt={project.title}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-            />
-          </motion.div>
-          <div className="mt-6">
-            <HeroText project={project} />
-          </div>
-        </Container>
+            <ArrowLeft size={13} />
+            {p.backToPortfolio}
+          </Link>
 
-        {/* Desktop: full-bleed cover with the title over it */}
-        <div className="relative hidden flex-col lg:flex" style={{ minHeight: "clamp(480px, 75vw, 700px)" }}>
-          <div className="absolute inset-0">
-            <Image
-              src={project.heroImage}
-              alt={project.title}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover object-center"
-              placeholder="blur"
-              blurDataURL={BLUR_DATA_URL}
-            />
-          </div>
-
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/25 to-transparent" />
-
-          <div className="relative z-10 mt-auto">
-            <Container className="pb-20 pt-32">
-              <BackLink label={p.backToPortfolio} />
-              <div className="mt-6">
-                <HeroText project={project} />
+          <div className="mt-2 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <div className="mb-3 flex items-center gap-3">
+                <span className="eyebrow">{project.category}</span>
+                <span className="h-px w-6 bg-accent/40" />
+                <span className="text-xs font-medium tracking-widest text-accent/80">{project.year}</span>
               </div>
-            </Container>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Meta Bar ── */}
-      <div className="border-b border-white/6 bg-background/60 backdrop-blur-sm">
-        <Container>
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 py-5">
-            <MetaItem label={p.category} value={project.category} />
-            <MetaItem label={p.year} value={project.year} />
-            <MetaItem
-              label={p.tools}
-              value={project.tools.join(" · ")}
-            />
+              <h1 className="text-balance text-3xl font-semibold leading-[1.08] text-white sm:text-4xl lg:text-5xl" style={SERIF}>
+                {project.title}
+              </h1>
+              {project.excerpt && (
+                <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">{project.excerpt}</p>
+              )}
+            </div>
             {project.liveUrl && (
               <a
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-auto inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/8 px-4 py-2 text-xs font-semibold text-accentGlow transition-all duration-300 hover:bg-accent/15 hover:border-accent/40"
+                className="hidden h-11 shrink-0 items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-5 text-sm font-semibold text-accentGlow transition duration-300 hover:bg-accent/20 lg:inline-flex"
               >
-                <ExternalLink size={12} />
+                <ExternalLink size={14} />
                 {p.viewLive}
               </a>
             )}
           </div>
-        </Container>
-      </div>
+        </motion.div>
+      </Container>
 
-      {/* ── 01 За проекта ── */}
-      <NarrativeSection num="01" label={p.aboutSection}>
-        <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-start lg:gap-20">
-          <motion.p
-            className="text-lg leading-relaxed text-slate-200 sm:text-xl sm:leading-loose"
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeUp}
-          >
-            {project.summary}
-          </motion.p>
+      {/* ── Images first ── */}
+      <Container>
+        <ProjectMedia images={images} title={project.title} onOpen={setLightboxIndex} />
+      </Container>
 
-          {project.excerpt && project.excerpt !== project.summary && (
-            <motion.div
-              className="lg:w-64 shrink-0"
-              initial="hidden"
-              whileInView="show"
+      {/* ── Information ── */}
+      <Container className="py-12 sm:py-16">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14">
+          <div className="flex min-w-0 flex-col gap-12">
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              variants={fadeUp}
+              transition={{ duration: 0.6, ease: EASE_OUT }}
             >
-              <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
-                <p className="text-sm leading-relaxed text-slate-300 italic">
-                  &ldquo;{project.excerpt}&rdquo;
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </NarrativeSection>
+              <SectionLabel num="01" label={p.aboutSection} />
+              <p className="max-w-3xl text-base leading-relaxed text-slate-200 sm:text-lg sm:leading-relaxed">{project.summary}</p>
+            </motion.section>
 
-      {/* ── 02 Цели / Процес / Резултати — обединена секция ── */}
-      {(project.goals.length > 0 || project.process.length > 0 || project.outcome.length > 0) && (
-        <NarrativeSection num="02" label={p.approachSection} alt>
-          <ProjectApproach project={project} p={p} />
-        </NarrativeSection>
-      )}
-
-      {/* ── 03 Визуали ── */}
-      {project.gallery.length > 0 && (
-        <NarrativeSection
-          num="03"
-          label={p.visualsSection}
-          fullWidthMedia
-        >
-          <ProjectGallery
-            images={project.gallery}
-            title={project.title}
-            onOpen={(i) => setLightboxIndex(i + 1)}
-          />
-        </NarrativeSection>
-      )}
-
-      {/* ── Brand Identity (colors + fonts) ── */}
-      {((project.colors && project.colors.length > 0) || (project.fonts && project.fonts.length > 0)) && (
-        <NarrativeSection
-          num={getBrandNum(project)}
-          label={p.identitySection}
-          alt
-        >
-          <div className="grid gap-10 lg:grid-cols-2">
-            {/* Colors */}
-            {project.colors && project.colors.length > 0 && (
-              <div>
-                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
-                  {p.colourPalette}
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  {project.colors.map((hex) => {
-                    const clean = hex.trim();
-                    return (
-                      <motion.div
-                        key={clean}
-                        className="group flex flex-col items-center gap-2"
-                        initial={{ opacity: 0, y: 16 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.3 }}
-                        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                      >
-                        <div
-                          className="h-16 w-16 rounded-2xl border border-white/10 shadow-lg transition-transform duration-300 group-hover:scale-110 sm:h-20 sm:w-20"
-                          style={{ backgroundColor: clean }}
-                          aria-label={clean}
-                        />
-                        <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
-                          {clean}
-                        </span>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Fonts */}
-            {project.fonts && project.fonts.length > 0 && (
-              <div>
-                <p className="mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
-                  {p.typography}
-                </p>
-                <div className="flex flex-col gap-3">
-                  {project.fonts.map((entry, i) => {
-                    const [name, role] = entry.split("—").map((s) => s.trim());
-                    return (
-                      <motion.div
-                        key={entry}
-                        className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/[0.03] px-5 py-4"
-                        initial={{ opacity: 0, x: 20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true, amount: 0.3 }}
-                        transition={{ duration: 0.5, delay: i * 0.07, ease: [0.25, 0.1, 0.25, 1] }}
-                      >
-                        <span className="text-base font-semibold text-white">{name}</span>
-                        {role && (
-                          <span className="text-xs font-medium uppercase tracking-widest text-slate-500">
-                            {role}
-                          </span>
-                        )}
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
+            {approachTabs.length > 0 && (
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, ease: EASE_OUT }}
+              >
+                <SectionLabel num="02" label={p.approachSection} />
+                <ProjectApproachTabs tabs={approachTabs} />
+              </motion.section>
             )}
           </div>
-        </NarrativeSection>
-      )}
 
-      {/* ── 06 Live ── */}
-      {project.liveUrl && (
-        <NarrativeSection
-          num={getLiveNum(project)}
-          label="Live"
-        >
-          <LiveSiteSection url={project.liveUrl} title={project.title} p={p} />
-        </NarrativeSection>
-      )}
+          <div className="order-first lg:order-none">
+            <div className="lg:sticky lg:top-24">
+              <ProjectFacts
+                project={project}
+                labels={{
+                  category: p.category,
+                  year: p.year,
+                  tools: p.tools,
+                  colourPalette: p.colourPalette,
+                  typography: p.typography,
+                  viewLive: p.viewLive,
+                  livePreview: copy.livePreview,
+                }}
+                onOpenPreview={() => setIsPreviewOpen(true)}
+              />
+            </div>
+          </div>
+        </div>
+      </Container>
 
       {/* ── CTA ── */}
-      <section className="section-padding">
-        <Container>
-          <motion.div
-            className="surface-strong relative overflow-hidden p-8 sm:p-12 lg:p-16"
-            initial={{ opacity: 0, y: 32 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(232,164,74,0.1),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(79,156,247,0.07),transparent_40%)]" />
-            <div className="relative flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <span className="eyebrow">{p.nextStep}</span>
-                <h2 className="section-title mt-3 text-balance">
-                  {p.ctaTitle}
-                </h2>
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-                  {p.ctaDescription}
-                </p>
-              </div>
-              <Link
-                href="/contact"
-                className="group inline-flex shrink-0 items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-6 py-3 text-sm font-semibold text-accentGlow transition-all duration-300 hover:bg-accent/20 hover:shadow-[0_0_28px_rgba(232,164,74,0.2)]"
-              >
-                {p.letsTalk}
-                <ArrowUpRight
-                  size={16}
-                  className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                />
-              </Link>
-            </div>
-          </motion.div>
-        </Container>
-      </section>
-
-      {/* ── Lightbox ── */}
-      <AnimatePresence>
-        {lightboxIndex !== null && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 p-4 backdrop-blur-md"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
-            onClick={closeLightbox}
-          >
-            <motion.div
-              className="relative flex max-h-[92vh] max-w-6xl w-full items-center justify-center"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Image
-                src={allImages[lightboxIndex]}
-                alt={`${project.title} — ${lightboxIndex + 1} / ${allImages.length}`}
-                width={1600}
-                height={1000}
-                className="h-auto max-h-[88vh] w-full rounded-2xl object-contain"
-              />
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white/70 backdrop-blur-sm tabular-nums">
-                {lightboxIndex + 1} / {allImages.length}
-              </div>
-              <button
-                onClick={closeLightbox}
-                aria-label="Затвори"
-                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20"
-              >
-                <X size={16} />
-              </button>
-              {allImages.length > 1 && (
-                <>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); lightboxPrev(); }}
-                    aria-label="Предишна снимка"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20"
-                  >
-                    <ChevronLeft size={18} />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); lightboxNext(); }}
-                    aria-label="Следваща снимка"
-                    className="absolute right-14 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20"
-                  >
-                    <ChevronRight size={18} />
-                  </button>
-                </>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
-
-// ─── Hero pieces ──────────────────────────────────────────────────────────────
-
-function BackLink({ label }: { label: string }) {
-  return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-      <Link
-        href="/portfolio"
-        className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.25em] text-slate-400 transition-colors duration-300 hover:text-accent"
-      >
-        <ArrowLeft size={13} />
-        {label}
-      </Link>
-    </motion.div>
-  );
-}
-
-function HeroText({ project }: { project: Project }) {
-  return (
-    <motion.div
-      initial="hidden"
-      animate="show"
-      variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-    >
-      <motion.div variants={fadeUp} className="mb-4 flex items-center gap-3">
-        <span className="eyebrow">{project.category}</span>
-        <span className="h-px w-8 bg-accent/40" />
-        <span className="text-xs font-medium tracking-widest text-accent/80">{project.year}</span>
-      </motion.div>
-
-      <motion.h1 className="display-title max-w-4xl text-balance leading-[1.06]" variants={fadeUp}>
-        {project.title}
-      </motion.h1>
-
-      <motion.div className="mt-6 flex flex-wrap gap-2" variants={fadeUp}>
-        {project.tools.map((tool) => (
-          <span
-            key={tool}
-            className="rounded-full border border-white/12 bg-white/6 px-3 py-1 text-xs text-slate-300 backdrop-blur-sm"
-          >
-            {tool}
-          </span>
-        ))}
-      </motion.div>
-    </motion.div>
-  );
-}
-
-// ─── NarrativeSection ─────────────────────────────────────────────────────────
-
-function NarrativeSection({
-  num,
-  label,
-  children,
-  alt = false,
-  fullWidthMedia = false,
-}: {
-  num: string;
-  label: string;
-  children: React.ReactNode;
-  alt?: boolean;
-  fullWidthMedia?: boolean;
-}) {
-  return (
-    <section className={`border-b border-white/6 ${alt ? "bg-white/[0.015]" : ""}`}>
-      <Container>
-        {/* Section header */}
+      <Container className="pb-16 sm:pb-24">
         <motion.div
-          className="flex items-baseline gap-4 pb-8 pt-14 sm:pt-20 lg:pt-24"
+          className="surface-strong relative flex flex-col gap-5 overflow-hidden p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: 0.6, ease: EASE_OUT }}
         >
-          <span
-            className="shrink-0 font-semibold text-white/10 select-none tabular-nums"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", lineHeight: 1, fontFamily: "Georgia, serif" }}
-            aria-hidden
-          >
-            {num}
-          </span>
-          <div className="flex items-center gap-3">
-            <div className="h-px w-8 bg-accent/50" />
-            <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-accent">
-              {label}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(232,164,74,0.1),transparent_45%)]" />
+          <div className="relative">
+            <span className="eyebrow">{p.nextStep}</span>
+            <h2 className="mt-2 text-balance text-xl font-semibold text-white sm:text-2xl" style={SERIF}>
+              {p.ctaTitle}
             </h2>
           </div>
+          <Link
+            href="/contact"
+            className="group relative inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-6 text-sm font-semibold text-background transition duration-150 hover:-translate-y-px hover:brightness-110 active:translate-y-0"
+          >
+            {p.letsTalk}
+            <ArrowUpRight size={16} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </Link>
         </motion.div>
-
-        {/* Content */}
-        <div className="pb-14 sm:pb-20 lg:pb-24">
-          {children}
-        </div>
       </Container>
-    </section>
-  );
-}
 
-// ─── MetaItem ─────────────────────────────────────────────────────────────────
-
-function MetaItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-[10px] uppercase tracking-[0.25em] text-slate-500">{label}</span>
-      <span className="text-xs font-medium text-slate-200">{value}</span>
-    </div>
-  );
-}
-
-// ─── ProjectGallery ───────────────────────────────────────────────────────────
-
-function ProjectGallery({
-  images,
-  title,
-  onOpen,
-}: {
-  images: string[];
-  title: string;
-  onOpen: (index: number) => void;
-}) {
-  if (images.length === 0) return null;
-
-  return (
-    <div className="flex flex-col gap-3 sm:gap-4">
-      {/* First image — full bleed */}
-      <GalleryImage
-        src={images[0]}
-        alt={`${title} — visual 1`}
-        onClick={() => onOpen(0)}
-      />
-      {images.length > 1 && (
-        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
-          {images.slice(1).map((src, i) => (
-            <GalleryImage
-              key={src}
-              src={src}
-              alt={`${title} — visual ${i + 2}`}
-              onClick={() => onOpen(i + 1)}
-            />
-          ))}
-        </div>
+      <ProjectLightbox images={images} title={project.title} index={lightboxIndex} onChange={setLightboxIndex} />
+      {project.liveUrl && (
+        <LivePreviewDialog
+          url={project.liveUrl}
+          title={project.title}
+          isOpen={isPreviewOpen}
+          openTabLabel={p.liveOpenTab}
+          onClose={closePreview}
+        />
       )}
-    </div>
-  );
-}
-
-function GalleryImage({
-  src,
-  alt,
-  onClick,
-}: {
-  src: string;
-  alt: string;
-  onClick: () => void;
-}) {
-  return (
-    <motion.button
-      type="button"
-      aria-label={`Увеличи: ${alt}`}
-      // 16:10 matches the project visuals (1600×1000), so they show uncropped at every screen size.
-      className="group relative aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-2xl border border-white/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-      onClick={onClick}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-    >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 80vw, 1200px"
-        className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-        placeholder="blur"
-        blurDataURL={BLUR_DATA_URL}
-        loading="lazy"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-      <div className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white/80 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
-        <ArrowUpRight size={14} />
-      </div>
-    </motion.button>
-  );
-}
-
-// ─── LiveSiteSection ──────────────────────────────────────────────────────────
-
-function LiveSiteSection({
-  url,
-  title,
-  p,
-}: {
-  url: string;
-  title: string;
-  p: PortfolioTranslations;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const inner = innerRef.current;
-    if (!container || !inner) return;
-
-    function rescale() {
-      if (!container || !inner) return;
-      const scale = container.clientWidth / 1280;
-      inner.style.transform = `scale(${scale})`;
-      container.style.height = `${Math.round(800 * scale)}px`;
-    }
-
-    rescale();
-    const ro = new ResizeObserver(rescale);
-    ro.observe(container);
-    return () => ro.disconnect();
-  }, []);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-    >
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <p className="text-sm text-slate-400">
-          {p.liveDescription}
-        </p>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-xs font-semibold text-accentGlow transition-all duration-300 hover:bg-accent/20"
-        >
-          <ExternalLink size={12} />
-          {p.liveOpen}
-          <ArrowUpRight
-            size={12}
-            className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          />
-        </a>
-      </div>
-
-      <div className="surface overflow-hidden">
-        <div className="flex items-center gap-3 border-b border-white/8 bg-white/[0.03] px-4 py-3">
-          <div className="flex gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-          </div>
-          <div className="flex flex-1 items-center gap-2 rounded-md border border-white/8 bg-white/5 px-3 py-1">
-            <span className="text-[11px] text-slate-500">{url.replace("https://", "")}</span>
-          </div>
-        </div>
-
-        <div ref={containerRef} className="relative w-full overflow-hidden bg-slate-950">
-          <div
-            ref={innerRef}
-            className="absolute left-0 top-0 origin-top-left"
-            style={{ width: "1280px", height: "800px" }}
-          >
-            <iframe
-              src={url}
-              title={`Live preview — ${title}`}
-              className="border-0"
-              style={{ width: "1280px", height: "800px" }}
-              loading="lazy"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            />
-          </div>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute inset-0 flex items-end justify-end p-4 opacity-0 transition-opacity duration-300 hover:opacity-100"
-            aria-label={`${p.liveOpen} ${title}`}
-          >
-            <span className="flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-[11px] text-white backdrop-blur-sm">
-              <ExternalLink size={11} />
-              {p.liveOpenTab}
-            </span>
-          </a>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-// ─── ProjectApproach — Goals + Process + Outcome в едно ──────────────────────
-
-function ProjectApproach({ project, p }: { project: Project; p: PortfolioTranslations }) {
-  const cols = [
-    project.goals.length > 0 && {
-      key: "goals",
-      label: p.goalsCol,
-      num: "01",
-      items: project.goals,
-      renderItem: (item: string, i: number) => (
-        <div key={item} className="relative overflow-hidden">
-          <span
-            className="absolute -right-1 -top-2 font-semibold text-white/[0.04] select-none pointer-events-none"
-            style={{ fontSize: "3.5rem", lineHeight: 1, fontFamily: "Georgia, serif" }}
-            aria-hidden
-          >
-            {String(i + 1).padStart(2, "0")}
-          </span>
-          <p className="relative text-sm leading-relaxed text-slate-200">{item}</p>
-        </div>
-      ),
-    },
-    project.process.length > 0 && {
-      key: "process",
-      label: p.processCol,
-      num: "02",
-      items: project.process,
-      renderItem: (item: string, i: number) => (
-        <div key={item} className="flex gap-3">
-          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-background text-[10px] font-semibold text-accentGlow">
-            {String(i + 1).padStart(2, "0")}
-          </span>
-          <p className="text-sm leading-relaxed text-slate-300">{item}</p>
-        </div>
-      ),
-    },
-    project.outcome.length > 0 && {
-      key: "outcome",
-      label: p.outcomesCol,
-      num: "03",
-      items: project.outcome,
-      renderItem: (item: string, _i: number) => (
-        <div key={item} className="flex items-start gap-3">
-          <span className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-accent/15 text-[9px] font-semibold text-accentGlow">
-            ✓
-          </span>
-          <p className="text-sm leading-relaxed text-slate-200">{item}</p>
-        </div>
-      ),
-    },
-  ].filter(Boolean) as NonNullable<{
-    key: string;
-    label: string;
-    num: string;
-    items: string[];
-    renderItem: (item: string, i: number) => React.ReactNode;
-  }>[];
-
-  // Mobile accordion state
-  const [openCol, setOpenCol] = React.useState<string>(cols[0]?.key ?? "");
-
-  return (
-    <>
-      {/* Desktop — 3 columns */}
-      <div className="hidden lg:grid lg:grid-cols-3 lg:divide-x lg:divide-white/6">
-        {cols.map((col, ci) => (
-          <motion.div
-            key={col.key}
-            className="px-8 first:pl-0 last:pr-0"
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6, delay: ci * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            {/* Column header */}
-            <div className="mb-6 flex items-center gap-3">
-              <span
-                className="font-semibold text-white/10 tabular-nums select-none"
-                style={{ fontSize: "2rem", lineHeight: 1, fontFamily: "Georgia, serif" }}
-                aria-hidden
-              >
-                {col.num}
-              </span>
-              <div className="h-px flex-1 bg-accent/20" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">
-                {col.label}
-              </span>
-            </div>
-
-            {/* Items */}
-            <div className="flex flex-col gap-5">
-              {col.items.map((item, i) => col.renderItem(item, i))}
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Mobile — accordion */}
-      <div className="flex flex-col divide-y divide-white/6 lg:hidden">
-        {cols.map((col) => {
-          const isOpen = openCol === col.key;
-          return (
-            <div key={col.key}>
-              <button
-                type="button"
-                onClick={() => setOpenCol(isOpen ? "" : col.key)}
-                className="flex w-full items-center justify-between gap-4 py-4 text-left"
-                aria-expanded={isOpen}
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className="font-semibold text-white/10 tabular-nums select-none"
-                    style={{ fontSize: "1.5rem", lineHeight: 1, fontFamily: "Georgia, serif" }}
-                    aria-hidden
-                  >
-                    {col.num}
-                  </span>
-                  <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">
-                    {col.label}
-                  </span>
-                </div>
-                <motion.span
-                  className="text-slate-400"
-                  animate={{ rotate: isOpen ? 180 : 0 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </motion.span>
-              </button>
-
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-                    className="overflow-hidden"
-                  >
-                    <div className="flex flex-col gap-4 pb-6">
-                      {col.items.map((item, i) => col.renderItem(item, i))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          );
-        })}
-      </div>
     </>
   );
-}
-
-function getBrandNum(project: Project): string {
-  let n = 1; // 01 summary
-  const hasApproach = project.goals.length > 0 || project.process.length > 0 || project.outcome.length > 0;
-  if (hasApproach) n++; // 02 approach
-  if (project.gallery.length > 0) n++; // 03 visuals
-  n++; // brand
-  return String(n).padStart(2, "0");
-}
-
-function getLiveNum(project: Project): string {
-  let n = 1; // 01 summary
-  const hasApproach = project.goals.length > 0 || project.process.length > 0 || project.outcome.length > 0;
-  if (hasApproach) n++; // 02 approach
-  if (project.gallery.length > 0) n++; // 03 visuals
-  const hasBrand = (project.colors && project.colors.length > 0) || (project.fonts && project.fonts.length > 0);
-  if (hasBrand) n++; // brand
-  n++; // live
-  return String(n).padStart(2, "0");
 }
