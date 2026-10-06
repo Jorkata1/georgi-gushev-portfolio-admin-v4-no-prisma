@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ExternalLink, MonitorPlay } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Project } from "@/types";
+import { FontPreview } from "./font-preview";
 import { EASE_OUT } from "./motion-presets";
 
 export interface ProjectFactsLabels {
@@ -82,10 +83,10 @@ export function ProjectFacts({ project, labels, onOpenPreview }: ProjectFactsPro
 
       {fonts.length > 0 && (
         <FactGroup label={labels.typography}>
-          <ul className="flex flex-col gap-1.5">
+          <ul className="flex flex-col gap-2">
             {fonts.map(({ name, role }) => (
-              <li key={name} className="flex items-baseline justify-between gap-3 text-sm">
-                <span className="font-semibold text-white">{name}</span>
+              <li key={name} className="flex items-baseline justify-between gap-3">
+                <FontPreview name={name} />
                 {role && <span className="text-right text-xs text-slate-500">{role}</span>}
               </li>
             ))}
