@@ -4,7 +4,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Project } from "@/types";
 import { useLanguage } from "@/lib/language-context";
 import { JOURNEY_COPY, type JourneyCopy, type JourneyLocale } from "@/components/home/journey/journey-copy";
-import { CHAPTER_COUNT, CHAPTER_SCROLL, TRACK_HEIGHT_VH, formatChapterNumber, getChapterForProgress } from "@/components/home/journey/journey-config";
+import {
+  CHAPTER_COUNT,
+  CHAPTER_SCROLL,
+  LOGO_READY_PROGRESS,
+  SMALL_SCREEN_QUERY,
+  TRACK_HEIGHT_VH,
+  formatChapterNumber,
+  getChapterForProgress
+} from "@/components/home/journey/journey-config";
 import { useSiteHeaderReveal } from "@/components/home/journey/use-site-header-reveal";
 import { JourneyCanvas, type JourneyCanvasStatus } from "@/components/home/journey/journey-canvas";
 import type { JourneyProject } from "@/components/home/journey/scene/projects";
@@ -12,6 +20,21 @@ import { JourneyActions, JourneyChapter, JourneyIntro } from "@/components/home/
 
 const CONTROL_CLASS =
   "min-h-[40px] rounded-full border border-white/15 bg-[#0B1627]/60 px-4 text-[13px] font-semibold text-white backdrop-blur transition-colors duration-200 ease-out hover:border-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent active:opacity-80";
+
+const LAST_CHAPTER = CHAPTER_COUNT - 1;
+
+/** Tracks whether the phone layout is active; false during server rendering. */
+function useIsSmallScreen(): boolean {
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia(SMALL_SCREEN_QUERY);
+    const update = () => setIsSmallScreen(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return isSmallScreen;
+}
 
 function JourneyFallback({ copy }: { copy: JourneyCopy }) {
   return (
@@ -55,9 +78,14 @@ export function HomeJourney({ featuredProjects }: HomeJourneyProps) {
   );
   const progressBarRef = useRef<HTMLSpanElement>(null);
   const [chapterIndex, setChapterIndex] = useState(-1);
+  const [isLogoReady, setIsLogoReady] = useState(false);
   const [status, setStatus] = useState<JourneyCanvasStatus>("loading");
+  const isSmallScreen = useIsSmallScreen();
+  // On a phone the closing copy, its buttons and the menu wait until the logo has fully formed.
+  const isHoldingFinale = isSmallScreen && chapterIndex === LAST_CHAPTER && !isLogoReady;
+  const visibleChapter = isHoldingFinale ? -1 : chapterIndex;
   // The site's main menu stays hidden until the journey reaches its last chapter.
-  const isJourneyFinished = chapterIndex === CHAPTER_COUNT - 1;
+  const isJourneyFinished = chapterIndex === LAST_CHAPTER && !isHoldingFinale;
   useSiteHeaderReveal(isJourneyFinished || status === "unsupported");
 
   useEffect(() => {
@@ -69,6 +97,7 @@ export function HomeJourney({ featuredProjects }: HomeJourneyProps) {
       progressRef.current = progress;
       if (progressBarRef.current) progressBarRef.current.style.transform = `scaleX(${progress})`;
       setChapterIndex(getChapterForProgress(progress));
+      setIsLogoReady(progress >= LOGO_READY_PROGRESS);
     };
     readProgress();
     window.addEventListener("scroll", readProgress, { passive: true });
@@ -121,7 +150,7 @@ export function HomeJourney({ featuredProjects }: HomeJourneyProps) {
         />
 
         <JourneyIntro copy={copy.intro} isVisible={chapterIndex < 0} />
-        <JourneyChapter copy={copy} chapterIndex={chapterIndex} projects={projects} />
+        <JourneyChapter copy={copy} chapterIndex={visibleChapter} projects={projects} />
 
         <div className={`absolute right-4 z-20 flex gap-2 transition-[top] duration-300 ease-out sm:right-10 ${isJourneyFinished ? "top-24" : "top-6"}`}>
           <button type="button" className={`${CONTROL_CLASS} hidden sm:block`} onClick={() => scrollToProgress(0)}>

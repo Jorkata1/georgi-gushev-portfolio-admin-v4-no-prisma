@@ -13,6 +13,17 @@ export const FINALE_START = 0.84;
 /** The camera rests a little before each station, so the scene is in front of it. */
 export const CAMERA_LEAD = 0.05;
 
+/** Scroll window in which the finale's particles fly together into the logo. */
+export const LOGO_ASSEMBLE_START = 0.85;
+export const LOGO_ASSEMBLE_END = 0.97;
+/**
+ * On phones the logo and the closing copy share the screen, so the last chapter's copy waits
+ * until the logo has fully formed (a little after, as the camera trails the scroll).
+ */
+export const LOGO_READY_PROGRESS = LOGO_ASSEMBLE_END + 0.008;
+/** Matches the phone layout in the 3D scene. */
+export const SMALL_SCREEN_QUERY = "(max-width: 640px)";
+
 /** Track length in viewport heights: how much scrolling the whole journey takes. */
 export const TRACK_HEIGHT_VH = 1000;
 

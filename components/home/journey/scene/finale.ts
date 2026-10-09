@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { LOGO_ASSEMBLE_END, LOGO_ASSEMBLE_START } from "@/components/home/journey/journey-config";
 import type { JourneyPath } from "@/components/home/journey/scene/journey-path";
 import { smoothstep, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
 import { createLogoParticles, sampleLogo, type LogoParticles } from "@/components/home/journey/scene/logo-particles";
@@ -11,9 +12,8 @@ export type FinalePart = ScenePart & {
 
 const LOGO_WIDTH = 44;
 const SCATTER = 30;
-/** Scroll window in which the particles fly together into the logo. */
-const ASSEMBLE_START = 0.85;
-const ASSEMBLE_END = 0.97;
+const ASSEMBLE_START = LOGO_ASSEMBLE_START;
+const ASSEMBLE_END = LOGO_ASSEMBLE_END;
 
 /** Sampling step for the logo particles (in pixels of the sampling canvas): smaller = more particles. */
 const LOGO_SAMPLE_STEP = 2;

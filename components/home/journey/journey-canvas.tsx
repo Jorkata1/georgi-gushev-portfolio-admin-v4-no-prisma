@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, type MutableRefObject } from "react";
 import { useRouter } from "next/navigation";
+import { SMALL_SCREEN_QUERY } from "@/components/home/journey/journey-config";
 import type { JourneySceneCopy } from "@/components/home/journey/journey-copy";
 import type { JourneyScene } from "@/components/home/journey/scene/create-journey-scene";
 import type { JourneyProject } from "@/components/home/journey/scene/projects";
 
-const SMALL_SCREEN_QUERY = "(max-width: 640px)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 export type JourneyCanvasStatus = "loading" | "ready" | "unsupported";
