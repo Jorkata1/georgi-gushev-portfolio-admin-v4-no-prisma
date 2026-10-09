@@ -9,7 +9,7 @@ const CODE_LINES = [
   '  focus: "Design / Web / Digital",',
   "};",
   "",
-  "await designer.init();"
+  "await designer.init();",
 ];
 const CODE_TEXT = CODE_LINES.join("\n");
 
@@ -18,29 +18,57 @@ const TYPING_MS = 1150;
 const PAUSE_AFTER_TYPING_MS = 150;
 const LOADING_MS = 600;
 const WELCOME_MS = 700;
-const EXIT_MS = 700;
+/** The terminal card fades out; the dark backdrop stays so the page can fade in from it. */
+const CONTENT_EXIT_MS = 400;
 const PAGE_REVEAL_MS = 900;
 
 const SEEN_KEY = "intro-seen";
 const COMPLETE_EVENT = "intro-complete";
-const REVEAL_ATTRIBUTE = "data-intro-reveal";
+/** Style tags added outside React (so hydration never sees a difference). */
+const SKIP_STYLE_ID = "gdx-intro-skip";
+const REVEAL_STYLE_ID = "gdx-page-reveal";
+const BACKDROP = "#060e1a";
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-/** After the intro, the page content fades in softly underneath the fading overlay. */
-const PAGE_REVEAL_STYLE = `
-  html[${REVEAL_ATTRIBUTE}] main {
-    animation: gdx-page-reveal ${PAGE_REVEAL_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
+/** Static rules rendered with the intro: the page fades in from the same dark color as the backdrop. */
+const INTRO_STYLE = `
+  html { background-color: ${BACKDROP}; }
   @keyframes gdx-page-reveal {
     from { opacity: 0; }
     to { opacity: 1; }
   }
-  @media (prefers-reduced-motion: reduce) {
-    html[${REVEAL_ATTRIBUTE}] main { animation: none; }
-  }
+`;
+const PAGE_REVEAL_RULE = `body { animation: gdx-page-reveal ${PAGE_REVEAL_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both; }`;
+
+/**
+ * Runs while the HTML is parsed, before the overlay is painted: a visitor who already saw the
+ * intro this session (or prefers reduced motion) never sees it, not even for a frame, and the
+ * page simply fades in. It only adds a <style> tag, so React's markup is left untouched.
+ */
+const EARLY_SCRIPT = `
+  try {
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (sessionStorage.getItem("${SEEN_KEY}") === "true" || reduce) {
+      var style = document.createElement("style");
+      style.id = "${SKIP_STYLE_ID}";
+      style.textContent = "[data-site-intro]{display:none!important}" + (reduce ? "" : ${JSON.stringify(PAGE_REVEAL_RULE)});
+      document.head.appendChild(style);
+    }
+  } catch (error) {}
 `;
 
-type Phase = "typing" | "loading" | "welcome" | "done";
+function addRevealStyle() {
+  const style = document.createElement("style");
+  style.id = REVEAL_STYLE_ID;
+  style.textContent = PAGE_REVEAL_RULE;
+  document.head.appendChild(style);
+}
+
+function removeStyle(id: string) {
+  document.getElementById(id)?.remove();
+}
+
+type Phase = "typing" | "loading" | "welcome" | "leaving" | "done";
 
 function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -126,27 +154,28 @@ export function IntroAnimation() {
   const [loaded, setLoaded] = useState(0);
   const hasFinished = useRef(false);
 
-  const finish = useCallback((immediate: boolean) => {
-    if (hasFinished.current) return;
-    hasFinished.current = true;
-    rememberIntroSeen();
-    setPhase("done");
-    window.dispatchEvent(new Event(COMPLETE_EVENT));
-    if (immediate) {
-      setIsActive(false);
-      return;
-    }
-    const root = document.documentElement;
-    const style = document.createElement("style");
-    style.textContent = PAGE_REVEAL_STYLE;
-    document.head.appendChild(style);
-    root.setAttribute(REVEAL_ATTRIBUTE, "");
-    window.setTimeout(() => setIsActive(false), EXIT_MS);
+  /** Fades the page in from the dark backdrop (unless the early script already started it), then cleans up. */
+  const revealPage = useCallback((skipped: boolean) => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!skipped && !prefersReducedMotion) addRevealStyle();
     window.setTimeout(() => {
-      root.removeAttribute(REVEAL_ATTRIBUTE);
-      style.remove();
-    }, Math.max(EXIT_MS, PAGE_REVEAL_MS) + 100);
+      removeStyle(REVEAL_STYLE_ID);
+      removeStyle(SKIP_STYLE_ID);
+    }, PAGE_REVEAL_MS + 100);
   }, []);
+
+  const finish = useCallback(
+    (skipped: boolean) => {
+      if (hasFinished.current) return;
+      hasFinished.current = true;
+      rememberIntroSeen();
+      setPhase("done");
+      setIsActive(false);
+      window.dispatchEvent(new Event(COMPLETE_EVENT));
+      revealPage(skipped);
+    },
+    [revealPage],
+  );
 
   // Returning visitors in the same session, and visitors who prefer reduced motion, skip the intro.
   useEffect(() => {
@@ -162,7 +191,7 @@ export function IntroAnimation() {
       (t) => setTypedCount(Math.floor(t * CODE_TEXT.length)),
       () => {
         timeoutId = window.setTimeout(() => setPhase("loading"), PAUSE_AFTER_TYPING_MS);
-      }
+      },
     );
     return () => {
       cancel();
@@ -175,100 +204,115 @@ export function IntroAnimation() {
     return animateProgress(
       LOADING_MS,
       (t) => setLoaded(easeInOutCubic(t) * 100),
-      () => setPhase("welcome")
+      () => setPhase("welcome"),
     );
   }, [phase]);
 
   useEffect(() => {
     if (phase !== "welcome") return;
-    const timeoutId = window.setTimeout(() => finish(false), WELCOME_MS);
+    const timeoutId = window.setTimeout(() => setPhase("leaving"), WELCOME_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "leaving") return;
+    const timeoutId = window.setTimeout(() => finish(false), CONTENT_EXIT_MS);
     return () => window.clearTimeout(timeoutId);
   }, [phase, finish]);
 
-  if (!isActive) return null;
+  // The style stays mounted after the intro so the page fade-in can finish.
+  const earlyAssets = (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: INTRO_STYLE }} />
+      <script dangerouslySetInnerHTML={{ __html: EARLY_SCRIPT }} />
+    </>
+  );
+  if (!isActive) return earlyAssets;
 
   const typedLines = CODE_TEXT.slice(0, typedCount).split("\n");
   const isTyping = phase === "typing";
-  const showStatus = phase === "loading" || phase === "welcome";
+  const showStatus = phase === "loading" || phase === "welcome" || phase === "leaving";
+  const showWelcome = phase === "welcome" || phase === "leaving";
 
   return (
-    <AnimatePresence>
-      {phase !== "done" && (
+    <>
+      {earlyAssets}
+      <div
+        data-site-intro=""
+        role="status"
+        aria-label="GDX Studio"
+        className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#060e1a]"
+      >
         <motion.div
-          key="site-intro"
-          role="status"
-          aria-label="GDX Studio"
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#060e1a]"
-          exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: EXIT_MS / 1000, ease: EASE_OUT }}
+          className="w-full max-w-lg px-6"
+          animate={phase === "leaving" ? { opacity: 0, scale: 0.98, y: -8 } : { opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: CONTENT_EXIT_MS / 1000, ease: "easeIn" }}
         >
-          <div className="w-full max-w-lg px-6">
-            <motion.div
-              className="overflow-hidden rounded-2xl border border-white/10 bg-[#0a1628] shadow-[0_0_80px_rgba(79,156,247,0.08)]"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: EASE_OUT }}
-            >
-              <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
-                <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-                <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
-                <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-                <span className="ml-3 font-mono text-[11px] text-slate-500">gdxstudio.init</span>
-              </div>
+          <motion.div
+            className="overflow-hidden rounded-2xl border border-white/10 bg-[#0a1628] shadow-[0_0_80px_rgba(79,156,247,0.08)]"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE_OUT }}
+          >
+            <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
+              <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+              <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
+              <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+              <span className="ml-3 font-mono text-[11px] text-slate-500">gdxstudio.init</span>
+            </div>
 
-              <div className="min-h-[200px] p-5 font-mono text-[13px] leading-[1.8]" aria-hidden="true">
-                {typedLines.map((line, index) => {
-                  const isLastLine = index === typedLines.length - 1;
-                  return (
-                    <div key={index} className="flex">
-                      <span className="mr-4 w-5 select-none text-right text-[11px] text-slate-600">{index + 1}</span>
-                      <span className="whitespace-pre">
-                        {line === "" ? " " : highlightLine(line)}
-                        {isLastLine && (isTyping || phase === "loading") && <Caret />}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <AnimatePresence>
-                {showStatus && (
-                  <motion.div
-                    className="border-t border-white/[0.06] px-5 py-4"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.25, ease: "easeOut" }}
-                  >
-                    <div className="flex items-center justify-between font-mono text-[11px] text-slate-500">
-                      <span>{phase === "welcome" ? "✓ Ready" : "Initializing..."}</span>
-                      <span className="tabular-nums">{Math.round(loaded)}%</span>
-                    </div>
-                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/5">
-                      <div
-                        className="h-full origin-left rounded-full bg-gradient-to-r from-accent via-accent to-primary"
-                        style={{ transform: `scaleX(${loaded / 100})` }}
-                      />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+            <div className="min-h-[200px] p-5 font-mono text-[13px] leading-[1.8]" aria-hidden="true">
+              {typedLines.map((line, index) => {
+                const isLastLine = index === typedLines.length - 1;
+                return (
+                  <div key={index} className="flex">
+                    <span className="mr-4 w-5 select-none text-right text-[11px] text-slate-600">{index + 1}</span>
+                    <span className="whitespace-pre">
+                      {line === "" ? " " : highlightLine(line)}
+                      {isLastLine && (isTyping || phase === "loading") && <Caret />}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
 
             <AnimatePresence>
-              {phase === "welcome" && (
-                <motion.p
-                  className="mt-8 text-center text-2xl font-semibold text-white"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: EASE_OUT }}
+              {showStatus && (
+                <motion.div
+                  className="border-t border-white/[0.06] px-5 py-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
                 >
-                  Welcome to <span className="text-gradient">GDX Studio</span>
-                </motion.p>
+                  <div className="flex items-center justify-between font-mono text-[11px] text-slate-500">
+                    <span>{showWelcome ? "✓ Ready" : "Initializing..."}</span>
+                    <span className="tabular-nums">{Math.round(loaded)}%</span>
+                  </div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/5">
+                    <div
+                      className="h-full origin-left rounded-full bg-gradient-to-r from-accent via-accent to-primary"
+                      style={{ transform: `scaleX(${loaded / 100})` }}
+                    />
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
+
+          <AnimatePresence>
+            {showWelcome && (
+              <motion.p
+                className="mt-8 text-center text-2xl font-semibold text-white"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: EASE_OUT }}
+              >
+                Welcome to <span className="text-gradient">GDX Studio</span>
+              </motion.p>
+            )}
+          </AnimatePresence>
         </motion.div>
-      )}
-    </AnimatePresence>
+      </div>
+    </>
   );
 }
