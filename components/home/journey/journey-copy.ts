@@ -38,8 +38,10 @@ export type JourneySceneCopy = {
 
 export type JourneyCopy = {
   intro: { eyebrow: string; title: string; titleAccent: string; text: string; scrollHint: string };
-  chapters: [JourneyChapterCopy, JourneyChapterCopy, JourneyChapterCopy, JourneyChapterCopy, JourneyChapterCopy, JourneyChapterCopy];
+  /** In order: chaos, structure, code, testing, launch, projects, finale. */
+  chapters: JourneyChapterCopy[];
   controls: { skip: string; restart: string; chapters: string; loading: string };
+  projects: { viewProject: string; viewAll: string; listLabel: string };
   cta: { inquiry: string; projects: string; siteCheck: string };
   scene: JourneySceneCopy;
 };
@@ -50,7 +52,7 @@ export const JOURNEY_COPY: Record<JourneyLocale, JourneyCopy> = {
       eyebrow: "GDX Studio · уеб дизайн и изработка",
       title: "Как се ражда",
       titleAccent: "един сайт.",
-      text: "Една линия минава през шестте стъпки, по които правя всеки проект: от хаоса на стария сайт до готовия, бърз сайт на всеки екран.",
+      text: "Една линия минава през стъпките, по които правя всеки проект: от хаоса на стария сайт до готовия, бърз сайт на всеки екран.",
       scrollHint: "Скролнете, за да тръгнете"
     },
     chapters: [
@@ -59,9 +61,11 @@ export const JOURNEY_COPY: Record<JourneyLocale, JourneyCopy> = {
       { label: "Кодът", title: "Бързина, вградена в основата.", text: "Модерни технологии, оптимизирани снимки и само кодът, който наистина е нужен." },
       { label: "Тестът", title: "Всяка грешка спира тук.", text: "Формуляри, мобилни екрани, достъпност и скорост. Проверявам всичко, преди да го видят клиентите ви." },
       { label: "Пускането", title: "Един сайт. Всеки екран.", text: "Еднакво добре на телефон, таблет и компютър, от първия ден." },
+      { label: "Проектите", title: "Същият път, истински проекти.", text: "Три от проектите, направени точно така. Изберете един, за да видите как е създаден." },
       { label: "GDX Studio", title: "Вашият сайт е следващата спирка.", text: "Разкажете ми за проекта си и ще ви покажа как изглежда пътят до него." }
     ],
     controls: { skip: "Пропусни до края", restart: "Отначало", chapters: "Глави", loading: "Подготвяме пътя" },
+    projects: { viewProject: "Виж проекта", viewAll: "Всички проекти", listLabel: "Избрани проекти" },
     cta: { inquiry: "Изпрати запитване", projects: "Вижте проектите", siteCheck: "Провери сайта си безплатно" },
     scene: {
       loading: "Зарежда се… 4,8 s",
@@ -97,7 +101,7 @@ export const JOURNEY_COPY: Record<JourneyLocale, JourneyCopy> = {
       eyebrow: "GDX Studio · web design and development",
       title: "How a website",
       titleAccent: "comes to life.",
-      text: "One line runs through the six steps I follow on every project: from the chaos of an old site to a finished, fast site on every screen.",
+      text: "One line runs through the steps I follow on every project: from the chaos of an old site to a finished, fast site on every screen.",
       scrollHint: "Scroll to begin"
     },
     chapters: [
@@ -106,9 +110,11 @@ export const JOURNEY_COPY: Record<JourneyLocale, JourneyCopy> = {
       { label: "Code", title: "Speed built into the foundation.", text: "Modern technology, optimized images and only the code that is actually needed." },
       { label: "Testing", title: "Every bug stops here.", text: "Forms, mobile screens, accessibility and speed. I check everything before your clients see it." },
       { label: "Launch", title: "One site. Every screen.", text: "Equally good on phone, tablet and desktop, from day one." },
+      { label: "Projects", title: "Same road, real projects.", text: "Three projects built exactly this way. Pick one to see how it was made." },
       { label: "GDX Studio", title: "Your website is the next stop.", text: "Tell me about your project and I will show you the road to it." }
     ],
     controls: { skip: "Skip to the end", restart: "Start over", chapters: "Chapters", loading: "Preparing the road" },
+    projects: { viewProject: "View project", viewAll: "All projects", listLabel: "Selected projects" },
     cta: { inquiry: "Send an inquiry", projects: "See the projects", siteCheck: "Check your site for free" },
     scene: {
       loading: "Loading… 4.8 s",

@@ -1,11 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Project } from "@/types";
 import { useLanguage } from "@/lib/language-context";
 import { JOURNEY_COPY, type JourneyCopy, type JourneyLocale } from "@/components/home/journey/journey-copy";
 import { CHAPTER_COUNT, CHAPTER_SCROLL, TRACK_HEIGHT_VH, formatChapterNumber, getChapterForProgress } from "@/components/home/journey/journey-config";
 import { useSiteHeaderReveal } from "@/components/home/journey/use-site-header-reveal";
 import { JourneyCanvas, type JourneyCanvasStatus } from "@/components/home/journey/journey-canvas";
+import type { JourneyProject } from "@/components/home/journey/scene/projects";
 import { JourneyActions, JourneyChapter, JourneyIntro } from "@/components/home/journey/journey-overlay";
 
 const CONTROL_CLASS =
@@ -29,13 +31,28 @@ function JourneyFallback({ copy }: { copy: JourneyCopy }) {
 
 /**
  * The homepage as one 3D journey: scrolling flies the camera along a glowing line through
- * the six steps of building a website. The track is tall; the scene is pinned inside it.
+ * the steps of building a website, past featured projects, to the GDX mark. The track is tall;
+ * the scene is pinned inside it.
  */
-export function HomeJourney() {
+const FEATURED_IN_JOURNEY = 3;
+
+type HomeJourneyProps = {
+  featuredProjects: Project[];
+};
+
+export function HomeJourney({ featuredProjects }: HomeJourneyProps) {
   const { locale } = useLanguage();
   const copy = JOURNEY_COPY[locale as JourneyLocale] ?? JOURNEY_COPY.bg;
   const sectionRef = useRef<HTMLElement>(null);
   const progressRef = useRef(0);
+  const projects = useMemo<JourneyProject[]>(
+    () =>
+      featuredProjects
+        .filter((project) => Boolean(project.heroImage))
+        .slice(0, FEATURED_IN_JOURNEY)
+        .map((project) => ({ slug: project.slug, title: project.title, category: project.category, image: project.heroImage })),
+    [featuredProjects]
+  );
   const progressBarRef = useRef<HTMLSpanElement>(null);
   const [chapterIndex, setChapterIndex] = useState(-1);
   const [status, setStatus] = useState<JourneyCanvasStatus>("loading");
@@ -97,14 +114,14 @@ export function HomeJourney() {
       </ol>
 
       <div className="sticky top-0 h-[100svh] overflow-hidden bg-[#060E1A]">
-        <JourneyCanvas copy={copy.scene} progressRef={progressRef} onStatusChange={setStatus} />
+        <JourneyCanvas copy={copy.scene} progressRef={progressRef} projects={projects} viewProjectLabel={copy.projects.viewProject} onStatusChange={setStatus} />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,transparent_45%,rgba(6,14,26,0.75)_100%),linear-gradient(to_top,rgba(6,14,26,0.9),transparent_42%)]"
         />
 
         <JourneyIntro copy={copy.intro} isVisible={chapterIndex < 0} />
-        <JourneyChapter copy={copy} chapterIndex={chapterIndex} />
+        <JourneyChapter copy={copy} chapterIndex={chapterIndex} projects={projects} />
 
         <div className={`absolute right-4 z-20 flex gap-2 transition-[top] duration-300 ease-out sm:right-10 ${isJourneyFinished ? "top-24" : "top-6"}`}>
           <button type="button" className={`${CONTROL_CLASS} hidden sm:block`} onClick={() => scrollToProgress(0)}>

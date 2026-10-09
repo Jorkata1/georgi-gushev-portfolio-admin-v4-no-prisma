@@ -8,6 +8,7 @@ import { createStructure } from "@/components/home/journey/scene/structure";
 import { createCodeTunnel, createTestScanner } from "@/components/home/journey/scene/code-and-test";
 import { createDevices } from "@/components/home/journey/scene/devices";
 import { createFinale, createStars } from "@/components/home/journey/scene/finale";
+import { createProjects, type JourneyProject } from "@/components/home/journey/scene/projects";
 import { SCENE_COLORS, disposeObject, smoothstep, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
 
 /** How quickly the camera catches up with the scroll position (higher = snappier). */
@@ -23,6 +24,8 @@ export type JourneySceneOptions = {
   copy: JourneySceneCopy;
   reduceMotion: boolean;
   isSmallScreen: boolean;
+  projects: JourneyProject[];
+  viewProjectLabel: string;
 };
 
 export type JourneyScene = {
@@ -31,10 +34,15 @@ export type JourneyScene = {
   /** Jumps straight to a progress without easing, e.g. on first paint. */
   snapTo: (progress: number) => void;
   resize: (width: number, height: number) => void;
+  /**
+   * Hit-tests the project cards at a pointer position in normalized device coordinates
+   * (-1 → 1) and highlights the one under it. Returns its link, or null.
+   */
+  pickProject: (x: number, y: number) => string | null;
   dispose: () => void;
 };
 
-export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen }: JourneySceneOptions): JourneyScene {
+export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen, projects, viewProjectLabel }: JourneySceneOptions): JourneyScene {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isSmallScreen, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, isSmallScreen ? 1.5 : 1.75));
   renderer.setClearColor(SCENE_COLORS.ink, 1);
@@ -46,6 +54,7 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen }
 
   const path = createPathHelpers(createJourneyPath());
   const finale = createFinale(scene, path, camera);
+  const projectCards = createProjects(scene, path, projects, viewProjectLabel, isSmallScreen);
   const parts: ScenePart[] = [
     createRibbon(scene, path, isSmallScreen, reduceMotion),
     createChaos(scene, path, copy, isSmallScreen),
@@ -53,6 +62,7 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen }
     createCodeTunnel(scene, path, isSmallScreen),
     createTestScanner(scene, path),
     createDevices(scene, path, copy, renderer, isSmallScreen),
+    projectCards,
     finale,
     createStars(scene, path, isSmallScreen)
   ];
@@ -113,8 +123,24 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen }
     renderer.render(scene, camera);
   }
 
+  const raycaster = new THREE.Raycaster();
+  const pointerNdc = new THREE.Vector2();
+  function pickProject(x: number, y: number): string | null {
+    const visibleCards = projectCards.pickables.filter((card) => card.parent?.visible);
+    if (visibleCards.length === 0) {
+      projectCards.setHovered(null);
+      return null;
+    }
+    raycaster.setFromCamera(pointerNdc.set(x, y), camera);
+    const hit = raycaster.intersectObjects(visibleCards, false)[0]?.object ?? null;
+    projectCards.setHovered(hit);
+    const href = hit?.userData.href;
+    return typeof href === "string" ? href : null;
+  }
+
   return {
     render,
+    pickProject,
     snapTo(value: number) {
       progress = value;
     },

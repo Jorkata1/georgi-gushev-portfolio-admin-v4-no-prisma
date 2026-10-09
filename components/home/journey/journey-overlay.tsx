@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Gauge } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Gauge } from "lucide-react";
 import type { JourneyCopy } from "@/components/home/journey/journey-copy";
-import { CHAPTER_COUNT, formatChapterNumber } from "@/components/home/journey/journey-config";
+import { CHAPTER_COUNT, PROJECTS_CHAPTER, formatChapterNumber } from "@/components/home/journey/journey-config";
+import type { JourneyProject } from "@/components/home/journey/scene/projects";
 
 const HEADING_FONT = { fontFamily: "Georgia, Cambria, 'Times New Roman', Times, serif" } as const;
 const SITE_CHECK_URL = "https://check.gdxstudio.com";
@@ -43,10 +44,40 @@ export function JourneyIntro({ copy, isVisible }: JourneyIntroProps) {
 type JourneyChapterProps = {
   copy: JourneyCopy;
   chapterIndex: number;
+  projects: JourneyProject[];
 };
 
+/** Text links to the projects shown as cards in the scene, so they work without a pointer too. */
+function JourneyProjectLinks({ copy, projects }: { copy: JourneyCopy["projects"]; projects: JourneyProject[] }) {
+  return (
+    <div className="mt-5">
+      <ul aria-label={copy.listLabel} className="flex flex-col gap-1">
+        {projects.map((project) => (
+          <li key={project.slug}>
+            <Link
+              href={`/portfolio/${project.slug}`}
+              className={`group inline-flex min-h-[44px] items-center gap-3 rounded-lg pr-2 text-white transition-colors duration-200 ease-out hover:text-accent ${FOCUS_RING}`}
+            >
+              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">{project.category}</span>
+              <span className="font-semibold">{project.title}</span>
+              <ArrowUpRight size={16} aria-hidden="true" className="transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <Link
+        href="/portfolio"
+        className={`mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-white/20 bg-[#0B1627]/70 px-4 text-sm font-semibold text-white backdrop-blur transition duration-200 ease-out hover:border-accent/60 active:scale-[0.98] ${FOCUS_RING}`}
+      >
+        {copy.viewAll}
+        <ArrowRight size={16} aria-hidden="true" />
+      </Link>
+    </div>
+  );
+}
+
 /** Copy for the chapter the camera is at, bottom-left; the last chapter adds the actions. */
-export function JourneyChapter({ copy, chapterIndex }: JourneyChapterProps) {
+export function JourneyChapter({ copy, chapterIndex, projects }: JourneyChapterProps) {
   const isVisible = chapterIndex >= 0;
   const index = Math.max(0, chapterIndex);
   const chapter = copy.chapters[index];
@@ -74,6 +105,7 @@ export function JourneyChapter({ copy, chapterIndex }: JourneyChapterProps) {
         <p className="mt-3 max-w-md text-[15px] leading-relaxed text-slate-300 sm:text-base">{chapter.text}</p>
       </motion.div>
 
+      {index === PROJECTS_CHAPTER && <JourneyProjectLinks copy={copy.projects} projects={projects} />}
       {isLast && <JourneyActions copy={copy.cta} />}
     </div>
   );
