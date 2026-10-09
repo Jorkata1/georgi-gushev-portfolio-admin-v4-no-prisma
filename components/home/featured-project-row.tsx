@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import type { Project } from "@/types";
 
@@ -11,9 +11,7 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 const MAX_TOOLS = 4;
 const BLUR_DATA_URL = "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=";
 
-/** The frame opens like a curtain from a thin vertical slit in the middle. */
-const CURTAIN_CLOSED = "inset(8% 46% 8% 46% round 24px)";
-const CURTAIN_OPEN = "inset(0% 0% 0% 0% round 24px)";
+const CURTAIN_COLOR = "#060E1A";
 
 type FeaturedProjectRowProps = {
   project: Project;
@@ -21,7 +19,17 @@ type FeaturedProjectRowProps = {
   viewLabel: string;
 };
 
-function MaskedWords({ text, delay, reduceMotion }: { text: string; delay: number; reduceMotion: boolean }) {
+function MaskedWords({
+  text,
+  delay,
+  isRevealed,
+  reduceMotion
+}: {
+  text: string;
+  delay: number;
+  isRevealed: boolean;
+  reduceMotion: boolean;
+}) {
   const words = text.split(/\s+/).filter(Boolean);
   return (
     <>
@@ -30,13 +38,12 @@ function MaskedWords({ text, delay, reduceMotion }: { text: string; delay: numbe
           <motion.span
             className="inline-block"
             initial={reduceMotion ? { opacity: 0 } : { y: "110%" }}
-            whileInView={reduceMotion ? { opacity: 1 } : { y: "0%" }}
-            viewport={{ once: true, amount: 0.6 }}
+            animate={isRevealed ? (reduceMotion ? { opacity: 1 } : { y: "0%" }) : undefined}
             transition={{ duration: 0.8, delay: delay + wordIndex * 0.06, ease: EASE_OUT }}
           >
             {word}
           </motion.span>
-          {wordIndex < words.length - 1 && " "}
+          {wordIndex < words.length - 1 && "\u00A0"}
         </span>
       ))}
     </>
@@ -45,7 +52,10 @@ function MaskedWords({ text, delay, reduceMotion }: { text: string; delay: numbe
 
 export function FeaturedProjectRow({ project, index, viewLabel }: FeaturedProjectRowProps) {
   const reduceMotion = useReducedMotion() ?? false;
+  const rowRef = useRef<HTMLElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
+  // One trigger for the whole row: masked or clipped children can't detect visibility themselves.
+  const isRevealed = useInView(rowRef, { once: true, amount: 0.25 });
   const { scrollYProgress } = useScroll({ target: frameRef, offset: ["start end", "end start"] });
   // The picture drifts slower than the page inside an oversized layer, which reads as depth.
   const parallaxY = useTransform(scrollYProgress, [0, 1], reduceMotion ? ["0%", "0%"] : ["-7%", "7%"]);
@@ -55,23 +65,21 @@ export function FeaturedProjectRow({ project, index, viewLabel }: FeaturedProjec
   const href = `/portfolio/${project.slug}`;
 
   return (
-    <article className="group relative grid items-center gap-6 sm:gap-8 lg:grid-cols-12 lg:gap-12">
+    <article ref={rowRef} className="group relative grid items-center gap-6 sm:gap-8 lg:grid-cols-12 lg:gap-12">
       <motion.div
         ref={frameRef}
         className={`relative aspect-[16/10] overflow-hidden rounded-3xl border border-white/8 bg-white/[0.03] lg:col-span-7 ${
           isReversed ? "lg:order-2" : ""
         }`}
-        initial={reduceMotion ? { opacity: 0 } : { clipPath: CURTAIN_CLOSED }}
-        whileInView={reduceMotion ? { opacity: 1 } : { clipPath: CURTAIN_OPEN }}
-        viewport={{ once: true, amount: 0.35 }}
-        transition={{ duration: 1.1, ease: EASE_OUT }}
+        initial={{ opacity: 0 }}
+        animate={isRevealed ? { opacity: 1 } : undefined}
+        transition={{ duration: 0.4 }}
       >
         <motion.div className="absolute inset-[-8%]" style={{ y: parallaxY }}>
           <motion.div
             className="relative h-full w-full"
             initial={reduceMotion ? false : { scale: 1.2 }}
-            whileInView={{ scale: 1 }}
-            viewport={{ once: true, amount: 0.35 }}
+            animate={isRevealed ? { scale: 1 } : undefined}
             transition={{ duration: 1.4, ease: EASE_OUT }}
           >
             <Image
@@ -86,6 +94,28 @@ export function FeaturedProjectRow({ project, index, viewLabel }: FeaturedProjec
           </motion.div>
         </motion.div>
         <span className="absolute inset-0 bg-gradient-to-t from-[#060E1A]/40 via-transparent to-transparent" />
+
+        {/* Curtain: two panels part from the middle (transform only, works in every browser). */}
+        {!reduceMotion && (
+          <>
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-y-0 left-0 w-1/2"
+              style={{ backgroundColor: CURTAIN_COLOR }}
+              initial={{ x: "0%" }}
+              animate={isRevealed ? { x: "-101%" } : undefined}
+              transition={{ duration: 1.1, delay: 0.1, ease: EASE_OUT }}
+            />
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-y-0 right-0 w-1/2"
+              style={{ backgroundColor: CURTAIN_COLOR }}
+              initial={{ x: "0%" }}
+              animate={isRevealed ? { x: "101%" } : undefined}
+              transition={{ duration: 1.1, delay: 0.1, ease: EASE_OUT }}
+            />
+          </>
+        )}
       </motion.div>
 
       <div className={`relative lg:col-span-5 ${isReversed ? "lg:order-1" : ""}`}>
@@ -94,8 +124,7 @@ export function FeaturedProjectRow({ project, index, viewLabel }: FeaturedProjec
           className="block font-semibold leading-none text-white/10 tabular-nums"
           style={{ fontFamily: "Georgia, serif", fontSize: "clamp(3rem, 7vw, 6rem)" }}
           initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: isReversed ? 40 : -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
+          animate={isRevealed ? { opacity: 1, x: 0 } : undefined}
           transition={{ duration: 0.9, ease: EASE_OUT }}
         >
           {number}
@@ -104,8 +133,7 @@ export function FeaturedProjectRow({ project, index, viewLabel }: FeaturedProjec
         <motion.p
           className="mt-3 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-accent"
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
+          animate={isRevealed ? { opacity: 1 } : undefined}
           transition={{ duration: 0.6, delay: 0.15 }}
         >
           {project.category}
@@ -119,7 +147,7 @@ export function FeaturedProjectRow({ project, index, viewLabel }: FeaturedProjec
         >
           {/* Stretched link: the whole row is clickable, with a single link for screen readers. */}
           <Link href={href} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
-            <MaskedWords text={project.title} delay={0.2} reduceMotion={reduceMotion} />
+            <MaskedWords text={project.title} delay={0.3} isRevealed={isRevealed} reduceMotion={reduceMotion} />
           </Link>
         </h3>
 
@@ -127,8 +155,7 @@ export function FeaturedProjectRow({ project, index, viewLabel }: FeaturedProjec
           <motion.p
             className="mt-4 max-w-md text-base leading-relaxed text-slate-300"
             initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.6 }}
+            animate={isRevealed ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.7, delay: 0.35, ease: EASE_OUT }}
           >
             {project.excerpt}
@@ -142,8 +169,7 @@ export function FeaturedProjectRow({ project, index, viewLabel }: FeaturedProjec
                 key={tool}
                 className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-slate-300"
                 initial={{ opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.6 }}
+                animate={isRevealed ? { opacity: 1, y: 0 } : undefined}
                 transition={{ duration: 0.5, delay: 0.45 + toolIndex * 0.05, ease: EASE_OUT }}
               >
                 {tool}
