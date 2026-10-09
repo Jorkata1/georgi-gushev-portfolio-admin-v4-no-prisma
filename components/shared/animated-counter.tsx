@@ -8,11 +8,18 @@ type AnimatedCounterProps = {
   suffix?: string;
   label: string;
   duration?: number;
+  /** "compact" keeps the hero stats inside the first screen on laptops. */
+  size?: "default" | "compact";
 };
+
+const NUMBER_SIZE_CLASSES = {
+  default: "text-3xl sm:text-4xl lg:text-5xl",
+  compact: "text-3xl sm:text-4xl"
+} as const;
 
 const COUNT_EASE = [0.16, 1, 0.3, 1] as const;
 
-export function AnimatedCounter({ value, suffix = "", label, duration = 2 }: AnimatedCounterProps) {
+export function AnimatedCounter({ value, suffix = "", label, duration = 2, size = "default" }: AnimatedCounterProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
   const prefersReducedMotion = useReducedMotion();
@@ -47,7 +54,7 @@ export function AnimatedCounter({ value, suffix = "", label, duration = 2 }: Ani
         {value}
         {suffix} {label}
       </span>
-      <span aria-hidden="true" className="text-3xl font-bold tabular-nums text-white sm:text-4xl lg:text-5xl">
+      <span aria-hidden="true" className={`${NUMBER_SIZE_CLASSES[size]} font-bold tabular-nums text-white`}>
         {count}
         <span className="text-accent">{suffix}</span>
       </span>

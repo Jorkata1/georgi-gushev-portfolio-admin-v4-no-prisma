@@ -1,3 +1,4 @@
+import { HomeFeaturedProjects } from "@/components/home/home-featured-projects";
 import { HomeHero } from "@/components/home/home-hero";
 import { HomeSections } from "@/components/home/home-sections";
 import { HomeSiteCheck } from "@/components/home/home-site-check";
@@ -11,8 +12,9 @@ export default async function HomePage() {
   return (
     <div className="home-snap">
       <HomeHero />
+      <HomeFeaturedProjects featuredProjects={featuredProjects} />
       <HomeSiteCheck />
-      <HomeSections featuredProjects={featuredProjects} />
+      <HomeSections />
     </div>
   );
 }

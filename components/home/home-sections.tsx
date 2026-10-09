@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { whatIDo } from "@/data/site";
-import { ProjectCard } from "@/components/cards/project-card";
 import { Container } from "@/components/shared/container";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionHeading } from "@/components/shared/section-heading";
@@ -14,13 +13,7 @@ import { AnimatedDivider } from "@/components/shared/animated-divider";
 import { ToolsMarquee } from "@/components/shared/tools-marquee";
 import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/data/translations";
-import type { Project } from "@/types";
-
-type HomeSectionsProps = {
-  featuredProjects: Project[];
-};
-
-export function HomeSections({ featuredProjects }: HomeSectionsProps) {
+export function HomeSections() {
   const { locale } = useLanguage();
   const t = translations[locale];
   const s = t.sections;
@@ -99,36 +92,6 @@ export function HomeSections({ featuredProjects }: HomeSectionsProps) {
                 </div>
               </Reveal>
             ))}
-          </div>
-        </Container>
-      </section>
-
-      <AnimatedDivider />
-
-      {/* Projects */}
-      <section className="section-padding">
-        <Container>
-          <SectionHeading
-            eyebrow={s.projects.eyebrow}
-            title={s.projects.title}
-            description={s.projects.description}
-          />
-
-          <div className="mt-8 grid gap-6 sm:mt-12 sm:gap-8">
-            {featuredProjects.map((project, index) => (
-              <Reveal key={project.id} delay={index * 0.08}>
-                <ProjectCard project={project} />
-              </Reveal>
-            ))}
-          </div>
-
-          <div className="mt-6 sm:mt-10">
-            <Link href="/portfolio">
-              <Button variant="secondary">
-                {s.projects.viewAll}
-                <ArrowRight size={16} />
-              </Button>
-            </Link>
           </div>
         </Container>
       </section>

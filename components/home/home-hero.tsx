@@ -86,8 +86,8 @@ export function HomeHero() {
               style={{ fontFamily: "Georgia, Cambria, 'Times New Roman', Times, serif" }}
               variants={fadeUp}
             >
-              <span className="text-2xl sm:text-5xl lg:text-7xl">{h.title}</span>
-              <span className="mt-1 block text-gradient text-2xl sm:text-5xl lg:text-7xl">
+              <span className="text-2xl sm:text-5xl lg:text-6xl 2xl:text-7xl">{h.title}</span>
+              <span className="mt-1 block text-gradient text-2xl sm:text-5xl lg:text-6xl 2xl:text-7xl">
                 {h.titleAccent}
               </span>
             </motion.h1>
@@ -117,7 +117,7 @@ export function HomeHero() {
             </motion.div>
 
             <motion.p
-              className="mt-4 max-w-xl text-base leading-relaxed text-slate-300 sm:mt-6 sm:text-lg"
+              className="mt-4 max-w-xl text-base leading-relaxed text-slate-300 sm:mt-5 sm:text-lg"
               variants={fadeUp}
             >
               {locale === "bg"
@@ -126,7 +126,7 @@ export function HomeHero() {
             </motion.p>
 
             <motion.div
-              className="mt-5 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-4"
+              className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:flex-wrap sm:gap-4"
               variants={fadeUp}
             >
               <Link href="/services" className="w-full sm:w-auto">
@@ -161,7 +161,7 @@ export function HomeHero() {
             </motion.div>
 
             <motion.div
-              className="mt-8 grid grid-cols-3 gap-4 rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-4 sm:mt-10 sm:p-6"
+              className="mt-8 grid grid-cols-3 gap-4 rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-4 sm:mt-8 sm:px-6 sm:py-4"
               variants={fadeUp}
             >
               {counters.map((counter) => (
@@ -170,6 +170,7 @@ export function HomeHero() {
                   value={counter.value}
                   suffix={counter.suffix}
                   label={counter.label}
+                  size="compact"
                 />
               ))}
             </motion.div>
