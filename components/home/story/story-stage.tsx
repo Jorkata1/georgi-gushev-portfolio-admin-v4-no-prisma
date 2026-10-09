@@ -4,9 +4,8 @@ import { motion, useTransform, type MotionValue } from "framer-motion";
 import type { StoryStageCopy } from "@/components/home/story/story-copy";
 import { TIMELINE } from "@/components/home/story/story-timeline";
 import { useStageScale } from "@/components/home/story/use-stage-scale";
-import { SceneOldSite } from "@/components/home/story/scene-old-site";
-import { SceneWireframe } from "@/components/home/story/scene-wireframe";
-import { SceneBuiltSite } from "@/components/home/story/scene-built-site";
+import { SceneSite } from "@/components/home/story/scene-site";
+import { SceneQaOverlay } from "@/components/home/story/scene-qa-overlay";
 import { SceneDevices } from "@/components/home/story/scene-devices";
 import {
   ChecklistCard,
@@ -80,9 +79,8 @@ export function StoryStage({ progress, copy, className = "" }: StoryStageProps) 
         >
           <BrowserChrome progress={progress} url={copy.url} />
           <div className="relative flex-1">
-            <SceneOldSite progress={progress} />
-            <SceneWireframe progress={progress} copy={copy} />
-            <SceneBuiltSite progress={progress} copy={copy} />
+            <SceneSite progress={progress} copy={copy} />
+            <SceneQaOverlay progress={progress} />
           </div>
         </motion.div>
 
