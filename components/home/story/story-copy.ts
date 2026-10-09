@@ -32,7 +32,25 @@ export type StoryStageCopy = {
   chips: [string, string, string];
 };
 
+export type StoryIntroCopy = {
+  lead: string;
+  scrollHint: string;
+};
+
+export type StoryFinaleCopy = {
+  eyebrow: string;
+  title: string;
+  text: string;
+  viewProject: string;
+  allProjects: string;
+  inquiry: string;
+  siteCheck: string;
+  projectsLabel: string;
+};
+
 export type StoryCopy = {
+  intro: StoryIntroCopy;
+  finale: StoryFinaleCopy;
   sectionTitle: string;
   eyebrow: string;
   chapterNavLabel: string;
@@ -44,6 +62,20 @@ export type StoryCopy = {
 
 export const STORY_COPY: Record<StoryLocale, StoryCopy> = {
   bg: {
+    intro: {
+      lead: "Ето как един сайт стига от „бавен и объркан“ до „готов и бърз“, в пет стъпки.",
+      scrollHint: "Скролнете, за да видите как работя"
+    },
+    finale: {
+      eyebrow: "Избрани проекти",
+      title: "Същият процес, истински проекти.",
+      text: "Разгледайте какво съм направил или ми пишете за вашия сайт.",
+      viewProject: "Виж проекта",
+      allProjects: "Всички проекти",
+      inquiry: "Изпрати запитване",
+      siteCheck: "Провери сайта си безплатно",
+      projectsLabel: "Избрани проекти"
+    },
     sectionTitle: "Как работя",
     eyebrow: "Процесът",
     chapterNavLabel: "Глави от процеса",
@@ -103,6 +135,20 @@ export const STORY_COPY: Record<StoryLocale, StoryCopy> = {
     }
   },
   en: {
+    intro: {
+      lead: "Here is how a website goes from slow and confusing to finished and fast, in five steps.",
+      scrollHint: "Scroll to see how I work"
+    },
+    finale: {
+      eyebrow: "Selected work",
+      title: "Same process, real projects.",
+      text: "Look through what I have built, or write to me about your website.",
+      viewProject: "View project",
+      allProjects: "All projects",
+      inquiry: "Send an inquiry",
+      siteCheck: "Check your website for free",
+      projectsLabel: "Selected projects"
+    },
     sectionTitle: "How I work",
     eyebrow: "The process",
     chapterNavLabel: "Process chapters",

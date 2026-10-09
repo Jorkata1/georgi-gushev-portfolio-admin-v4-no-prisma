@@ -1,22 +1,10 @@
-import { HomeFeaturedProjects } from "@/components/home/home-featured-projects";
-import { HomeHero } from "@/components/home/home-hero";
-import { HomeSections } from "@/components/home/home-sections";
-import { HomeSiteCheck } from "@/components/home/home-site-check";
 import { HomeStory } from "@/components/home/home-story";
 import { getFeaturedProjects } from "@/lib/projects";
 
 export const revalidate = 3600;
 
+/** The homepage is one scroll-driven story: intro, the five-step process, then projects and actions. */
 export default async function HomePage() {
   const featuredProjects = await getFeaturedProjects();
-
-  return (
-    <div className="home-snap">
-      <HomeHero />
-      <HomeStory />
-      <HomeFeaturedProjects featuredProjects={featuredProjects} />
-      <HomeSiteCheck />
-      <HomeSections />
-    </div>
-  );
+  return <HomeStory featuredProjects={featuredProjects} />;
 }

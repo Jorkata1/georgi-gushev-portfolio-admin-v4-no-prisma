@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import type { StoryCopy } from "@/components/home/story/story-copy";
 import { CHAPTER_COUNT } from "@/components/home/story/story-timeline";
 
@@ -21,7 +19,6 @@ function formatChapterNumber(index: number): string {
 
 export function StoryChapterPanel({ copy, activeIndex, onSelectChapter }: StoryChapterPanelProps) {
   const chapter = copy.chapters[activeIndex];
-  const isLastChapter = activeIndex === LAST_CHAPTER_INDEX;
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
@@ -83,27 +80,6 @@ export function StoryChapterPanel({ copy, activeIndex, onSelectChapter }: StoryC
           })}
         </ol>
       </nav>
-
-      <div className="h-12">
-        <AnimatePresence>
-          {isLastChapter && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={COPY_TRANSITION}
-            >
-              <Link
-                href="/portfolio"
-                className="inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-accent px-5 text-sm font-bold text-[#060E1A] transition duration-200 ease-out hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#060E1A] active:scale-[0.98] sm:text-base"
-              >
-                {copy.viewProjects}
-                <ArrowRight size={18} aria-hidden="true" />
-              </Link>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
     </div>
   );
 }
