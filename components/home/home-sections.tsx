@@ -1,15 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { whatIDo } from "@/data/site";
 import { Container } from "@/components/shared/container";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
 import { TiltCard } from "@/components/shared/tilt-card";
-import { AnimatedDivider } from "@/components/shared/animated-divider";
 import { ToolsMarquee } from "@/components/shared/tools-marquee";
 import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/data/translations";
@@ -64,70 +62,6 @@ export function HomeSections() {
                 <ArrowRight size={16} />
               </Button>
             </Link>
-          </div>
-        </Container>
-      </section>
-
-      <AnimatedDivider />
-
-      {/* Help cases */}
-      <section className="hidden section-padding sm:block">
-        <Container>
-          <SectionHeading
-            eyebrow={s.help.eyebrow}
-            title={s.help.title}
-          />
-
-          <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-10 sm:grid-cols-3 sm:gap-4">
-            {t.helpCases.map((item, index) => (
-              <Reveal key={item} delay={index * 0.06} className="h-full">
-                <div className="surface flex h-full gap-2 p-3 sm:gap-3 sm:p-5">
-                  <CheckCircle2
-                    className="mt-0.5 shrink-0 text-accentGlow"
-                    size={14}
-                  />
-                  <p className="text-xs leading-snug text-slate-300 sm:text-sm">
-                    {item}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      <AnimatedDivider />
-
-      {/* Process — horizontal scroll on mobile */}
-      <section className="section-padding">
-        <Container>
-          <SectionHeading
-            eyebrow={s.process.eyebrow}
-            title={s.process.title}
-            description={s.process.description}
-          />
-
-          <div className="mt-8 sm:mt-12">
-            <div className="-mx-4 flex gap-4 overflow-x-auto overflow-y-hidden px-4 pb-4 snap-x snap-mandatory sm:mx-0 sm:px-0 sm:pb-0 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible">
-              {t.workProcess.map((item, index) => (
-                <Reveal key={item.title} delay={index * 0.08}>
-                  <article className="surface h-full min-w-[240px] shrink-0 snap-start p-5 sm:min-w-0 sm:p-6">
-                    <p className="text-xs uppercase tracking-[0.24em] text-accent">
-                      {s.process.step} {index + 1}
-                    </p>
-                    <h3 className="mt-3 text-lg font-semibold text-white sm:mt-4 sm:text-xl">
-                      {item.title}
-                    </h3>
-                    <p className="mt-2 text-xs leading-relaxed text-slate-300 sm:mt-3 sm:text-sm">
-                      {item.text}
-                    </p>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-            <p className="mt-2 text-center text-[10px] uppercase tracking-widest text-slate-500 sm:hidden">
-              ← Плъзни →
-            </p>
           </div>
         </Container>
       </section>
