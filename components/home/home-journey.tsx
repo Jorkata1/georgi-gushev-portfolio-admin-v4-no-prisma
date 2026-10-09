@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/language-context";
 import { JOURNEY_COPY, type JourneyCopy, type JourneyLocale } from "@/components/home/journey/journey-copy";
-import { CHAPTER_SCROLL, TRACK_HEIGHT_VH, formatChapterNumber, getChapterForProgress } from "@/components/home/journey/journey-config";
+import { CHAPTER_COUNT, CHAPTER_SCROLL, TRACK_HEIGHT_VH, formatChapterNumber, getChapterForProgress } from "@/components/home/journey/journey-config";
+import { useSiteHeaderReveal } from "@/components/home/journey/use-site-header-reveal";
 import { JourneyCanvas, type JourneyCanvasStatus } from "@/components/home/journey/journey-canvas";
 import { JourneyActions, JourneyChapter, JourneyIntro } from "@/components/home/journey/journey-overlay";
 
@@ -38,6 +39,9 @@ export function HomeJourney() {
   const progressBarRef = useRef<HTMLSpanElement>(null);
   const [chapterIndex, setChapterIndex] = useState(-1);
   const [status, setStatus] = useState<JourneyCanvasStatus>("loading");
+  // The site's main menu stays hidden until the journey reaches its last chapter.
+  const isJourneyFinished = chapterIndex === CHAPTER_COUNT - 1;
+  useSiteHeaderReveal(isJourneyFinished || status === "unsupported");
 
   useEffect(() => {
     const readProgress = () => {
@@ -102,7 +106,7 @@ export function HomeJourney() {
         <JourneyIntro copy={copy.intro} isVisible={chapterIndex < 0} />
         <JourneyChapter copy={copy} chapterIndex={chapterIndex} />
 
-        <div className="absolute right-4 top-24 z-20 flex gap-2 sm:right-10">
+        <div className={`absolute right-4 z-20 flex gap-2 transition-[top] duration-300 ease-out sm:right-10 ${isJourneyFinished ? "top-24" : "top-6"}`}>
           <button type="button" className={`${CONTROL_CLASS} hidden sm:block`} onClick={() => scrollToProgress(0)}>
             {copy.controls.restart}
           </button>
