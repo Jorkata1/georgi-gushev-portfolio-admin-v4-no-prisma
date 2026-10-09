@@ -1,49 +1,49 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
-const SLIDE_MS = 400;
-const HIDDEN_TRANSFORM = "translateY(-110%)";
+const STATE_ATTRIBUTE = "data-journey-menu";
+const STYLE_ID = "journey-menu-style";
 
 /**
- * While the journey plays, the site's main header slides out of the way; it slides back in
- * once the journey reaches its end. The header is lifted out of the page flow (fixed) for as
- * long as the homepage is open, so hiding it leaves no empty band, and every inline style it
- * had is restored when the visitor leaves the homepage.
+ * Rules keyed on an attribute of <html>, so they keep working even if the header is
+ * re-rendered or mounted after the journey (inline styles on the element would be lost).
+ * On the homepage the header is lifted out of the page flow (fixed), so hiding it leaves
+ * no empty band; visibility flips after the slide so the hidden menu leaves the tab order.
  */
-export function useSiteHeaderReveal(isVisible: boolean) {
-  const headerRef = useRef<HTMLElement | null>(null);
+const HEADER_RULES = `
+  html[${STATE_ATTRIBUTE}] body header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    transition: transform 400ms ease-out, visibility 0s linear 0s;
+  }
+  html[${STATE_ATTRIBUTE}="hidden"] body header {
+    transform: translateY(-110%);
+    visibility: hidden;
+    transition: transform 400ms ease-in, visibility 0s linear 400ms;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html[${STATE_ATTRIBUTE}] body header { transition: none; }
+  }
+`;
 
+/** Keeps the site's main menu out of the way until the journey reaches its end. */
+export function useSiteHeaderReveal(isVisible: boolean) {
   useEffect(() => {
-    const header = document.querySelector<HTMLElement>("body header");
-    if (!header) return;
-    headerRef.current = header;
-    const originalStyle = header.style.cssText;
-    header.style.position = "fixed";
-    header.style.top = "0";
-    header.style.left = "0";
-    header.style.right = "0";
-    header.style.zIndex = "50";
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = HEADER_RULES;
+    document.head.appendChild(style);
     return () => {
-      header.style.cssText = originalStyle;
-      headerRef.current = null;
+      style.remove();
+      document.documentElement.removeAttribute(STATE_ATTRIBUTE);
     };
   }, []);
 
   useEffect(() => {
-    const header = headerRef.current;
-    if (!header) return;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const duration = prefersReducedMotion ? 0 : SLIDE_MS;
-    if (isVisible) {
-      header.style.transition = `transform ${duration}ms ease-out, visibility 0s`;
-      header.style.transform = "translateY(0)";
-      header.style.visibility = "visible";
-    } else {
-      // Visibility flips after the slide so the hidden header also leaves the tab order.
-      header.style.transition = `transform ${duration}ms ease-in, visibility 0s linear ${duration}ms`;
-      header.style.transform = HIDDEN_TRANSFORM;
-      header.style.visibility = "hidden";
-    }
+    document.documentElement.setAttribute(STATE_ATTRIBUTE, isVisible ? "shown" : "hidden");
   }, [isVisible]);
 }
