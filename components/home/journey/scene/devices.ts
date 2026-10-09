@@ -1,11 +1,25 @@
 import * as THREE from "three";
-import { CHAPTER_STATIONS } from "@/components/home/journey/journey-config";
+import { CAMERA_LEAD, CHAPTER_STATIONS } from "@/components/home/journey/journey-config";
 import type { JourneySceneCopy } from "@/components/home/journey/journey-copy";
-import { proximity, type JourneyPath } from "@/components/home/journey/scene/journey-path";
+import { chapterBuild, staggered, type JourneyPath } from "@/components/home/journey/scene/journey-path";
 import { drawSite } from "@/components/home/journey/scene/device-site";
-import { SCENE_COLORS, createCanvasTexture, roundRect, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
+import { SCENE_COLORS, createCanvasTexture, roundRect, smoothstep, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
 
-const LAUNCH_U = CHAPTER_STATIONS[4] + 0.005;
+const LAUNCH_CHAPTER = 4;
+const LAUNCH_U = CHAPTER_STATIONS[LAUNCH_CHAPTER] + 0.005;
+/**
+ * The desktop stands right on the line, so the devices leave before the camera reaches them:
+ * they fade out between these two points, the desktop rising over the camera, the others sliding aside.
+ */
+const LEAVE_START = LAUNCH_U - CAMERA_LEAD + 0.012;
+const LEAVE_END = LAUNCH_U - 0.012;
+const LEAVE_RISE = 4;
+const LEAVE_SPREAD = 3;
+/** Share of the build each part takes: the branches grow first, then the device lights up. */
+const BRANCH_SHARE = 0.55;
+/** A device starts this much smaller and lower, then settles into place. */
+const START_SCALE = 0.86;
+const START_DROP = 1.4;
 const BODY = "#121925";
 
 type DeviceSpec = {
@@ -84,6 +98,8 @@ export function createDevices(scene: THREE.Scene, path: JourneyPath, copy: Journ
   const branchCore = new THREE.MeshBasicMaterial({ color: SCENE_COLORS.goldSoft, transparent: true });
   const branchHalo = new THREE.MeshBasicMaterial({ color: SCENE_COLORS.gold, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false });
 
+  /** Branch tubes grow from the main line towards their device as the scene builds. */
+  const branches: Array<{ index: number; core: THREE.TubeGeometry; halo: THREE.TubeGeometry }> = [];
   const devices = DEVICES.map((spec, index) => {
     const [canvasWidth, canvasHeight] = spec.canvas;
     const width = spec.width * sizeScale;
@@ -108,29 +124,59 @@ export function createDevices(scene: THREE.Scene, path: JourneyPath, copy: Journ
       const control = start.clone().lerp(end, 0.55);
       control.y = start.y - 0.1;
       const curve = new THREE.QuadraticBezierCurve3(start, control, end);
-      group.add(
-        new THREE.Mesh(new THREE.TubeGeometry(curve, 64, 0.035, 10, false), branchCore),
-        new THREE.Mesh(new THREE.TubeGeometry(curve, 64, 0.16, 10, false), branchHalo)
-      );
+      branches.push({
+        index,
+        core: new THREE.TubeGeometry(curve, 64, 0.035, 10, false),
+        halo: new THREE.TubeGeometry(curve, 64, 0.16, 10, false)
+      });
+      const latest = branches[branches.length - 1];
+      group.add(new THREE.Mesh(latest.core, branchCore), new THREE.Mesh(latest.halo, branchHalo));
     }
-    return { mesh, base, screenMaterial, glowMaterial, index };
+    const outward = path.sideAt(LAUNCH_U).multiplyScalar(Math.sign(spec.side));
+    return { mesh, base, outward, screenMaterial, glowMaterial, index };
   });
   scene.add(group);
 
   const lift = new THREE.Vector3();
+  const growBranch = (geometry: THREE.TubeGeometry, amount: number) => {
+    const total = geometry.index?.count ?? 0;
+    // Whole tube segments only (each one is radialSegments quads × 6 indices).
+    const segment = geometry.parameters.radialSegments * 6;
+    geometry.setDrawRange(0, Math.round((total * amount) / segment) * segment);
+  };
+
   return {
     update(state: FrameState) {
-      const visibility = proximity(state.cameraU, LAUNCH_U, 0.1, 0.5);
-      group.visible = visibility > 0.001;
+      const build = chapterBuild(state.cameraU, LAUNCH_CHAPTER);
+      const leave = smoothstep(state.cameraU, LEAVE_START, LEAVE_END);
+      const fade = 1 - leave;
+      group.visible = build > 0.001 && fade > 0.001;
       if (!group.visible) return;
-      devices.forEach((device) => {
-        const float = state.reduceMotion ? 0 : Math.sin(state.elapsed * 1.2 + device.index) * 0.12;
-        device.mesh.position.copy(device.base).add(lift.set(0, float - (1 - visibility) * 3, 0));
-        device.screenMaterial.opacity = visibility;
-        device.glowMaterial.opacity = visibility * 0.9;
+
+      // Desktop first, then tablet and phone; each device lights up once its branch has reached it.
+      const reveals = devices.map((device) => staggered(build, device.index, devices.length));
+      branches.forEach((branch) => {
+        const grow = Math.min(1, reveals[branch.index] / BRANCH_SHARE);
+        growBranch(branch.core, grow);
+        growBranch(branch.halo, grow);
       });
-      branchCore.opacity = visibility;
-      branchHalo.opacity = visibility * 0.22;
+      branchCore.opacity = fade;
+      branchHalo.opacity = fade * 0.22;
+
+      devices.forEach((device) => {
+        const isBranched = device.index !== 0;
+        const raw = reveals[device.index];
+        const appear = isBranched ? Math.max(0, (raw - BRANCH_SHARE * 0.6) / (1 - BRANCH_SHARE * 0.6)) : raw;
+        const float = state.reduceMotion ? 0 : Math.sin(state.elapsed * 1.2 + device.index) * 0.12;
+        const rise = isBranched ? 0 : leave * LEAVE_RISE;
+        device.mesh.position
+          .copy(device.base)
+          .add(lift.set(0, float - (1 - appear) * START_DROP + rise, 0))
+          .addScaledVector(device.outward, leave * LEAVE_SPREAD);
+        device.mesh.scale.setScalar(START_SCALE + (1 - START_SCALE) * appear);
+        device.screenMaterial.opacity = appear * fade;
+        device.glowMaterial.opacity = appear * fade * 0.9;
+      });
     }
   };
 }

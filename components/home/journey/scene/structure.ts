@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { CHAPTER_STATIONS } from "@/components/home/journey/journey-config";
-import { proximity, type JourneyPath } from "@/components/home/journey/scene/journey-path";
+import { chapterBuild, stationFade, type JourneyPath } from "@/components/home/journey/scene/journey-path";
 import { SCENE_COLORS, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
 
 const STRUCTURE_U = CHAPTER_STATIONS[1] - 0.005;
@@ -95,7 +95,7 @@ export function createStructure(scene: THREE.Scene, path: JourneyPath, isSmallSc
 
   return {
     update(state: FrameState) {
-      const visibility = proximity(state.cameraU, STRUCTURE_U, 0.12, 0.1);
+      const visibility = chapterBuild(state.cameraU, 1) * stationFade(state.cameraU, STRUCTURE_U, 0.1);
       group.visible = visibility > 0.001;
       if (!group.visible) return;
       columnMaterial.opacity = visibility * 0.12;

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { CHAPTER_STATIONS, PROJECTS_CHAPTER } from "@/components/home/journey/journey-config";
-import { proximity, type JourneyPath } from "@/components/home/journey/scene/journey-path";
+import { chapterBuild, staggered, stationFade, type JourneyPath } from "@/components/home/journey/scene/journey-path";
 import { FONTS, createCanvasTexture, roundRect, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
 
 export type JourneyProject = {
@@ -130,10 +130,13 @@ export function createProjects(
       hovered = object;
     },
     update(state: FrameState) {
-      const visibility = proximity(state.cameraU, PROJECTS_U, 0.12, 0.09);
-      group.visible = visibility > 0.001;
+      const build = chapterBuild(state.cameraU, PROJECTS_CHAPTER);
+      const fade = stationFade(state.cameraU, PROJECTS_U, 0.09);
+      group.visible = build > 0.001 && fade > 0.001;
       if (!group.visible) return;
-      cards.forEach((card) => {
+      cards.forEach((card, index) => {
+        // The cards rise in one after another and are all in place when the chapter copy appears.
+        const visibility = staggered(build, index, cards.length) * fade;
         const target = card.mesh === hovered ? 1 : 0;
         card.hover += (target - card.hover) * Math.min(1, state.delta * 10);
         const bob = state.reduceMotion ? 0 : Math.sin(state.elapsed * 1.1 + card.phase) * 0.12;

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { CAMERA_LEAD } from "@/components/home/journey/journey-config";
+import { CAMERA_LEAD, CHAPTER_STATIONS, CHAPTER_SWITCH } from "@/components/home/journey/journey-config";
 import { smoothstep } from "@/components/home/journey/scene/scene-kit";
 
 const UP = new THREE.Vector3(0, 1, 0);
@@ -38,8 +38,30 @@ export function chaosAt(u: number): number {
   return 1 - smoothstep(u, 0.12, 0.21);
 }
 
-/** 0 → 1 as the camera approaches a station, fully shown while it rests there, back to 0 after. */
-export function proximity(cameraU: number, targetU: number, before = 0.12, after = 0.06): number {
-  if (cameraU < targetU - CAMERA_LEAD) return smoothstep(cameraU, targetU - before, targetU - CAMERA_LEAD);
+/** Where the build-in of a chapter's scene starts and finishes, as fractions of the way from the previous rest. */
+const BUILD_START = CHAPTER_SWITCH - 0.3;
+/** Finishes a little before the copy switches: the camera trails the scroll, so this lands together with the text. */
+const BUILD_END = CHAPTER_SWITCH - 0.07;
+
+/**
+ * 0 → 1 while the camera travels towards a chapter's scene, timed so the scene is fully built by
+ * the moment that chapter's copy appears. Stays at 1 afterwards; pair it with `stationFade`.
+ */
+export function chapterBuild(cameraU: number, chapterIndex: number): number {
+  const rest = CHAPTER_STATIONS[chapterIndex] - CAMERA_LEAD;
+  const previousRest = chapterIndex === 0 ? 0 : CHAPTER_STATIONS[chapterIndex - 1] - CAMERA_LEAD;
+  const gap = rest - previousRest;
+  return smoothstep(cameraU, previousRest + gap * BUILD_START, previousRest + gap * BUILD_END);
+}
+
+/** 1 until the camera passes a station, then 0 over `after` units of the line. */
+export function stationFade(cameraU: number, targetU: number, after: number): number {
   return 1 - smoothstep(cameraU, targetU + 0.02, targetU + after);
+}
+
+/** Share of a staggered build that belongs to item `index` of `count` (each item takes `span` of it). */
+export function staggered(build: number, index: number, count: number, span = 0.6): number {
+  const delay = count <= 1 ? 0 : (index / (count - 1)) * (1 - span);
+  const t = Math.min(1, Math.max(0, (build - delay) / span));
+  return t * t * (3 - 2 * t);
 }

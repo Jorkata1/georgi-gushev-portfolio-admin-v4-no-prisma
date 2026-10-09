@@ -21,13 +21,16 @@ export const CHAPTER_SCROLL = CHAPTER_STATIONS.map((station, index) =>
   index === CHAPTER_COUNT - 1 ? 1 : Math.max(0.045, ((station - CAMERA_LEAD) / CAMERA_MAX_U) * CAMERA_END)
 );
 
-/** Chapter to show for a scroll progress, or -1 for the intro. Switches halfway between rests. */
+/** How far from one rest to the next (0 → 1) the chapter copy switches. */
+export const CHAPTER_SWITCH = 0.45;
+
+/** Chapter to show for a scroll progress, or -1 for the intro. Switches a little before halfway between rests. */
 export function getChapterForProgress(progress: number): number {
   if (progress < INTRO_END) return -1;
   let chapter = 0;
   CHAPTER_SCROLL.forEach((rest, index) => {
     const previous = index === 0 ? 0 : CHAPTER_SCROLL[index - 1];
-    if (progress >= previous + (rest - previous) * 0.45) chapter = index;
+    if (progress >= previous + (rest - previous) * CHAPTER_SWITCH) chapter = index;
   });
   return chapter;
 }
