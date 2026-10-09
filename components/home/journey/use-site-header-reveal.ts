@@ -28,9 +28,19 @@ const HEADER_RULES = `
   @media (prefers-reduced-motion: reduce) {
     html[${STATE_ATTRIBUTE}] body header { transition: none; }
   }
+  /* Homepage footer: only the copyright line stays; the journey's finale already carries the links. */
+  html[${STATE_ATTRIBUTE}] body footer > .container-shell { display: none; }
+  /* No "back to top" button on the homepage; the journey has its own "Start over". */
+  html[${STATE_ATTRIBUTE}] button.fixed.bottom-5.right-5,
+  html[${STATE_ATTRIBUTE}] button[aria-label="Нагоре"],
+  html[${STATE_ATTRIBUTE}] button[aria-label="Back to top"] { display: none !important; }
 `;
 
-/** Keeps the site's main menu out of the way until the journey reaches its end. */
+/**
+ * Homepage-only adjustments to the site chrome: the main menu stays out of the way until the
+ * journey reaches its end, the footer is reduced to the copyright line, and the "back to top"
+ * button is hidden. Everything is undone when the visitor leaves the homepage.
+ */
 export function useSiteHeaderReveal(isVisible: boolean) {
   useEffect(() => {
     const style = document.createElement("style");

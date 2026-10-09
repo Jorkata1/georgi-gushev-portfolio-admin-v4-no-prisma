@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { CAMERA_END, CAMERA_MAX_U, FINALE_START } from "@/components/home/journey/journey-config";
 import type { JourneySceneCopy } from "@/components/home/journey/journey-copy";
-import { chaosAt, createJourneyPath, createPathHelpers } from "@/components/home/journey/scene/journey-path";
+import { createJourneyPath, createPathHelpers } from "@/components/home/journey/scene/journey-path";
 import { createRibbon } from "@/components/home/journey/scene/ribbon";
 import { createChaos } from "@/components/home/journey/scene/chaos";
 import { createStructure } from "@/components/home/journey/scene/structure";
@@ -93,14 +93,11 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen, 
 
     const cameraU = THREE.MathUtils.clamp((progress / CAMERA_END) * CAMERA_MAX_U, 0, CAMERA_MAX_U);
     const finaleAmount = smoothstep(progress, FINALE_START, 1);
-    const chaos = chaosAt(cameraU);
 
     cameraPosition.copy(path.pointAt(cameraU)).addScaledVector(up, CAMERA_HEIGHT);
     lookTarget.copy(path.pointAt(Math.min(cameraU + 0.04, 1))).addScaledVector(up, 1);
     if (!reduceMotion) {
-      // A nervous shake on the chaotic stretch, and a gentle parallax from the pointer.
-      cameraPosition.x += Math.sin(elapsed * 9) * 0.06 * chaos;
-      cameraPosition.y += Math.cos(elapsed * 7) * 0.05 * chaos;
+      // A gentle parallax from the pointer.
       cameraPosition.addScaledVector(path.sideAt(cameraU), smoothPointer.x * 0.6);
       cameraPosition.y -= smoothPointer.y * 0.35;
     }
