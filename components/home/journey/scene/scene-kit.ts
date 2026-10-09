@@ -34,6 +34,8 @@ export type FrameState = {
 
 export type ScenePart = {
   update?: (state: FrameState) => void;
+  /** Stops any work still in flight (e.g. image loads) when the scene is torn down. */
+  dispose?: () => void;
 };
 
 export type DrawFn = (context: CanvasRenderingContext2D, width: number, height: number) => void;

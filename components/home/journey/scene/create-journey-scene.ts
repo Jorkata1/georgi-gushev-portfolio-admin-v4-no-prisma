@@ -53,7 +53,7 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen, 
   const camera = new THREE.PerspectiveCamera(isSmallScreen ? 70 : 58, 1, 0.1, 600);
 
   const path = createPathHelpers(createJourneyPath());
-  const finale = createFinale(scene, path, camera);
+  const finale = createFinale(scene, path, camera, isSmallScreen);
   const projectCards = createProjects(scene, path, projects, viewProjectLabel, isSmallScreen);
   const parts: ScenePart[] = [
     createRibbon(scene, path, isSmallScreen, reduceMotion),
@@ -70,10 +70,12 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen, 
   const overviewLook = new THREE.Vector3();
   const overviewPosition = new THREE.Vector3();
   function updateOverview() {
-    // A portrait screen is narrow, so frame closer to the logo and pull further back.
+    // Frame the end of the route with the logo; a portrait screen sits closer to the logo and further back.
     const isPortrait = camera.aspect < 1;
-    overviewLook.copy(path.pointAt(0.72)).lerp(finale.logo.position, isPortrait ? 0.55 : 0);
-    overviewPosition.copy(overviewLook).add(OVERVIEW_OFFSET.clone().multiplyScalar(isPortrait ? 1.45 : 1));
+    overviewLook.copy(path.pointAt(0.72)).lerp(finale.logo.position, isPortrait ? 0.9 : 0.35);
+    overviewPosition.copy(overviewLook).add(OVERVIEW_OFFSET.clone().multiplyScalar(isPortrait ? 1.9 : 1));
+    // On a phone the chapter copy fills the lower half, so aim below the logo to lift it up the screen.
+    if (isPortrait) overviewLook.y -= 14;
   }
 
   const timer = new THREE.Timer();
@@ -146,8 +148,11 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen, 
       camera.aspect = width / Math.max(height, 1);
       camera.updateProjectionMatrix();
       updateOverview();
+      const bufferHeight = height * renderer.getPixelRatio();
+      finale.setViewScale(bufferHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))));
     },
     dispose() {
+      parts.forEach((part) => part.dispose?.());
       timer.dispose();
       disposeObject(scene);
       renderer.dispose();

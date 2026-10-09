@@ -1,49 +1,78 @@
 import * as THREE from "three";
 import type { JourneyPath } from "@/components/home/journey/scene/journey-path";
-import { createCanvasTexture, smoothstep, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
+import { smoothstep, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
+import { createLogoParticles, sampleLogo, type LogoParticles } from "@/components/home/journey/scene/logo-particles";
 
-export type FinalePart = ScenePart & { logo: THREE.Mesh };
+export type FinalePart = ScenePart & {
+  logo: THREE.Object3D;
+  /** Pixels per world unit at distance 1, so particle size follows the viewport. */
+  setViewScale: (viewScale: number) => void;
+};
 
-/** Chapter 06: the line ends in the GDX mark, which turns to face the overview camera. */
-export function createFinale(scene: THREE.Scene, path: JourneyPath, camera: THREE.Camera): FinalePart {
-  const material = new THREE.MeshBasicMaterial({
-    transparent: true,
-    depthWrite: false,
-    map: createCanvasTexture(1500, 600, (ctx, w, h) => {
-      const glow = ctx.createRadialGradient(w / 2, h / 2, 10, w / 2, h / 2, w / 2);
-      glow.addColorStop(0, "rgba(232,164,74,0.28)");
-      glow.addColorStop(1, "rgba(232,164,74,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, w, h);
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#e8a44a";
-      ctx.font = "700 300px Georgia, serif";
-      ctx.fillText("GDX", w / 2, h * 0.62);
-      ctx.fillStyle = "#eef2f8";
-      ctx.font = "700 64px 'JetBrains Mono', monospace";
-      ctx.fillText("S T U D I O", w / 2, h * 0.86);
-    })
-  });
-  const logo = new THREE.Mesh(new THREE.PlaneGeometry(18, 7.2), material);
+const LOGO_WIDTH = 44;
+const SCATTER = 30;
+/** Scroll window in which the particles fly together into the logo. */
+const ASSEMBLE_START = 0.85;
+const ASSEMBLE_END = 0.97;
+
+/**
+ * Chapter 07: the line ends in the GDX Studio logo, assembled from thousands of particles that
+ * fly in from a scattered cloud (chaos turning into order); the crisp logo fades in once they land.
+ */
+export function createFinale(scene: THREE.Scene, path: JourneyPath, camera: THREE.Camera, isSmallScreen: boolean): FinalePart {
+  const logo = new THREE.Group();
   const endPoint = path.pointAt(1);
   const endTangent = path.tangentAt(1);
-  logo.position.copy(endPoint).add(new THREE.Vector3(0, 4.2, 0)).add(endTangent.clone().multiplyScalar(2));
-  logo.lookAt(logo.position.clone().sub(endTangent).add(new THREE.Vector3(0, 0.25, 0)));
+  logo.position.copy(endPoint).add(new THREE.Vector3(0, 5, 0)).add(endTangent.clone().multiplyScalar(2));
+  logo.visible = false;
   scene.add(logo);
 
-  const baseQuaternion = logo.quaternion.clone();
-  const facing = new THREE.Object3D();
+  let particles: LogoParticles | null = null;
+  let crispMaterial: THREE.MeshBasicMaterial | null = null;
+  let viewScale = 800;
+  let isDisposed = false;
+
+  sampleLogo(isSmallScreen ? 3 : 2)
+    .then(({ sample, image }) => {
+      if (isDisposed) return;
+      particles = createLogoParticles(sample, LOGO_WIDTH, SCATTER, false);
+      particles.uniforms.uViewScale.value = viewScale;
+      logo.add(particles.points);
+      if (!image) return;
+      const texture = new THREE.Texture(image);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.anisotropy = 4;
+      texture.needsUpdate = true;
+      crispMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0, depthWrite: false, fog: false });
+      const crisp = new THREE.Mesh(new THREE.PlaneGeometry(LOGO_WIDTH, LOGO_WIDTH / sample.aspect), crispMaterial);
+      crisp.position.z = -0.05;
+      logo.add(crisp);
+    })
+    .catch((error: unknown) => console.error("[journey] Could not build the logo", error));
 
   return {
     logo,
+    setViewScale(value: number) {
+      viewScale = value;
+      if (particles) particles.uniforms.uViewScale.value = value;
+    },
     update(state: FrameState) {
-      material.opacity = smoothstep(state.progress, 0.74, 0.9);
-      logo.scale.setScalar(1 + state.finale * 2.2);
-      logo.quaternion.copy(baseQuaternion);
-      if (state.finale <= 0) return;
-      facing.position.copy(logo.position);
-      facing.lookAt(camera.position);
-      logo.quaternion.slerp(facing.quaternion, state.finale);
+      logo.visible = state.progress >= ASSEMBLE_START - 0.01;
+      if (!logo.visible) return;
+      logo.lookAt(camera.position);
+      const assemble = state.reduceMotion ? 1 : smoothstep(state.progress, ASSEMBLE_START, ASSEMBLE_END);
+      if (particles) {
+        particles.uniforms.uAssemble.value = assemble;
+        particles.uniforms.uTime.value = state.elapsed;
+        particles.uniforms.uMotion.value = state.reduceMotion ? 0 : 1;
+        // The cloud fades in, then thins out once the crisp logo has taken over.
+        const appear = smoothstep(state.progress, ASSEMBLE_START - 0.01, ASSEMBLE_START + 0.02);
+        particles.uniforms.uOpacity.value = appear * (1 - 0.6 * smoothstep(assemble, 0.85, 1));
+      }
+      if (crispMaterial) crispMaterial.opacity = smoothstep(assemble, 0.8, 1);
+    },
+    dispose() {
+      isDisposed = true;
     }
   };
 }
