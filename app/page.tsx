@@ -1,10 +1,6 @@
-import { HomeStory } from "@/components/home/home-story";
-import { getFeaturedProjects } from "@/lib/projects";
+import { HomeJourney } from "@/components/home/home-journey";
 
-export const revalidate = 3600;
-
-/** The homepage is one scroll-driven story: intro, the five-step process, then projects and actions. */
-export default async function HomePage() {
-  const featuredProjects = await getFeaturedProjects();
-  return <HomeStory featuredProjects={featuredProjects} />;
+/** The homepage is one scroll-driven 3D journey through the six steps of building a website. */
+export default function HomePage() {
+  return <HomeJourney />;
 }
