@@ -5,7 +5,7 @@ import type { MotionValue } from "framer-motion";
 import { LAST_SLIDE, clampSlide } from "@/components/home/story/story-timeline";
 
 /** After a slide change, further input is ignored for this long so one gesture = one slide. */
-const SLIDE_LOCK_MS = 900;
+const SLIDE_LOCK_MS = 2200;
 /** Wheel events closer together than this belong to the same gesture (trackpad momentum). */
 const WHEEL_GESTURE_GAP_MS = 200;
 const MIN_WHEEL_DELTA = 4;

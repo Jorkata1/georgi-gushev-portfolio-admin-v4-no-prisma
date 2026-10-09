@@ -11,7 +11,7 @@ export const LAST_SLIDE = SLIDE_COUNT - 1;
 export const SECTION_HEIGHT_VH = SLIDE_COUNT * 100;
 
 /** How a slide's animation plays once the visitor moves to it. */
-export const SLIDE_TRANSITION = { duration: 1.4, ease: [0.22, 1, 0.36, 1] } as const;
+export const SLIDE_TRANSITION = { duration: 3, ease: [0.45, 0, 0.25, 1] } as const;
 
 export type StoryPhase = "intro" | "story" | "finale";
 
