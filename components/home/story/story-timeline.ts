@@ -3,39 +3,49 @@ import { useTransform, type MotionValue } from "framer-motion";
 /** Number of chapters; each one owns an equal slice of the section's scroll progress. */
 export const CHAPTER_COUNT = 5;
 
-/** The page is one pinned story: an intro screen, the five chapters, then a finale. */
-const SEGMENT_COUNT = CHAPTER_COUNT + 2;
-const SEGMENT = 1 / SEGMENT_COUNT;
+/** The page is one pinned story told in slides: an intro, the five chapters, then a finale. */
+export const SLIDE_COUNT = CHAPTER_COUNT + 2;
+export const LAST_SLIDE = SLIDE_COUNT - 1;
 
-/** Section height in viewports. One viewport of scroll per segment feels unhurried without dragging. */
-export const SECTION_HEIGHT_VH = SEGMENT_COUNT * 100;
+/** Section height in viewports: one viewport of scroll per slide. */
+export const SECTION_HEIGHT_VH = SLIDE_COUNT * 100;
 
-/** Slice of the page's scroll progress that drives the five-chapter scene (0 → 1). */
-export const STORY_RANGE = [SEGMENT, 1 - SEGMENT];
-
-/** Where the intro hands over to the scene, and the scene to the finale. */
-const INTRO_EXIT = SEGMENT * 0.5;
-const FINALE_ENTER = 1 - SEGMENT * 0.6;
+/** How a slide's animation plays once the visitor moves to it. */
+export const SLIDE_TRANSITION = { duration: 1.4, ease: [0.22, 1, 0.36, 1] } as const;
 
 export type StoryPhase = "intro" | "story" | "finale";
 
-export function getPhase(pageProgress: number): StoryPhase {
-  if (pageProgress < INTRO_EXIT) return "intro";
-  if (pageProgress >= FINALE_ENTER) return "finale";
+export function clampSlide(slide: number): number {
+  return Math.min(LAST_SLIDE, Math.max(0, slide));
+}
+
+/** Nearest slide for a scroll progress through the section (0 → 1). */
+export function getSlideFromScroll(scrollProgress: number): number {
+  return clampSlide(Math.round(scrollProgress * LAST_SLIDE));
+}
+
+export function getPhaseForSlide(slide: number): StoryPhase {
+  if (slide === 0) return "intro";
+  if (slide === LAST_SLIDE) return "finale";
   return "story";
 }
 
-/** Converts a scene progress (0 → 1) to the matching page progress. */
-export function toPageProgress(storyProgress: number): number {
-  const [start, end] = STORY_RANGE;
-  return start + (end - start) * storyProgress;
+/** Chapter shown on a slide; the intro and finale fall back to the nearest chapter. */
+export function getChapterIndexForSlide(slide: number): number {
+  return Math.min(CHAPTER_COUNT - 1, Math.max(0, slide - 1));
 }
 
-/** Where each chapter's scene is "at rest". Used for the reduced-motion version and chapter jumps. */
+/** Where each chapter's scene is "at rest": a slide's animation plays up to this point. */
 export const CHAPTER_REST_PROGRESS = [0.15, 0.36, 0.57, 0.79, 1] as const;
 
+/** Scene progress a slide animates to. The intro shows the scene's first frame. */
+export function getStoryProgressForSlide(slide: number): number {
+  if (slide === 0) return 0;
+  return CHAPTER_REST_PROGRESS[getChapterIndexForSlide(slide)];
+}
+
 /**
- * Scroll-progress keyframes for every moving part of the scene.
+ * Scene-progress keyframes for every moving part of the scene (0 → 1 across the five chapters).
  * Chapter n occupies [n / 5, (n + 1) / 5]; each part animates inside its chapter so the
  * scene never changes faster than the copy on the left.
  */
@@ -70,11 +80,6 @@ export const TIMELINE = {
   phoneIn: [0.86, 0.92],
   chipsIn: [0.9, 0.95]
 };
-
-export function getChapterIndex(progress: number): number {
-  const index = Math.floor(progress * CHAPTER_COUNT);
-  return Math.min(CHAPTER_COUNT - 1, Math.max(0, index));
-}
 
 /** Opacity that fades in over [a, b], holds, then fades out over [c, d]. */
 export function useFadeWindow(progress: MotionValue<number>, stops: number[]): MotionValue<number> {

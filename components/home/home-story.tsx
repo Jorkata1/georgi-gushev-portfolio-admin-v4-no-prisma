@@ -1,21 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
 import { Container } from "@/components/shared/container";
 import { useLanguage } from "@/lib/language-context";
 import { translations } from "@/data/translations";
 import type { Project } from "@/types";
 import { STORY_COPY, type StoryCopy, type StoryLocale } from "@/components/home/story/story-copy";
 import {
-  CHAPTER_REST_PROGRESS,
+  LAST_SLIDE,
   SECTION_HEIGHT_VH,
-  STORY_RANGE,
-  getChapterIndex,
-  getPhase,
-  toPageProgress,
-  type StoryPhase
+  SLIDE_TRANSITION,
+  getChapterIndexForSlide,
+  getPhaseForSlide,
+  getSlideFromScroll,
+  getStoryProgressForSlide
 } from "@/components/home/story/story-timeline";
+import { useSlideNavigation } from "@/components/home/story/use-slide-navigation";
 import { StoryLayer } from "@/components/home/story/story-ui";
 import { StoryStage } from "@/components/home/story/story-stage";
 import { StoryChapterPanel } from "@/components/home/story/story-chapter-panel";
@@ -35,33 +36,38 @@ type StoryContentProps = {
 function StoryPinned({ copy, hero, projects }: StoryContentProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
-  const storyProgress = useTransform(scrollYProgress, STORY_RANGE, [0, 1]);
-  const [phase, setPhase] = useState<StoryPhase>("intro");
-  const [activeIndex, setActiveIndex] = useState(0);
+  // The scene and the progress bar are not scrubbed by scroll: each slide plays its own animation.
+  const storyProgress = useMotionValue(0);
+  const barProgress = useMotionValue(0);
+  const [slide, setSlide] = useState(0);
+  const { goToSlide } = useSlideNavigation({ sectionRef, scrollProgress: scrollYProgress });
 
   // A reload can restore the scroll position mid-story, before any scroll event fires.
   useEffect(() => {
-    setPhase(getPhase(scrollYProgress.get()));
-    setActiveIndex(getChapterIndex(storyProgress.get()));
-  }, [scrollYProgress, storyProgress]);
+    setSlide(getSlideFromScroll(scrollYProgress.get()));
+  }, [scrollYProgress]);
 
-  useMotionValueEvent(scrollYProgress, "change", (value) => setPhase(getPhase(value)));
-  useMotionValueEvent(storyProgress, "change", (value) => setActiveIndex(getChapterIndex(value)));
+  useMotionValueEvent(scrollYProgress, "change", (value) => setSlide(getSlideFromScroll(value)));
 
-  const handleSelectChapter = useCallback((index: number) => {
-    const section = sectionRef.current;
-    if (!section) return;
-    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-    const scrollableDistance = section.offsetHeight - window.innerHeight;
-    const target = sectionTop + scrollableDistance * toPageProgress(CHAPTER_REST_PROGRESS[index]);
-    window.scrollTo({ top: target, behavior: "smooth" });
-  }, []);
+  useEffect(() => {
+    const sceneAnimation = animate(storyProgress, getStoryProgressForSlide(slide), SLIDE_TRANSITION);
+    const barAnimation = animate(barProgress, slide / LAST_SLIDE, SLIDE_TRANSITION);
+    return () => {
+      sceneAnimation.stop();
+      barAnimation.stop();
+    };
+  }, [slide, storyProgress, barProgress]);
+
+  const handleSelectChapter = useCallback((index: number) => goToSlide(index + 1), [goToSlide]);
+
+  const phase = getPhaseForSlide(slide);
+  const activeIndex = getChapterIndexForSlide(slide);
 
   return (
     <section ref={sectionRef} className="relative" style={{ height: `${SECTION_HEIGHT_VH}svh` }}>
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         <div className="absolute inset-x-0 bottom-0 z-10 h-[3px] bg-white/[0.06]">
-          <motion.div className="h-full origin-left bg-accent" style={{ scaleX: scrollYProgress }} />
+          <motion.div className="h-full origin-left bg-accent" style={{ scaleX: barProgress }} />
         </div>
 
         <StoryLayer isActive={phase === "intro"} className="flex items-center">
