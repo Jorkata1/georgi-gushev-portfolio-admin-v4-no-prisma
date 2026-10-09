@@ -4,7 +4,39 @@ const SUPABASE_HOSTNAME = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : "*.supabase.co";
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  // Next.js injects inline bootstrap scripts; eval is only needed by the dev server.
+  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com`,
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  `img-src 'self' data: blob: https://${SUPABASE_HOSTNAME}`,
+  `connect-src 'self' https://${SUPABASE_HOSTNAME} https://va.vercel-scripts.com`,
+  "worker-src 'self' blob:",
+  // Live previews of client sites on project pages.
+  "frame-src https:",
+  "frame-ancestors 'self'",
+  "form-action 'self' https://check.gdxstudio.com",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "upgrade-insecure-requests"
+].join("; ");
+
+const securityHeaders = [
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" }
+];
+
 const nextConfig = {
+  poweredByHeader: false,
+
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb"
@@ -12,20 +44,10 @@ const nextConfig = {
   },
 
   images: {
-    // Modern formats — AVIF first, WebP fallback. Cuts payload ~50-70% vs PNG/JPEG.
     formats: ["image/avif", "image/webp"],
-
-    // Explicit breakpoints. Next.js generates srcset only for these widths.
-    // Keep this list short — each extra width = extra transformations on Vercel.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-
-    // Cache optimized variants for 30 days on the CDN edge.
-    // This is the single most important setting for reducing Supabase egress:
-    // once an image is transformed, it's served from Vercel's edge cache,
-    // not re-fetched from Supabase on every request.
     minimumCacheTTL: 60 * 60 * 24 * 30,
-
     remotePatterns: [
       {
         protocol: "https",
@@ -40,9 +62,12 @@ const nextConfig = {
     ]
   },
 
-  // Aggressive caching for static assets in /public
   async headers() {
     return [
+      {
+        source: "/:path*",
+        headers: securityHeaders
+      },
       {
         source: "/:all*(svg|jpg|jpeg|png|webp|avif|ico|woff|woff2)",
         headers: [

@@ -9,6 +9,7 @@ import {
   verifyAdminCredentials
 } from "@/lib/admin-auth";
 import { makeId } from "@/lib/content-store";
+import { consumeRateLimit, getRequestIp } from "@/lib/rate-limit";
 import { parseLanguageLines } from "@/lib/content-utils";
 import { joinLines, splitLines } from "@/lib/project-helpers";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -45,26 +46,42 @@ function revalidatePortfolioPaths(slug?: string) {
   }
 }
 
+const LOGIN_ATTEMPT_LIMIT = 5;
+const LOGIN_WINDOW_SECONDS = 15 * 60;
+
 export async function loginAdminAction(
   _prevState: AdminFormState,
   formData: FormData
 ): Promise<AdminFormState> {
-  try {
-    const parsed = adminLoginSchema.safeParse({
-      username: extractField(formData, "username"),
-      password: extractField(formData, "password")
-    });
+  const parsed = adminLoginSchema.safeParse({
+    username: extractField(formData, "username"),
+    password: extractField(formData, "password")
+  });
 
-    if (!parsed.success) {
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: "Провери данните за вход.",
+      fieldErrors: parsed.error.flatten().fieldErrors
+    };
+  }
+
+  try {
+    // Fails closed: if attempts can't be counted, no password guess is evaluated.
+    const withinLimit = await consumeRateLimit(
+      "admin-login",
+      getRequestIp(),
+      LOGIN_ATTEMPT_LIMIT,
+      LOGIN_WINDOW_SECONDS
+    );
+    if (!withinLimit) {
       return {
         status: "error",
-        message: "Провери данните за вход.",
-        fieldErrors: parsed.error.flatten().fieldErrors
+        message: "Твърде много опити за вход. Опитай отново след 15 минути."
       };
     }
 
     const valid = await verifyAdminCredentials(parsed.data.username, parsed.data.password);
-
     if (!valid) {
       return {
         status: "error",
@@ -73,14 +90,16 @@ export async function loginAdminAction(
     }
 
     await createAdminSession();
-    redirect("/admin/projects");
   } catch (error) {
     console.error("Admin login error:", error);
     return {
       status: "error",
-      message: "Липсва или е невалидна admin конфигурация в .env.local."
+      message: "Входът временно не е възможен. Провери admin конфигурацията."
     };
   }
+
+  // Outside try/catch: redirect() works by throwing, so catching it would swallow the navigation.
+  redirect("/admin/projects");
 }
 
 export async function logoutAdminAction() {
