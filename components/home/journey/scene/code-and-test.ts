@@ -3,6 +3,8 @@ import { CHAPTER_STATIONS } from "@/components/home/journey/journey-config";
 import type { JourneyPath } from "@/components/home/journey/scene/journey-path";
 import { SCENE_COLORS, createCanvasTexture, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
 
+const CODE_LINE_COUNT = 30;
+
 const CODE_LINES = [
   "export default function Page() {",
   "<Hero priority format=\"avif\" />",
@@ -17,7 +19,7 @@ const CODE_LINES = [
 ];
 
 /** Chapter 03: a tunnel of gold rings lined with lines of code. */
-export function createCodeTunnel(scene: THREE.Scene, path: JourneyPath, isSmallScreen: boolean): ScenePart {
+export function createCodeTunnel(scene: THREE.Scene, path: JourneyPath): ScenePart {
   const group = new THREE.Group();
   const start = CHAPTER_STATIONS[2] - 0.07;
   const textures = CODE_LINES.map((line) =>
@@ -37,7 +39,7 @@ export function createCodeTunnel(scene: THREE.Scene, path: JourneyPath, isSmallS
     group.add(ring);
   }
   const labelGeometry = new THREE.PlaneGeometry(5.2, 0.49);
-  for (let i = 0; i < (isSmallScreen ? 18 : 30); i += 1) {
+  for (let i = 0; i < CODE_LINE_COUNT; i += 1) {
     const u = start - 0.005 + Math.random() * 0.12;
     const angle = Math.random() * Math.PI * 2;
     const radius = 3.1 + Math.random() * 0.8;

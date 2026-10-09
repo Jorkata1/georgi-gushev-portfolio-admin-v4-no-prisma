@@ -18,6 +18,20 @@ const CAMERA_HEIGHT = 2.3;
 const FOG_DENSITY = 0.022;
 const OVERVIEW_FOG_DENSITY = 0.0025;
 const OVERVIEW_OFFSET = new THREE.Vector3(-40, 52, 62);
+/** Phones have 3× screens; 2× keeps them sharp without drawing three times the pixels. */
+const MAX_PIXEL_RATIO_PHONE = 2;
+const MAX_PIXEL_RATIO_DESKTOP = 1.75;
+/**
+ * Safety net for slower devices: when most frames in a window take longer than this (≈ 40 fps),
+ * the resolution steps down a little, never below the minimum. A few slow frames (loading
+ * textures, a background tab) never trigger it, and the first seconds are not measured.
+ */
+const SLOW_FRAME_SECONDS = 1 / 40;
+const FRAME_WINDOW = 90;
+const SLOW_SHARE = 0.6;
+const WARMUP_SECONDS = 2.5;
+const PIXEL_RATIO_STEP = 0.25;
+const MIN_PIXEL_RATIO = 1;
 
 export type JourneySceneOptions = {
   canvas: HTMLCanvasElement;
@@ -43,8 +57,10 @@ export type JourneyScene = {
 };
 
 export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen, projects, viewProjectLabel }: JourneySceneOptions): JourneyScene {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isSmallScreen, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isSmallScreen ? 1.5 : 1.75));
+  // Full quality on every screen: phones get the same antialiasing and detail as desktops.
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+  let pixelRatio = Math.min(window.devicePixelRatio, isSmallScreen ? MAX_PIXEL_RATIO_PHONE : MAX_PIXEL_RATIO_DESKTOP);
+  renderer.setPixelRatio(pixelRatio);
   renderer.setClearColor(SCENE_COLORS.ink, 1);
 
   const scene = new THREE.Scene();
@@ -53,18 +69,18 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen, 
   const camera = new THREE.PerspectiveCamera(isSmallScreen ? 70 : 58, 1, 0.1, 600);
 
   const path = createPathHelpers(createJourneyPath());
-  const finale = createFinale(scene, path, camera, isSmallScreen);
+  const finale = createFinale(scene, path, camera);
   const projectCards = createProjects(scene, path, projects, viewProjectLabel, isSmallScreen);
   const parts: ScenePart[] = [
-    createRibbon(scene, path, isSmallScreen, reduceMotion),
-    createChaos(scene, path, copy, isSmallScreen),
+    createRibbon(scene, path, reduceMotion),
+    createChaos(scene, path, copy),
     createStructure(scene, path, isSmallScreen),
-    createCodeTunnel(scene, path, isSmallScreen),
+    createCodeTunnel(scene, path),
     createTestScanner(scene, path),
     createDevices(scene, path, copy, renderer, isSmallScreen),
     projectCards,
     finale,
-    createStars(scene, path, isSmallScreen)
+    createStars(scene, path)
   ];
 
   const overviewLook = new THREE.Vector3();
@@ -120,6 +136,30 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen, 
     };
     parts.forEach((part) => part.update?.(state));
     renderer.render(scene, camera);
+    adaptResolution(delta, elapsed);
+  }
+
+  let viewportWidth = 1;
+  let viewportHeight = 1;
+  let frameCount = 0;
+  let slowFrames = 0;
+  function updateViewScale() {
+    const bufferHeight = viewportHeight * renderer.getPixelRatio();
+    finale.setViewScale(bufferHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))));
+  }
+  function adaptResolution(delta: number, elapsed: number) {
+    if (pixelRatio <= MIN_PIXEL_RATIO || elapsed < WARMUP_SECONDS) return;
+    frameCount += 1;
+    if (delta > SLOW_FRAME_SECONDS) slowFrames += 1;
+    if (frameCount < FRAME_WINDOW) return;
+    const isSlow = slowFrames / frameCount > SLOW_SHARE;
+    frameCount = 0;
+    slowFrames = 0;
+    if (!isSlow) return;
+    pixelRatio = Math.max(MIN_PIXEL_RATIO, pixelRatio - PIXEL_RATIO_STEP);
+    renderer.setPixelRatio(pixelRatio);
+    renderer.setSize(viewportWidth, viewportHeight, false);
+    updateViewScale();
   }
 
   const raycaster = new THREE.Raycaster();
@@ -144,12 +184,13 @@ export function createJourneyScene({ canvas, copy, reduceMotion, isSmallScreen, 
       progress = value;
     },
     resize(width: number, height: number) {
+      viewportWidth = width;
+      viewportHeight = height;
       renderer.setSize(width, height, false);
       camera.aspect = width / Math.max(height, 1);
       camera.updateProjectionMatrix();
       updateOverview();
-      const bufferHeight = height * renderer.getPixelRatio();
-      finale.setViewScale(bufferHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))));
+      updateViewScale();
     },
     dispose() {
       parts.forEach((part) => part.dispose?.());

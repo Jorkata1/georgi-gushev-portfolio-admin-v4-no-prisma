@@ -15,11 +15,15 @@ const SCATTER = 30;
 const ASSEMBLE_START = 0.85;
 const ASSEMBLE_END = 0.97;
 
+/** Sampling step for the logo particles (in pixels of the sampling canvas): smaller = more particles. */
+const LOGO_SAMPLE_STEP = 2;
+const STAR_COUNT = 1800;
+
 /**
  * Chapter 07: the line ends in the GDX Studio logo, assembled from thousands of particles that
  * fly in from a scattered cloud (chaos turning into order); the crisp logo fades in once they land.
  */
-export function createFinale(scene: THREE.Scene, path: JourneyPath, camera: THREE.Camera, isSmallScreen: boolean): FinalePart {
+export function createFinale(scene: THREE.Scene, path: JourneyPath, camera: THREE.Camera): FinalePart {
   const logo = new THREE.Group();
   const endPoint = path.pointAt(1);
   const endTangent = path.tangentAt(1);
@@ -32,7 +36,7 @@ export function createFinale(scene: THREE.Scene, path: JourneyPath, camera: THRE
   let viewScale = 800;
   let isDisposed = false;
 
-  sampleLogo(isSmallScreen ? 3 : 2)
+  sampleLogo(LOGO_SAMPLE_STEP)
     .then(({ sample, image }) => {
       if (isDisposed) return;
       particles = createLogoParticles(sample, LOGO_WIDTH, SCATTER, false);
@@ -78,8 +82,8 @@ export function createFinale(scene: THREE.Scene, path: JourneyPath, camera: THRE
 }
 
 /** Faint stars scattered along the route for depth. */
-export function createStars(scene: THREE.Scene, path: JourneyPath, isSmallScreen: boolean): ScenePart {
-  const count = isSmallScreen ? 900 : 1800;
+export function createStars(scene: THREE.Scene, path: JourneyPath): ScenePart {
+  const count = STAR_COUNT;
   const positions = new Float32Array(count * 3);
   for (let i = 0; i < count; i += 1) {
     const point = path.pointAt(Math.random());

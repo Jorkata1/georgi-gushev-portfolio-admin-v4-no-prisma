@@ -7,9 +7,10 @@ import { createCanvasTexture, roundRect, type FrameState, type ScenePart } from 
 /** Minimum space between two panels, in world units. */
 const PANEL_GAP = 0.35;
 const PLACEMENT_ATTEMPTS = 40;
+const PANEL_COUNT = 32;
 
 /** Chapter 01: tilted fragments of old websites float around a torn, wobbling line. */
-export function createChaos(scene: THREE.Scene, path: JourneyPath, copy: JourneySceneCopy, isSmallScreen: boolean): ScenePart {
+export function createChaos(scene: THREE.Scene, path: JourneyPath, copy: JourneySceneCopy): ScenePart {
   const group = new THREE.Group();
   const fragments = getChaosFragments(copy).map((fragment) => ({
     texture: createCanvasTexture(fragment.width, fragment.height, fragment.draw),
@@ -27,7 +28,7 @@ export function createChaos(scene: THREE.Scene, path: JourneyPath, copy: Journey
   const isFree = (center: THREE.Vector3, radius: number) =>
     occupied.every((other) => other.center.distanceTo(center) > other.radius + radius + PANEL_GAP);
 
-  const panelCount = isSmallScreen ? 20 : 32;
+  const panelCount = PANEL_COUNT;
   for (let i = 0; i < panelCount; i += 1) {
     const fragment = fragments[i % fragments.length];
     const height = 0.9 + Math.random() * 1.2;

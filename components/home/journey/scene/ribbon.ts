@@ -2,6 +2,10 @@ import * as THREE from "three";
 import { chaosAt, type JourneyPath } from "@/components/home/journey/scene/journey-path";
 import { SCENE_COLORS, type FrameState, type ScenePart } from "@/components/home/journey/scene/scene-kit";
 
+/** Detail of the line along its length (same on every screen). */
+const RIBBON_SAMPLES = 2400;
+const TRAIL_SEGMENTS = 800;
+
 function buildRibbonGeometry(path: JourneyPath, width: number, samples: number): THREE.BufferGeometry {
   const positions: number[] = [];
   const uvs: number[] = [];
@@ -90,7 +94,7 @@ const GLOW_FRAGMENT = /* glsl */ `
   }
 `;
 
-export function createRibbon(scene: THREE.Scene, path: JourneyPath, isSmallScreen: boolean, reduceMotion: boolean): ScenePart {
+export function createRibbon(scene: THREE.Scene, path: JourneyPath, reduceMotion: boolean): ScenePart {
   const uniforms = {
     uTime: { value: 0 },
     uReveal: { value: 0.2 },
@@ -98,7 +102,7 @@ export function createRibbon(scene: THREE.Scene, path: JourneyPath, isSmallScree
     uBeige: { value: SCENE_COLORS.beige },
     uFlow: { value: reduceMotion ? 0 : 1 }
   };
-  const samples = isSmallScreen ? 1200 : 2400;
+  const samples = RIBBON_SAMPLES;
   const shared = { uniforms, vertexShader: VERTEX_SHADER, transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending };
 
   const core = new THREE.Mesh(buildRibbonGeometry(path, 0.9, samples), new THREE.ShaderMaterial({ ...shared, fragmentShader: CORE_FRAGMENT }));
@@ -106,7 +110,7 @@ export function createRibbon(scene: THREE.Scene, path: JourneyPath, isSmallScree
 
   // In the final overview the whole route lights up as one bright line.
   const trailMaterial = new THREE.MeshBasicMaterial({ color: SCENE_COLORS.goldSoft, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false });
-  const trail = new THREE.Mesh(new THREE.TubeGeometry(path.curve, isSmallScreen ? 400 : 800, 0.32, 8, false), trailMaterial);
+  const trail = new THREE.Mesh(new THREE.TubeGeometry(path.curve, TRAIL_SEGMENTS, 0.32, 8, false), trailMaterial);
 
   scene.add(glow, core, trail);
 
