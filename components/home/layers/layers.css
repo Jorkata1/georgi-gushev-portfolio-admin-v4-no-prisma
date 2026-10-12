@@ -165,9 +165,10 @@
   .gl-metric dd.is-good span:first-child { color: var(--gl-good); }
 
   @media (max-width: 820px) {
-    .gl-stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: 52% 48%; align-items: stretch; }
+    /* The copy row is exactly as tall as its longest step; the scene takes all the rest, so nothing floats in empty space. */
+    .gl-stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; align-items: stretch; }
     .gl-scene { grid-row: 1; }
-    .gl-copy { grid-row: 2; align-items: start; padding-top: 8px; }
+    .gl-copy { grid-row: 2; height: auto; align-items: start; padding-top: 8px; }
     .gl-lead { margin-top: 12px; }
     .gl-metric { padding: 10px 12px; }
     .gl-metric dt { letter-spacing: 0.06em; }
@@ -182,7 +183,6 @@
   }
   /* Short phones (SE, mini, landscape-ish heights): give the copy more room and tighten the type. */
   @media (max-width: 820px) and (max-height: 760px) {
-    .gl-stage { grid-template-rows: 46% 54%; }
     .gl-root h1 { font-size: 32px; }
     .gl-root h2 { font-size: 28px; }
     .gl-lead { font-size: 15px; line-height: 1.5; margin-top: 8px; }
@@ -216,7 +216,7 @@
   @media (max-height: 500px) and (orientation: landscape) {
     .gl-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); align-items: stretch; padding-inline: max(20px, env(safe-area-inset-left)) max(20px, env(safe-area-inset-right)); }
     .gl-scene { grid-row: 1; grid-column: 2; }
-    .gl-copy { grid-row: 1; grid-column: 1; align-items: center; padding: 0 0 36px; }
+    .gl-copy { grid-row: 1; grid-column: 1; height: 100%; align-items: center; padding: 0 0 36px; }
     .gl-root h1 { font-size: 28px; }
     .gl-root h2 { font-size: 24px; }
     .gl-eyebrow { margin-bottom: 8px; }
