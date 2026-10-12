@@ -15,6 +15,7 @@ import {
   TILT_EASE,
   getStepForProgress,
 } from "@/components/home/layers/layers-config";
+import { layoutFinale, type FinalePose } from "@/components/home/layers/layers-finale";
 import { hasSeenIntro, playIntro, type HeroPose } from "@/components/home/layers/layers-intro";
 import { clamp, createStyleWriter, decodeText, lerp, smooth, type Decoder } from "@/components/home/layers/layers-motion";
 import { createStepLock } from "@/components/home/layers/layers-step-lock";
@@ -48,6 +49,7 @@ export function createLayersEngine({ root, glyphs, decimalSeparator, onChromeCha
   const stage = required<HTMLElement>(root, "[data-gl-stage]");
   const stack = required<HTMLElement>(root, "[data-gl-stack]");
   const spot = root.querySelector<HTMLElement>("[data-gl-spot]");
+  const callouts = required<HTMLElement>(root, "[data-gl-callouts]");
   const steps = Array.from(root.querySelectorAll<HTMLElement>("[data-gl-step]"));
   const railButtons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-gl-rail] button"));
   const eyebrowLabels = steps.map((step) => step.querySelector<HTMLElement>("[data-gl-decode]"));
@@ -68,6 +70,7 @@ export function createLayersEngine({ root, glyphs, decimalSeparator, onChromeCha
   const pointer = { x: 0, y: 0 };
   const tilt = { x: 0, y: 0 };
   const heroPose: HeroPose = { rx: 58, rz: -36, float: 0, fit: 1 };
+  let finalePose: FinalePose = { fit: 1, x: 0, y: 0 };
   let target = 0;
   let current = 0;
   let frameScale = 1;
@@ -94,6 +97,7 @@ export function createLayersEngine({ root, glyphs, decimalSeparator, onChromeCha
     const scene = stack.parentElement;
     if (!scene) return;
     heroPose.fit = Math.min(scene.clientWidth / STACK_FIT_WIDTH, scene.clientHeight / STACK_FIT_HEIGHT, STACK_FIT_MAX);
+    finalePose = layoutFinale(scene, callouts, steps[steps.length - 1]);
   }
 
   function setChrome(isVisible: boolean) {
@@ -162,12 +166,18 @@ export function createLayersEngine({ root, glyphs, decimalSeparator, onChromeCha
     heroPose.rx = lerp(58, 0, flatten) + tilt.y * 6 * live;
     heroPose.rz = lerp(-36 + progress * 10, 0, flatten) + tilt.x * 8 * live;
     heroPose.float = Math.sin(time / 900) * 6 * live;
+    /* On the finale the flat site grows and moves over to make room for the layer call-outs. */
+    const grow = smooth(flatten, 0.2, 1);
+    const fit = lerp(heroPose.fit, finalePose.fit, grow);
+    const shiftX = finalePose.x * grow;
+    const shiftY = finalePose.y * grow + heroPose.float;
     /* Written directly (not through inherited custom properties) so the per-frame float never restyles the children. */
     write(
       stack,
       "transform",
-      `translateY(${heroPose.float.toFixed(1)}px) scale(${heroPose.fit.toFixed(3)}) rotateX(${heroPose.rx.toFixed(2)}deg) rotateZ(${heroPose.rz.toFixed(2)}deg)`,
+      `translate(${shiftX.toFixed(1)}px, ${shiftY.toFixed(1)}px) scale(${fit.toFixed(3)}) rotateX(${heroPose.rx.toFixed(2)}deg) rotateZ(${heroPose.rz.toFixed(2)}deg)`,
     );
+    callouts.classList.toggle("is-on", flatten > 0.97);
     write(stack, "--gl-grid", smooth(explode, 0.4, 0.9).toFixed(2));
     write(stack, "--gl-tag", explode.toFixed(2));
     write(stack, "--gl-beam-z", `${(-2 * MAX_GAP * explode).toFixed(1)}px`);
@@ -247,6 +257,10 @@ export function createLayersEngine({ root, glyphs, decimalSeparator, onChromeCha
   });
 
   fitStack();
+  /* Label widths depend on the web font; measure again once it has loaded. */
+  void document.fonts?.ready.then(() => {
+    if (root.isConnected) fitStack();
+  });
   readScroll();
   current = target;
   render(current, 0);

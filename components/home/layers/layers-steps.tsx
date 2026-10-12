@@ -1,9 +1,14 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import type { LayersCopy, LayersHeading, LayersStepCopy } from "@/components/home/layers/layers-copy";
+import type { Project } from "@/types";
 
 const CONTACT_HREF = "/contact";
 const SITE_CHECK_HREF = "https://check.gdxstudio.com";
+const CONTACT_EMAIL = "business@gdxstudio.com";
+/** How many recent projects the finale shows. */
+export const FINALE_PROJECT_COUNT = 3;
 
 /** Splits a heading into words so they can rise in one after another; the accent part is italic gold. */
 function HeadingWords({ heading }: { heading: LayersHeading }) {
@@ -66,8 +71,28 @@ function LayerStep({ index, step }: { index: number; step: LayersStepCopy }) {
   );
 }
 
+/** Small project cards under the finale buttons: proof that the five layers turn into real sites. */
+function RecentProjects({ label, projects }: { label: string; projects: Project[] }) {
+  if (projects.length === 0) return null;
+  return (
+    <div className="gl-recent">
+      <p className="gl-recent-label">{label}</p>
+      <div className="gl-recent-row">
+        {projects.map((project) => (
+          <Link key={project.id} className="gl-recent-card" href={`/portfolio/${project.slug}`} tabIndex={-1}>
+            <span className="gl-recent-img">
+              <Image src={project.heroImage} alt="" fill sizes="(max-width: 820px) 30vw, 160px" className="gl-recent-pic" />
+            </span>
+            <span className="gl-recent-name">{project.title}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** The copy column: the hero, five layer steps and the finale, stacked in one grid cell. */
-export function LayersSteps({ copy }: { copy: LayersCopy }) {
+export function LayersSteps({ copy, projects }: { copy: LayersCopy; projects: Project[] }) {
   const [words, visual, layout, foundation, speed] = copy.steps;
   return (
     <div className="gl-copy">
@@ -121,6 +146,14 @@ export function LayersSteps({ copy }: { copy: LayersCopy }) {
             {copy.finale.secondary}
           </a>
         </div>
+        <RecentProjects label={copy.finale.recentLabel} projects={projects.slice(0, FINALE_PROJECT_COUNT)} />
+        <p className="gl-trust">
+          <i aria-hidden="true" />
+          {copy.finale.reply} ·{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`} tabIndex={-1}>
+            {CONTACT_EMAIL}
+          </a>
+        </p>
       </Step>
     </div>
   );

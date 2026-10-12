@@ -5,9 +5,10 @@ import { useLanguage } from "@/lib/language-context";
 import { getLayersCopy, type LayersCopy } from "@/components/home/layers/layers-copy";
 import { createLayersEngine } from "@/components/home/layers/layers-engine";
 import { layersMonoFont } from "@/components/home/layers/layers-font";
-import { LayersIntro, LayersPlates } from "@/components/home/layers/layers-plates";
+import { LayersCallouts, LayersIntro, LayersPlates } from "@/components/home/layers/layers-plates";
 import { LayersSteps } from "@/components/home/layers/layers-steps";
 import { HOME_CHROME_RULES, useHomeChrome } from "@/components/home/layers/use-home-chrome";
+import type { Project } from "@/types";
 import "@/components/home/layers/layers.css";
 
 /* Without JavaScript the story cannot run: show the hero as a static page and keep the menu reachable. */
@@ -17,6 +18,7 @@ const NO_SCRIPT_STYLES =
 
 type LayersStoryProps = {
   copy: LayersCopy;
+  projects: Project[];
   onChromeChange: (isVisible: boolean) => void;
 };
 
@@ -24,7 +26,7 @@ type LayersStoryProps = {
  * The story markup. Memoised: after mount the engine owns the classes and states it toggles,
  * so this must not re-render while the engine runs (a language change remounts it instead).
  */
-const LayersStory = memo(function LayersStory({ copy, onChromeChange }: LayersStoryProps) {
+const LayersStory = memo(function LayersStory({ copy, projects, onChromeChange }: LayersStoryProps) {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,9 +53,10 @@ const LayersStory = memo(function LayersStory({ copy, onChromeChange }: LayersSt
       <section className="gl-track" data-gl-track="" aria-label={copy.ariaLabel}>
         <div className="gl-stage is-intro is-intro-stack" data-gl-stage="">
           <div className="gl-spot" data-gl-spot="" aria-hidden="true" />
-          <LayersSteps copy={copy} />
+          <LayersSteps copy={copy} projects={projects} />
           <div className="gl-scene" aria-hidden="true">
             <LayersPlates copy={copy} />
+            <LayersCallouts copy={copy} />
             <LayersIntro />
           </div>
           <nav className="gl-rail" data-gl-rail="" aria-label={copy.railLabel}>
@@ -71,7 +74,7 @@ const LayersStory = memo(function LayersStory({ copy, onChromeChange }: LayersSt
  * Homepage story: a website split into its five layers (words, visual, layout, foundation, speed),
  * one scroll step at a time, with an assembling intro on the first visit of a session.
  */
-export function HomeLayers() {
+export function HomeLayers({ featuredProjects }: { featuredProjects: Project[] }) {
   const { locale } = useLanguage();
   const copy = getLayersCopy(locale);
   const [isChromeVisible, setIsChromeVisible] = useState(false);
@@ -80,7 +83,7 @@ export function HomeLayers() {
     <>
       {/* In the server HTML, so the menu is already hidden on the first paint. */}
       <style dangerouslySetInnerHTML={{ __html: HOME_CHROME_RULES }} />
-      <LayersStory key={locale === "en" ? "en" : "bg"} copy={copy} onChromeChange={setIsChromeVisible} />
+      <LayersStory key={locale === "en" ? "en" : "bg"} copy={copy} projects={featuredProjects} onChromeChange={setIsChromeVisible} />
     </>
   );
 }

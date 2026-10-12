@@ -9,7 +9,7 @@ export default async function HomePage() {
   const featuredProjects = await getFeaturedProjects();
   return (
     <>
-      <HomeLayers />
+      <HomeLayers featuredProjects={featuredProjects} />
       <HomeFeaturedProjects featuredProjects={featuredProjects} />
     </>
   );

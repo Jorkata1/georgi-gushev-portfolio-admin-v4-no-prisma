@@ -35,7 +35,16 @@ export type LayersCopy = {
   metrics: readonly [LayersMetricCopy, LayersMetricCopy, LayersMetricCopy];
   wasLabel: string;
   metricsNote: string;
-  finale: { eyebrowBrand: string; eyebrow: string; heading: LayersHeading; lead: string; primary: string; secondary: string };
+  finale: {
+    eyebrowBrand: string;
+    eyebrow: string;
+    heading: LayersHeading;
+    lead: string;
+    primary: string;
+    secondary: string;
+    recentLabel: string;
+    reply: string;
+  };
   plates: {
     tags: readonly [string, string, string, string, string];
     brand: string;
@@ -117,6 +126,8 @@ export const LAYERS_COPY: Record<LayersLocale, LayersCopy> = {
       lead: "Разкажете ми за бизнеса си. До 24 часа ще имате отговор и първи идеи.",
       primary: "Изпрати запитване →",
       secondary: "Провери сайта си",
+      recentLabel: "Последни проекти",
+      reply: "Отговор до 24 ч",
     },
     plates: {
       tags: ["ДУМИ", "ВИЗИЯ", "ПОДРЕДБА", "ОСНОВА", "СКОРОСТ"],
@@ -197,6 +208,8 @@ export const LAYERS_COPY: Record<LayersLocale, LayersCopy> = {
       lead: "Tell me about your business. Within 24 hours you will have a reply with first ideas.",
       primary: "Send an inquiry →",
       secondary: "Check your site",
+      recentLabel: "Recent projects",
+      reply: "Reply within 24 h",
     },
     plates: {
       tags: ["WORDS", "VISUAL", "LAYOUT", "FOUNDATION", "SPEED"],

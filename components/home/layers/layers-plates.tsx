@@ -212,6 +212,30 @@ export function LayersPlates({ copy }: { copy: LayersCopy }) {
   );
 }
 
+/** Where each layer is called out on the assembled site (plate units) and on which side its label sits. */
+const CALLOUTS = [
+  { side: "left", x: 16, y: 114 },
+  { side: "top", x: 430, y: 76 },
+  { side: "left", x: 16, y: 239 },
+  { side: "bottom", x: 280, y: 330 },
+  { side: "bottom", x: 456, y: 330 },
+] as const;
+
+/** Finale: labels with leader lines from each of the five layers to the part of the finished site it shapes. */
+export function LayersCallouts({ copy }: { copy: LayersCopy }) {
+  return (
+    <div className="gl-callouts" data-gl-callouts="" aria-hidden="true">
+      <svg className="gl-co-lines" data-gl-callout-lines="" />
+      {copy.steps.map((step, index) => (
+        <span key={step.number} className="gl-co" data-side={CALLOUTS[index].side} data-x={CALLOUTS[index].x} data-y={CALLOUTS[index].y}>
+          <b>{step.number}</b>
+          {step.label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 /** Five outlined layers that assemble into the hero on the first visit of a session. */
 export function LayersIntro() {
   return (
