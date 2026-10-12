@@ -1,10 +1,16 @@
-import { HomeJourney } from "@/components/home/home-journey";
+import { HomeFeaturedProjects } from "@/components/home/home-featured-projects";
+import { HomeLayers } from "@/components/home/home-layers";
 import { getFeaturedProjects } from "@/lib/projects";
 
 export const revalidate = 3600;
 
-/** The homepage is one scroll-driven 3D journey: the steps of building a website, featured projects, then the GDX mark. */
+/** The homepage: the layers story (how a website is built), then the featured projects. */
 export default async function HomePage() {
   const featuredProjects = await getFeaturedProjects();
-  return <HomeJourney featuredProjects={featuredProjects} />;
+  return (
+    <>
+      <HomeLayers />
+      <HomeFeaturedProjects featuredProjects={featuredProjects} />
+    </>
+  );
 }
